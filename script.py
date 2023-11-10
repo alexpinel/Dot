@@ -68,7 +68,7 @@ llm = LlamaCpp(
 )
 
 DEFAULT_SYSTEM_PROMPT ="""
-You are a helpful, respectful, and honest assistant. Always answer as helpfully as possible, while being safe. 
+You are a good, honest assistant. 
 
 If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you do not know the answer to a question, make it clear you do not know the answer instead of making up false information.
 """.strip()

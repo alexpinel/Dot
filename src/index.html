@@ -3,207 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Dot</title>
-  <style>
-    @font-face {
-      font-family: 'Roboto';
-      src: local('Roboto-Regular'), 
-           url(./Roboto/Roboto-Regular.ttf) format('truetype');
-      font-weight: 400;
-      font-style: normal;
-    }
-
-    @font-face {
-      font-family: 'Roboto';
-      src: local('Roboto Bold'), local('Roboto-Bold'),
-           url(./Roboto/Roboto-Bold.ttf) format('truetype');
-      font-weight: 700;
-      font-style: normal;
-    }
-
-    body {
-      font-family:'Roboto', sans-serif; /* Use Roboto font */
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 100vh;
-      overflow: hidden; /* Lock scrolling */
-      background: url('Champ-davoine-Oat-Field-Claude-Monet-1890.jpg') center center fixed;
-      /* Replace 'path/to/your/image.jpg' with the actual path to your image */
-      background-size: cover; /* Cover the entire background */
-    }
-
-    /* Rest of your styles... */
-
-    #screen {
-      display: flex;
-      width: 100%;
-      height: 100vh;
-    }
-
-    #menu-side {
-      width: 200px;
-      background-color: rgba(230, 230, 230, 0.6);
-      backdrop-filter: saturate(180%) blur(20px);
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #888 #f1f1f1; /* Dark gray thumb on light gray track */
-    }
-
-    #menu-container {
-      padding: 10px;
-      text-align: center; /* Center the content horizontally */
-    }
-
-    #menu-logo {
-      width: 150px; /* Set the width as needed */
-      height: auto;
-      margin: 0 auto; /* Center the image */
-    }
-
-    #sidebar {
-      width: 200px;
-      background-color: #f0f0f000;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .folder,
-    .file {
-      padding: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .folder:hover,
-    .file:hover {
-      background-color: rgba(156, 156, 156, 0.6); /* Grey background on hover */
-      backdrop-filter: saturate(180%) blur(20px);
-      border-radius: 8px;
-    }
-
-    .contents {
-      display: none;
-      margin-left: 20px; /* Add some margin to indent subfolders */
-    }
-    #chat-side {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      margin-left: 40px; /* Add 20px margin to the left */
-    }
-
-    #chat-container {
-      width: 550px;
-      max-height: 530px;
-      overflow-y: auto;
-      padding: 10px;
-      background-color: rgba(230, 230, 230, 0.6);
-      backdrop-filter: saturate(180%) blur(20px);
-      border-radius: 8px;
-      position: fixed; /* Fixed position */
-      bottom: 70px; /* Adjusted position */
-      scrollbar-width: thin;
-      scrollbar-color: transparent transparent; /* Transparent thumb on transparent track */
-
-      /* WebKit (Chrome, Safari) */
-      &::-webkit-scrollbar {
-          width: 8px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-          background-color: #888;
-          border-radius: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background-color: rgba(230, 230, 230, 0.2);
-        backdrop-filter: saturate(180%) blur(20px);
-        border-radius: 8px;
-      }
-    }
-
-    #user-input-container {
-      display: flex;
-      align-items: center;
-      padding: 25px;
-      margin-top: 2px; /* Adjust as needed */
-      position: fixed; /* Fixed position */
-      bottom: 0; /* Align to the bottom */
-    }
-
-    #user-input {
-      width: 450px;
-      padding: 8px;
-      margin-right: 5px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    #send-button {
-      width: 40px;
-      padding: 8px;
-      background-color: #53ca57;
-      backdrop-filter: saturate(180%) blur(20px);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-    }
-
-    #send-button:hover {
-      background-color: #45a049;
-    }
-
-    #user-input, #send-button, #chat-container {
-      font-size: 16px; /* Adjust as needed */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
-    }
-
-    .bot-content-container {
-      display: flex;
-      align-items: flex-start; /* Align items to the top */
-    }
-
-    .bot-icon {
-      flex-shrink: 0; /* Do not allow the ball to shrink */
-      width: 15px;
-      height: 15px;
-      background-color: blue;
-      border-radius: 50%;
-      margin-right: 8px; /* Add margin for spacing */
-    }
-
-    .user-content-container {
-      display: flex;
-      align-items: flex-start; /* Align items to the top */
-    }
-
-    .user-icon {
-      flex-shrink: 0; /* Do not allow the ball to shrink */
-      width: 15px;
-      height: 15px;
-      background-color: rgba(255, 0, 191, 0.6);
-      backdrop-filter: saturate(180%) blur(20px);
-      border-radius: 30%;
-      margin-right: 8px; /* Add margin for spacing */
-    }
-  </style>
+  <link href="index.css" rel="stylesheet">
 </head>
 <body>
   <div id="screen">
-    <div id="menu-side" style="width: 200px;">
+    <div id="menu-side">
       <div id="menu-container">
         <!-- Logo at the top of the menu-side -->
-        <img src="logo.png" alt="Logo" id="menu-logo">
+        <img src="./Assets/logo.png" alt="Logo" id="menu-logo">
+        <button id="selectDirectoryButton"></button>
         <!-- Rest of the menu content... -->
       </div>
       <div id="sidebar">
         <!-- Sidebar content will be dynamically generated using JavaScript -->
+      </div>
+      <div id="fileTree">
+        <!-- File tree content goes here -->
       </div>
     </div>
     <div id="chat-side">
@@ -213,11 +28,12 @@
       <div id="user-input-container">
         <input type="text" id="user-input" placeholder="Type your message...">
         <button id="send-button" onclick="sendMessage('')">
-          <img src="arrow.svg" alt="Send Icon" style="width: 18px; height: 18px;">
+          <img src="./Assets/arrow.svg" alt="Send Icon" style="width: 18px; height: 18px;">
         </button>
       </div>
     </div>
   </div>
   <script src="./render.js"></script>
+  <script src="C:\Users\alexp\Desktop\Bluepoint-Dot\node_modules\jquery\dist\jquery.min.js"></script>
 </body>
 </html>

@@ -100,54 +100,94 @@ function sendMessage(buttonClicked) {
   }
 }
 
+
+const { dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const $ = require('jquery'); // Make sure to import jQuery
 
-const sidebar = document.getElementById('sidebar');
+$(document).ready(() => {
+  const $fileTree = $('#fileTree');
 
-function createFolderItem(folderPath, isOpenByDefault = false) {
-  const folderName = path.basename(folderPath);
-  const listItem = document.createElement('div');
-  listItem.className = 'folder';
-  listItem.textContent = folderName;
+  function populateTree(rootPath, parentElement) {
+    // Use fs.promises to work with promises for file system operations
+    fs.promises.readdir(rootPath)
+      .then((files) => {
+        const ul = $('<ul>');
 
-  // Check if the folder is the root folder; if yes, don't attach click event
-  if (folderPath !== rootDir) {
-    // Add a click event listener to toggle visibility of folder contents with a short animation
-    listItem.addEventListener('click', () => {
-      const contents = listItem.querySelector('.contents');
-      contents.style.display = contents.style.display === 'none' ? 'block' : 'none';
-    });
+        files.forEach((file) => {
+          const fullPath = path.join(rootPath, file);
+          const li = $('<li>');
+
+          fs.promises.stat(fullPath)
+            .then((stats) => {
+              if (stats.isDirectory()) {
+                li.text(file);
+                li.addClass('folder');
+
+                li.click(() => {
+                  if (li.children('ul').length === 0) {
+                    populateTree(fullPath, li);
+                  }
+                  li.children('ul').slideToggle();
+                });
+              } else if (stats.isFile()) {
+                li.text(file);
+                li.addClass('file');
+              }
+
+              ul.append(li);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
+
+        parentElement.append(ul);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
-  const contents = document.createElement('div');
-  contents.className = 'contents';
+  const defaultDirectory = './src/mystuff';
 
-  // Set the initial display style based on isOpenByDefault
-  contents.style.display = isOpenByDefault ? 'block' : 'none';
-
-  // Recursively add subfolders and files
-  const items = fs.readdirSync(folderPath);
-  items.forEach(item => {
-    const itemPath = path.join(folderPath, item);
-    if (fs.statSync(itemPath).isDirectory()) {
-      contents.appendChild(createFolderItem(itemPath));
-    } else {
-      // Create a list item for files
-      const fileItem = document.createElement('div');
-      fileItem.className = 'file';
-      fileItem.textContent = item;
-      contents.appendChild(fileItem);
+  // Wrap the main logic in an async function for cleaner error handling
+  async function initialize() {
+    try {
+      // Clear the existing tree and populate with the default directory
+      $fileTree.empty();
+      await populateTree(defaultDirectory, $fileTree);
+    } catch (err) {
+      console.error(err);
     }
-  });
+  }
 
-  listItem.appendChild(contents);
-  return listItem;
-}
+  initialize();
 
-// Specify the directory path you want to display
-const rootDir = path.join(__dirname, 'mystuff');
+  const { ipcRenderer } = require('electron');
 
-// Create the sidebar by adding folder items
-const rootFolderItem = createFolderItem(rootDir, true); // Set isOpenByDefault to true
-sidebar.appendChild(rootFolderItem);
+  function selectDirectory() {
+    ipcRenderer.invoke('open-dialog')
+      .then((result) => {
+        if (!result.canceled && result.filePaths.length > 0) {
+          const selectedDirectory = result.filePaths[0];
+          $fileTree.empty();
+          populateTree(selectedDirectory, $fileTree);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+  
+  $('#selectDirectoryButton').click(selectDirectory);
+});
+
+ipcRenderer.invoke('get-random-image')
+.then((randomImage) => {
+  document.body.style.backgroundImage = `url(${randomImage.replace(/\\/g, "/")})`;
+})
+.catch((err) => {
+  console.error(err);
+});

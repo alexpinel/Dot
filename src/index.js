@@ -1,6 +1,7 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
+const fs = require('fs');
 
 let mainWindow;
 let pythonProcess; // Declare pythonProcess globally
@@ -27,6 +28,30 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
     pythonProcess.stdin.write(`${userInput} ${buttonClicked}\n`);
   }
 });
+
+//OPEN FOLDER THING
+ipcMain.handle('open-dialog', async (event) => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+    title: 'Select Directory',
+  });
+
+  return result;
+});
+
+function getRandomImage() {
+  const imagesFolder = path.join(__dirname, './Assets/wallpapers'); // Replace with your folder path
+  const files = fs.readdirSync(imagesFolder);
+  const randomIndex = Math.floor(Math.random() * files.length);
+  const randomImage = path.join(imagesFolder, files[randomIndex]);
+
+  return randomImage;
+}
+
+ipcMain.handle('get-random-image', () => {
+  return getRandomImage();
+});
+
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 900,

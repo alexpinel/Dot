@@ -18,7 +18,9 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@craco/craco": "^5.9.0",
     "electron-squirrel-startup": "^1.0.0",
+    "jquery": "^3.7.1",
     "requirejs": "^2.3.6"
   },
   "devDependencies": {
@@ -28,6 +30,7 @@
     "@electron-forge/maker-squirrel": "^6.4.2",
     "@electron-forge/maker-zip": "^6.4.2",
     "@electron-forge/plugin-auto-unpack-natives": "^6.4.2",
+    "autoprefixer": "^10.4.16",
     "electron": "26.2.4"
   }
 }
