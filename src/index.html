@@ -6,20 +6,24 @@
   <link href="index.css" rel="stylesheet">
 </head>
 <body>
+  <div id="backgroundOverlay"></div>
   <div id="screen">
-    <div id="menu-side">
-      <div id="menu-container">
-        <!-- Logo at the top of the menu-side -->
-        <img src="./Assets/logo.png" alt="Logo" id="menu-logo">
-        <button id="selectDirectoryButton"></button>
+    <div id="menu-side" class="no-horizontal-scroll">
+      <div id="menu-container">      
+        <button id="selectDirectoryButton">Select Archive</button>
+        <label class="switch">
+          <input type="checkbox" id="galleryToggle">
+          <span class="slider round"></span>
+        </label>
         <!-- Rest of the menu content... -->
       </div>
-      <div id="sidebar">
+      <div id="sidebar" class="no-horizontal-scroll">
         <!-- Sidebar content will be dynamically generated using JavaScript -->
       </div>
-      <div id="fileTree">
+      <div id="fileTree" class="no-horizontal-scroll">
         <!-- File tree content goes here -->
       </div>
+      <div id="Ass"><img src="./Assets/logo.png" alt="Logo" id="menu-logo"></div>
     </div>
     <div id="chat-side">
       <div id="chat-container">

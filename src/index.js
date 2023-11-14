@@ -39,26 +39,14 @@ ipcMain.handle('open-dialog', async (event) => {
   return result;
 });
 
-function getRandomImage() {
-  const imagesFolder = path.join(__dirname, './Assets/wallpapers'); // Replace with your folder path
-  const files = fs.readdirSync(imagesFolder);
-  const randomIndex = Math.floor(Math.random() * files.length);
-  const randomImage = path.join(imagesFolder, files[randomIndex]);
-
-  return randomImage;
-}
-
-ipcMain.handle('get-random-image', () => {
-  return getRandomImage();
-});
-
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 900,
+    width: 1100,
     height: 700,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      icon: path.join(__dirname, 'Assets', 'icon.ico'), // Provide the correct path
     },
   });
 
@@ -66,16 +54,44 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
-app.on('ready', createWindow);
+let galleryViewInterval;
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
+ipcMain.handle('toggle-gallery-view', (event, toggle) => {
+  if (toggle) {
+    // Start the image rotation
+    galleryViewInterval = setInterval(() => {
+      const imagePath = getRandomImage();
+      mainWindow.webContents.send('update-background', imagePath);
+    }, 20000); // Change image every 20 seconds
+
+    // Send the first image immediately
+    const firstImagePath = getRandomImage();
+    mainWindow.webContents.send('update-background', firstImagePath);
+  } else {
+    // Stop the image rotation
+    clearInterval(galleryViewInterval);
   }
 });
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+function getRandomImage() {
+  const imagesFolder = path.join(__dirname, 'Assets', 'wallpapers');
+  const imageFiles = fs.readdirSync(imagesFolder);
+  const randomIndex = Math.floor(Math.random() * imageFiles.length);
+  return path.join(imagesFolder, imageFiles[randomIndex]);
+}
+
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.whenReady().then(() => {
+  createWindow();
+
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit();
 });

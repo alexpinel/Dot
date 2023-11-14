@@ -105,35 +105,60 @@ const { dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const $ = require('jquery'); // Make sure to import jQuery
+const defaultDirectory = './src/mystuff';
 
 $(document).ready(() => {
   const $fileTree = $('#fileTree');
+
+  function truncateText(text, maxLength) {
+    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+  }
 
   function populateTree(rootPath, parentElement) {
     // Use fs.promises to work with promises for file system operations
     fs.promises.readdir(rootPath)
       .then((files) => {
-        const ul = $('<ul>');
+        const ul = $('<ul>').css('list-style-type', 'none'); // Explicitly set list-style-type to none
 
         files.forEach((file) => {
           const fullPath = path.join(rootPath, file);
           const li = $('<li>');
+          const icon = $('<img>');
+          const arrow = $('<img>');
+          const textContainer = $('<div>'); // Container for text to be vertically centered
 
           fs.promises.stat(fullPath)
             .then((stats) => {
               if (stats.isDirectory()) {
-                li.text(file);
                 li.addClass('folder');
 
-                li.click(() => {
+                // Add folder icon and arrow icon
+                icon.attr('src', './Assets/icons/folder LM.png'); // Adjust the path to your folder icon
+                icon.addClass('icon');
+                arrow.attr('src', './Assets/icons/arrow LM.png'); // Adjust the path to your arrow icon
+                arrow.addClass('arrow-icon');
+                textContainer.text(truncateText(file, 15)); // Adjust the maximum length as needed
+                textContainer.addClass('text-container');
+
+                li.append(arrow, icon, textContainer);
+
+                arrow.click(() => {
                   if (li.children('ul').length === 0) {
                     populateTree(fullPath, li);
                   }
                   li.children('ul').slideToggle();
+                  arrow.toggleClass('rotate'); // Toggle the rotate class
                 });
               } else if (stats.isFile()) {
-                li.text(file);
                 li.addClass('file');
+
+                // Add document icon
+                icon.attr('src', './Assets/icons/document1 LM.png'); // Adjust the path to your document icon
+                icon.addClass('icon');
+                textContainer.text(truncateText(file, 20)); // Adjust the maximum length as needed
+                textContainer.addClass('text-container');
+
+                li.append(icon, textContainer);
               }
 
               ul.append(li);
@@ -150,7 +175,10 @@ $(document).ready(() => {
       });
   }
 
-  const defaultDirectory = './src/mystuff';
+  // Initial call to populate the tree with the root directory
+
+
+
 
   // Wrap the main logic in an async function for cleaner error handling
   async function initialize() {
@@ -184,10 +212,19 @@ $(document).ready(() => {
   $('#selectDirectoryButton').click(selectDirectory);
 });
 
-ipcRenderer.invoke('get-random-image')
-.then((randomImage) => {
-  document.body.style.backgroundImage = `url(${randomImage.replace(/\\/g, "/")})`;
-})
-.catch((err) => {
-  console.error(err);
+ipcRenderer.on('update-background', (event, imagePath) => {
+  const backgroundOverlay = document.getElementById('backgroundOverlay');
+  backgroundOverlay.style.backgroundImage = `url(${imagePath.replace(/\\/g, '/')})`;
+});
+
+function toggleGalleryView(isGalleryView) {
+  ipcRenderer.invoke('toggle-gallery-view', isGalleryView).then(() => {
+    console.log('Gallery view toggled:', isGalleryView);
+  }).catch((err) => {
+    console.error(err);
+  });
+}
+
+document.getElementById('galleryToggle').addEventListener('change', function () {
+  toggleGalleryView(this.checked);
 });

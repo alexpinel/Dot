@@ -24,13 +24,18 @@
     justify-content: space-between;
     min-height: 100vh;
     overflow: hidden; /* Lock scrolling */
+  }
+  
+  #backgroundOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
   }
-
-  /* Rest of your styles... */
-
   #screen {
     display: flex;
     width: 100%;
@@ -39,11 +44,12 @@
 
   #menu-side {
     width: 18vw;
-    background-color: rgba(226, 226, 226, 0.8);
+    background-color: rgba(235, 235, 235, 0.8);
     backdrop-filter: saturate(180%) blur(20px);
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: transparent transparent; /* Transparent thumb on transparent track */
+    
 
     /* WebKit (Chrome, Safari) */
     &::-webkit-scrollbar {
@@ -74,7 +80,7 @@
   }
 
   #sidebar {
-    width: 18vw;
+    width: 16vw;
     background-color: #f0f0f000;
     overflow-y: auto;
     display: flex;
@@ -91,30 +97,29 @@
 
   .folder:hover,
   .file:hover {
-    background-color: rgba(156, 156, 156, 0.6); /* Grey background on hover */
+    background-color: rgba(156, 156, 156, 0.3); /* Grey background on hover */
     backdrop-filter: saturate(180%) blur(20px);
     border-radius: 8px;
   }
 
   .contents {
     display: none;
-    margin-left: 20px; /* Add some margin to indent subfolders */
+    margin-left: 10px; /* Add some margin to indent subfolders */
   }
   #chat-side {
     width: 75vw;
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin-left: 40px; /* Add 20px margin to the left */
     align-items: center;
   }
 
   #chat-container {
-    width: 70vw;
+    width: 60vw;
     max-height: 80vh;
     overflow-y: auto;
     padding: 10px;
-    background-color: rgba(248, 248, 248, 0.6);
+    background-color: rgba(255, 255, 255, 0.603);
     backdrop-filter: saturate(180%) blur(20px);
     border-radius: 8px;
     position: fixed; /* Fixed position */
@@ -149,7 +154,7 @@
   }
 
   #user-input {
-    width: 65vw;
+    width: 55vw;
     padding: 8px;
     margin-right: 6px;
     border: 1px solid #ccc;
@@ -204,3 +209,109 @@
     border-radius: 30%;
     margin-right: 8px; /* Add margin for spacing */
   }
+
+  .no-horizontal-scroll {
+    overflow-x: hidden;
+  }
+
+  .tree-item {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+  }
+  
+  .icon, .arrow-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  
+  .text-container {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .arrow-icon {
+    /* Other styles */
+    transition: transform 0.3s ease; /* Add a transition for a smooth rotation effect */
+  }
+  
+  .rotate {
+    transform: rotate(90deg); /* Apply the rotation when the "rotate" class is present */
+  }
+  
+
+  /* THIS IS FOR THE GALLERY VIEW SWITCH */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 17px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 13px;
+  width: 13px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(13px);
+  -ms-transform: translateX(13px);
+  transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 17px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+#Ass {
+  position: absolute;
+  top: 95%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
