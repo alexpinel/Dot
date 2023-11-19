@@ -107,6 +107,9 @@ const path = require('path');
 const $ = require('jquery'); // Make sure to import jQuery
 const defaultDirectory = './src/mystuff';
 
+const $fileTree = $('#fileTree');
+const $loadingSpinner = $('#loadingSpinner')
+
 $(document).ready(() => {
   const $fileTree = $('#fileTree');
 
@@ -175,33 +178,31 @@ $(document).ready(() => {
       });
   }
 
-  // Initial call to populate the tree with the root directory
-
-
-
-
-  // Wrap the main logic in an async function for cleaner error handling
-  async function initialize() {
+  async function executePythonScript(directory) {
+    $loadingSpinner.show();
+  
     try {
-      // Clear the existing tree and populate with the default directory
+      // Invoke IPC event to execute the Python script
+      const result = await ipcRenderer.invoke('execute-python-script', directory);
+  
+      // Process the result if needed
+  
+      // Update the file tree
       $fileTree.empty();
-      await populateTree(defaultDirectory, $fileTree);
+      await populateTree(directory, $fileTree);
     } catch (err) {
       console.error(err);
+    } finally {
+      $loadingSpinner.hide();
     }
   }
-
-  initialize();
-
-  const { ipcRenderer } = require('electron');
 
   function selectDirectory() {
     ipcRenderer.invoke('open-dialog')
       .then((result) => {
         if (!result.canceled && result.filePaths.length > 0) {
           const selectedDirectory = result.filePaths[0];
-          $fileTree.empty();
-          populateTree(selectedDirectory, $fileTree);
+          executePythonScript(selectedDirectory);
         }
       })
       .catch((err) => {
@@ -211,6 +212,11 @@ $(document).ready(() => {
   
   $('#selectDirectoryButton').click(selectDirectory);
 });
+
+
+
+
+// GALLERY VIEW!!!!
 
 ipcRenderer.on('update-background', (event, imagePath) => {
   const backgroundOverlay = document.getElementById('backgroundOverlay');
@@ -227,4 +233,13 @@ function toggleGalleryView(isGalleryView) {
 
 document.getElementById('galleryToggle').addEventListener('change', function () {
   toggleGalleryView(this.checked);
+});
+
+
+
+const scriptToggle = document.getElementById('scriptToggle');
+
+scriptToggle.addEventListener('change', () => {
+    const selectedScript = scriptToggle.checked ? 'normalchat.py' : 'script.py';
+    ipcRenderer.send('switch-script', selectedScript);
 });

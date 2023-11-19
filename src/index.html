@@ -10,11 +10,12 @@
   <div id="screen">
     <div id="menu-side" class="no-horizontal-scroll">
       <div id="menu-container">      
+        <div class="header">
+          <h1>My Documents</h1>
+        </div>
         <button id="selectDirectoryButton">Select Archive</button>
-        <label class="switch">
-          <input type="checkbox" id="galleryToggle">
-          <span class="slider round"></span>
-        </label>
+
+        <div id="loadingSpinner" class="spinner"></div>
         <!-- Rest of the menu content... -->
       </div>
       <div id="sidebar" class="no-horizontal-scroll">
@@ -23,7 +24,29 @@
       <div id="fileTree" class="no-horizontal-scroll">
         <!-- File tree content goes here -->
       </div>
-      <div id="Ass"><img src="./Assets/logo.png" alt="Logo" id="menu-logo"></div>
+      <div id="Switchboard">
+        <div class="switch-group">
+          <img src="./Assets/icons/art LM.png" alt="Icon" class="switch-icon">
+          <p class="switch-text">Gallery view</p>
+          <label class="switch">
+            <input type="checkbox" id="galleryToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      
+        <div class="switch-group">
+          <img src="./Assets/icons/chat LM.png" alt="Icon" class="switch-icon">
+          <p class="switch-text">Casual dot</p>
+          <label class="switch">
+            <input type="checkbox" id="scriptToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+
+      <div id="Ass">
+        <img src="./Assets/logo.png" alt="Logo" id="menu-logo">
+      </div>
     </div>
     <div id="chat-side">
       <div id="chat-container">

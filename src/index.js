@@ -6,14 +6,19 @@ const fs = require('fs');
 let mainWindow;
 let pythonProcess; // Declare pythonProcess globally
 
+
+
+
+let currentScript = 'script.py'; // Default script
+
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
   // Check if the Python process is already running
   if (pythonProcess) {
     // Send the new input to the existing process
     pythonProcess.stdin.write(`${userInput} ${buttonClicked}\n`);
   } else {
-    // If the Python process is not running, spawn a new one
-    pythonProcess = spawn('python', ['script.py']);
+    // If the Python process is not running, spawn a new one with the default script
+    pythonProcess = spawn('python', [currentScript]);
 
     pythonProcess.stdout.on('data', (data) => {
       const message = data.toString().trim();
@@ -28,6 +33,35 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
     pythonProcess.stdin.write(`${userInput} ${buttonClicked}\n`);
   }
 });
+
+// Switch between the two scripts
+ipcMain.on('switch-script', (event) => {
+  // Toggle between 'script.py' and 'normalchat.py'
+  currentScript = currentScript === 'script.py' ? 'normalchat.py' : 'script.py';
+
+  // If the Python process is running, kill it and spawn a new one with the updated script
+  if (pythonProcess) {
+    pythonProcess.kill();
+    pythonProcess = spawn('python', [currentScript]);
+
+    pythonProcess.stdout.on('data', (data) => {
+      const message = data.toString().trim();
+      mainWindow.webContents.send('python-reply', message);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`Python Script Error: ${data}`);
+    });
+  }
+
+  // Optionally, you can inform the renderer process about the script switch
+  mainWindow.webContents.send('script-switched', currentScript);
+});
+
+
+
+
+
 
 //OPEN FOLDER THING
 ipcMain.handle('open-dialog', async (event) => {
@@ -94,4 +128,32 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
+});
+
+
+
+ipcMain.handle('execute-python-script', async (event, directory) => {
+  try {
+    // Replace 'your_script.py' with the actual name of your Python script
+    const pythonProcess = spawn('python', ['embeddings.py', directory]);
+
+    // Handle the output and errors if needed
+    pythonProcess.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+
+    // Wait for the Python process to exit
+    await new Promise((resolve) => {
+      pythonProcess.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+        resolve();
+      });
+    });
+  } catch (err) {
+    console.error(err);
+  }
 });
