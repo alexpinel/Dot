@@ -1,6 +1,10 @@
 const { ipcRenderer } = require('electron');
 
-function appendMessage(sender, message) {
+
+
+//// CHATTY CHAT CHAT STUFF!!!!
+
+function appendMessage(sender, message, isMarkdown) {
   const chatContainer = document.getElementById('bot-message');
 
   const messageDiv = document.createElement('div');
@@ -24,6 +28,7 @@ function appendMessage(sender, message) {
   } else if (sender === 'Bot') {
     const botIcon = document.createElement('div');
     botIcon.classList.add('bot-icon');
+    botIcon.style.marginTop = '10px'; // Adjust the value as needed
 
     const botContentContainer = document.createElement('div');
     botContentContainer.classList.add('bot-content-container');
@@ -31,7 +36,15 @@ function appendMessage(sender, message) {
     botContentContainer.appendChild(botIcon);
 
     const contentDiv = document.createElement('div');
-    contentDiv.innerText = message;
+    contentDiv.style.marginTop = '-9px'; // Adjust the value as needed
+
+    // Check if the content should be rendered as Markdown
+    if (isMarkdown) {
+      contentDiv.innerHTML = marked(message);
+    } else {
+      contentDiv.innerText = message;
+    }
+
     botContentContainer.appendChild(contentDiv);
 
     messageDiv.appendChild(botContentContainer);
@@ -40,7 +53,6 @@ function appendMessage(sender, message) {
   chatContainer.appendChild(messageDiv);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
-
 
 
 function showTypingIndicator() {
@@ -68,17 +80,25 @@ function hideTypingIndicator() {
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
+
+const {marked} = require('marked');
+
 ipcRenderer.on('python-reply', (event, reply) => {
   const chatContainer = document.getElementById('chat-container');
 
   try {
     const resultObject = JSON.parse(reply);
-    const resultMessage = resultObject.result;
+    const resultMessageMarkdown = resultObject.result;
+
+    console.log('Markdown Content:', resultMessageMarkdown);
 
     hideTypingIndicator(); // Remove typing indicator
-    appendMessage('Bot', resultMessage.trim());
+
+    // Append the Markdown content to bot-content-container
+    appendMessage('Bot', resultMessageMarkdown.trim(), true);
 
     chatContainer.scrollTop = chatContainer.scrollHeight;
+
   } catch (error) {
     console.error('Error parsing JSON:', error);
   }
@@ -100,54 +120,154 @@ function sendMessage(buttonClicked) {
   }
 }
 
+
+
+// SIDEBAR AND FILE TREE!!!!
+
+const { dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const $ = require('jquery'); // Make sure to import jQuery
+const defaultDirectory = './src/mystuff';
 
-const sidebar = document.getElementById('sidebar');
+const $fileTree = $('#fileTree');
+const $loadingSpinner = $('#loadingSpinner')
 
-function createFolderItem(folderPath, isOpenByDefault = false) {
-  const folderName = path.basename(folderPath);
-  const listItem = document.createElement('div');
-  listItem.className = 'folder';
-  listItem.textContent = folderName;
+$(document).ready(() => {
+  const $fileTree = $('#fileTree');
 
-  // Check if the folder is the root folder; if yes, don't attach click event
-  if (folderPath !== rootDir) {
-    // Add a click event listener to toggle visibility of folder contents with a short animation
-    listItem.addEventListener('click', () => {
-      const contents = listItem.querySelector('.contents');
-      contents.style.display = contents.style.display === 'none' ? 'block' : 'none';
-    });
+  function truncateText(text, maxLength) {
+    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
   }
 
-  const contents = document.createElement('div');
-  contents.className = 'contents';
+  function populateTree(rootPath, parentElement) {
+    // Use fs.promises to work with promises for file system operations
+    fs.promises.readdir(rootPath)
+      .then((files) => {
+        const ul = $('<ul>').css('list-style-type', 'none'); // Explicitly set list-style-type to none
 
-  // Set the initial display style based on isOpenByDefault
-  contents.style.display = isOpenByDefault ? 'block' : 'none';
+        files.forEach((file) => {
+          const fullPath = path.join(rootPath, file);
+          const li = $('<li>');
+          const icon = $('<img>');
+          const arrow = $('<img>');
+          const textContainer = $('<div>'); // Container for text to be vertically centered
 
-  // Recursively add subfolders and files
-  const items = fs.readdirSync(folderPath);
-  items.forEach(item => {
-    const itemPath = path.join(folderPath, item);
-    if (fs.statSync(itemPath).isDirectory()) {
-      contents.appendChild(createFolderItem(itemPath));
-    } else {
-      // Create a list item for files
-      const fileItem = document.createElement('div');
-      fileItem.className = 'file';
-      fileItem.textContent = item;
-      contents.appendChild(fileItem);
+          fs.promises.stat(fullPath)
+            .then((stats) => {
+              if (stats.isDirectory()) {
+                li.addClass('folder');
+
+                // Add folder icon and arrow icon
+                icon.attr('src', './Assets/icons/folder LM.png'); // Adjust the path to your folder icon
+                icon.addClass('icon');
+                arrow.attr('src', './Assets/icons/arrow LM.png'); // Adjust the path to your arrow icon
+                arrow.addClass('arrow-icon');
+                textContainer.text(truncateText(file, 15)); // Adjust the maximum length as needed
+                textContainer.addClass('text-container');
+
+                li.append(arrow, icon, textContainer);
+
+                arrow.click(() => {
+                  if (li.children('ul').length === 0) {
+                    populateTree(fullPath, li);
+                  }
+                  li.children('ul').slideToggle();
+                  arrow.toggleClass('rotate'); // Toggle the rotate class
+                });
+              } else if (stats.isFile()) {
+                li.addClass('file');
+
+                // Add document icon
+                icon.attr('src', './Assets/icons/document1 LM.png'); // Adjust the path to your document icon
+                icon.addClass('icon');
+                textContainer.text(truncateText(file, 20)); // Adjust the maximum length as needed
+                textContainer.addClass('text-container');
+
+                li.append(icon, textContainer);
+              }
+
+              ul.append(li);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
+
+        parentElement.append(ul);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  async function executePythonScript(directory) {
+    $loadingSpinner.show();
+  
+    try {
+      // Invoke IPC event to execute the Python script
+      const result = await ipcRenderer.invoke('execute-python-script', directory);
+  
+      // Process the result if needed
+  
+      // Update the file tree
+      $fileTree.empty();
+      await populateTree(directory, $fileTree);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      $loadingSpinner.hide();
     }
-  });
+  }
 
-  listItem.appendChild(contents);
-  return listItem;
+  function selectDirectory() {
+    ipcRenderer.invoke('open-dialog')
+      .then((result) => {
+        if (!result.canceled && result.filePaths.length > 0) {
+          const selectedDirectory = result.filePaths[0];
+          executePythonScript(selectedDirectory);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+  
+  $('#selectDirectoryButton').click(selectDirectory);
+});
+
+
+
+
+// GALLERY VIEW!!!!
+
+ipcRenderer.on('update-background', (event, imagePath) => {
+  const backgroundOverlay = document.getElementById('backgroundOverlay');
+  backgroundOverlay.style.backgroundImage = `url(${imagePath.replace(/\\/g, '/')})`;
+});
+
+function toggleGalleryView(isGalleryView) {
+  ipcRenderer.invoke('toggle-gallery-view', isGalleryView).then(() => {
+    console.log('Gallery view toggled:', isGalleryView);
+  }).catch((err) => {
+    console.error(err);
+  });
 }
 
-// Specify the directory path you want to display
-const rootDir = path.join(__dirname, 'mystuff');
+document.getElementById('galleryToggle').addEventListener('change', function () {
+  toggleGalleryView(this.checked);
+});
 
-// Create the sidebar by adding folder items
-const rootFolderItem = createFolderItem(rootDir, true); // Set isOpenByDefault to true
-sidebar.appendChild(rootFolderItem);
+
+
+// BIG DOT TOGGLE!!!!!
+
+const scriptToggle = document.getElementById('scriptToggle');
+
+scriptToggle.addEventListener('change', () => {
+    const selectedScript = scriptToggle.checked ? 'normalchat.py' : 'script.py';
+    ipcRenderer.send('switch-script', selectedScript);
+});
+
+
+

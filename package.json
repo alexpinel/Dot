@@ -1,8 +1,8 @@
 {
-  "name": "dax",
-  "productName": "dax",
+  "name": "dot",
+  "productName": "dot",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "DOOOOOOOOOOOOOOOT BAREBONES VERSION",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -13,21 +13,59 @@
   },
   "keywords": [],
   "author": {
-    "name": "alexpinel",
+    "name": "Alex Piñel Neparidze",
     "email": "alexpinel28@gmail.com"
   },
   "license": "MIT",
   "dependencies": {
+    "@craco/craco": "^5.9.0",
+    "dompurify": "^3.0.6",
     "electron-squirrel-startup": "^1.0.0",
-    "requirejs": "^2.3.6"
+    "fs-extra": "^10.0.1",
+    "jquery": "^3.7.1",
+    "markdown-it": "^13.0.2",
+    "marked": "^11.0.0",
+    "requirejs": "^2.3.6",
+    "virtualenv": "^0.3.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.4.2",
     "@electron-forge/maker-deb": "^6.4.2",
+    "@electron-forge/maker-dmg": "^7.2.0",
     "@electron-forge/maker-rpm": "^6.4.2",
     "@electron-forge/maker-squirrel": "^6.4.2",
     "@electron-forge/maker-zip": "^6.4.2",
     "@electron-forge/plugin-auto-unpack-natives": "^6.4.2",
-    "electron": "26.2.4"
+    "autoprefixer": "^10.4.16",
+    "electron": "26.2.4",
+    "electron-builder": "^24.6.4",
+    "ncp": "^2.0.0"
+  },
+  "build": {
+    "appId": "dot",
+    "productName": "dot",
+    "mac": {
+      "category": "Productivity",
+      "target": "dmg",
+      "icon": "./src/Assets/icon2.icns",
+      "identity": "Apple Development: alexpinel28@gmail.com (863FT89FMU)"
+    }
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "./src/Assets/icon2.icns",
+        "extraResources": {
+          "from": "./llm",
+          "to": "llm"
+        }
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-dmg", 
+          "config": {}
+        }
+      ]
+    }
   }
 }
