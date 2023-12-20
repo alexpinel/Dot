@@ -8,8 +8,39 @@ let pythonProcess; // Declare pythonProcess globally
 
 
 
+// FIND PYTHON VENV, WORKS IN DEVELOPMENT MODE AND **SHOULD** WORK IN PACKAGED APP
 
-let currentScript = 'script.py'; // Default script
+
+
+function findPython() {
+  const possibilities = [
+    // In packaged app
+    path.join(process.resourcesPath, "app", "llm", "python", "bin", "python3"),
+    // In development
+    path.join(__dirname, '..', 'llm', "python", "bin", "python3"),
+  ];
+  for (const path_to_python of possibilities) {
+    if (fs.existsSync(path_to_python)) {
+      return path_to_python;
+    }
+  }
+  console.log("Could not find python3, checked", possibilities);
+  app.quit();
+}
+
+const pythonPath = findPython();
+console.log('Python Path:', pythonPath);
+
+
+
+
+
+// RUNS DOT THROUGHT  script.py
+
+
+
+let currentScript = path.join(__dirname,  '..', 'llm', 'scripts', 'script.py');
+//let currentScript = path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'script.py'); // Default script
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
   // Check if the Python process is already running
@@ -18,15 +49,18 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
     pythonProcess.stdin.write(`${userInput} ${buttonClicked}\n`);
   } else {
     // If the Python process is not running, spawn a new one with the default script
-    pythonProcess = spawn('python', [currentScript]);
+    console.log(`Current working directory: ${process.cwd()}`);
+    pythonProcess = spawn(pythonPath, [currentScript], { shell: true });
 
     pythonProcess.stdout.on('data', (data) => {
       const message = data.toString().trim();
       mainWindow.webContents.send('python-reply', message);
+      console.log(`stdout: ${data}`);
     });
 
     pythonProcess.stderr.on('data', (data) => {
       console.error(`Python Script Error: ${data}`);
+      console.error(`stderr: ${data}`);
     });
 
     // Send the initial input to the new process
@@ -34,15 +68,21 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
   }
 });
 
+
+//BIG DOT TOGGLE!!!!
+
+
 // Switch between the two scripts
 ipcMain.on('switch-script', (event) => {
   // Toggle between 'script.py' and 'normalchat.py'
-  currentScript = currentScript === 'script.py' ? 'normalchat.py' : 'script.py';
+  
+  //currentScript = currentScript.endsWith('script.py') ? path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'normalchat.py') : path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'script.py');
+  currentScript = currentScript.endsWith('script.py') ? path.join(__dirname,  '..', 'llm', 'scripts', 'normalchat.py') : path.join(__dirname,  '..', 'llm', 'scripts', 'script.py');
 
   // If the Python process is running, kill it and spawn a new one with the updated script
   if (pythonProcess) {
     pythonProcess.kill();
-    pythonProcess = spawn('python', [currentScript]);
+    pythonProcess = spawn(pythonPath, [currentScript], { shell: true });
 
     pythonProcess.stdout.on('data', (data) => {
       const message = data.toString().trim();
@@ -60,10 +100,8 @@ ipcMain.on('switch-script', (event) => {
 
 
 
+//OPEN FOLDER THING!!!!
 
-
-
-//OPEN FOLDER THING
 ipcMain.handle('open-dialog', async (event) => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory'],
@@ -72,6 +110,12 @@ ipcMain.handle('open-dialog', async (event) => {
 
   return result;
 });
+
+
+
+
+
+// ELECTRON STUFF, CREATE THE WINDOW BLA BLA !!!!
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -87,6 +131,9 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
   mainWindow.webContents.openDevTools();
 };
+
+
+// GALLERY VIEW!!!!
 
 let galleryViewInterval;
 
@@ -114,12 +161,20 @@ function getRandomImage() {
   return path.join(imagesFolder, imageFiles[randomIndex]);
 }
 
+
+
+// MOAR ELECTRON STUFF!!!! TINKER AT RISK LMAO
+
+
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
 
 app.whenReady().then(() => {
   createWindow();
+
+  const pythonPath = findPython();
+  console.log('Python Path:', pythonPath);
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -132,10 +187,18 @@ app.on('window-all-closed', function () {
 
 
 
+const appPath = app.getAppPath();
+
 ipcMain.handle('execute-python-script', async (event, directory) => {
   try {
-    // Replace 'your_script.py' with the actual name of your Python script
-    const pythonProcess = spawn('python', ['embeddings.py', directory]);
+    // Construct paths relative to the script's location
+    // const pythonExecutablePath = path.join(__dirname, 'python', 'bin', 'python3');
+
+    //const pythonScriptPath = path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'embeddings.py');
+    const pythonScriptPath = path.join(__dirname, '..', 'llm', 'scripts', 'embeddings.py');
+
+    // Spawn the Python process
+    const pythonProcess = spawn(pythonPath, [pythonScriptPath, directory], { shell: true });
 
     // Handle the output and errors if needed
     pythonProcess.stdout.on('data', (data) => {
@@ -157,3 +220,7 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
     console.error(err);
   }
 });
+
+
+
+

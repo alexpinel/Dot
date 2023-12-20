@@ -1,6 +1,10 @@
 const { ipcRenderer } = require('electron');
 
-function appendMessage(sender, message) {
+
+
+//// CHATTY CHAT CHAT STUFF!!!!
+
+function appendMessage(sender, message, isMarkdown) {
   const chatContainer = document.getElementById('bot-message');
 
   const messageDiv = document.createElement('div');
@@ -24,6 +28,7 @@ function appendMessage(sender, message) {
   } else if (sender === 'Bot') {
     const botIcon = document.createElement('div');
     botIcon.classList.add('bot-icon');
+    botIcon.style.marginTop = '10px'; // Adjust the value as needed
 
     const botContentContainer = document.createElement('div');
     botContentContainer.classList.add('bot-content-container');
@@ -31,7 +36,15 @@ function appendMessage(sender, message) {
     botContentContainer.appendChild(botIcon);
 
     const contentDiv = document.createElement('div');
-    contentDiv.innerText = message;
+    contentDiv.style.marginTop = '-9px'; // Adjust the value as needed
+
+    // Check if the content should be rendered as Markdown
+    if (isMarkdown) {
+      contentDiv.innerHTML = marked(message);
+    } else {
+      contentDiv.innerText = message;
+    }
+
     botContentContainer.appendChild(contentDiv);
 
     messageDiv.appendChild(botContentContainer);
@@ -40,7 +53,6 @@ function appendMessage(sender, message) {
   chatContainer.appendChild(messageDiv);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
-
 
 
 function showTypingIndicator() {
@@ -68,17 +80,25 @@ function hideTypingIndicator() {
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
+
+const {marked} = require('marked');
+
 ipcRenderer.on('python-reply', (event, reply) => {
   const chatContainer = document.getElementById('chat-container');
 
   try {
     const resultObject = JSON.parse(reply);
-    const resultMessage = resultObject.result;
+    const resultMessageMarkdown = resultObject.result;
+
+    console.log('Markdown Content:', resultMessageMarkdown);
 
     hideTypingIndicator(); // Remove typing indicator
-    appendMessage('Bot', resultMessage.trim());
+
+    // Append the Markdown content to bot-content-container
+    appendMessage('Bot', resultMessageMarkdown.trim(), true);
 
     chatContainer.scrollTop = chatContainer.scrollHeight;
+
   } catch (error) {
     console.error('Error parsing JSON:', error);
   }
@@ -100,6 +120,9 @@ function sendMessage(buttonClicked) {
   }
 }
 
+
+
+// SIDEBAR AND FILE TREE!!!!
 
 const { dialog } = require('electron');
 const fs = require('fs');
@@ -237,9 +260,14 @@ document.getElementById('galleryToggle').addEventListener('change', function () 
 
 
 
+// BIG DOT TOGGLE!!!!!
+
 const scriptToggle = document.getElementById('scriptToggle');
 
 scriptToggle.addEventListener('change', () => {
     const selectedScript = scriptToggle.checked ? 'normalchat.py' : 'script.py';
     ipcRenderer.send('switch-script', selectedScript);
 });
+
+
+

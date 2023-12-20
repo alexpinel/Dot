@@ -43,8 +43,8 @@
   }
 
   #menu-side {
-    width: 18vw;
-    background-color: rgba(235, 235, 235, 0.8);
+    width: 20vw;
+    background-color: rgba(236, 236, 236, 0.926);
     backdrop-filter: saturate(180%) blur(20px);
     overflow-y: auto;
     scrollbar-width: thin;
@@ -74,19 +74,21 @@
   }
 
   .header {
+    font-size: 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 10px 20px; /* Adjust the vertical padding (top and bottom) */
     text-align: left;
-    border-bottom: 1px solid #ccc;
+    line-height: 1; /* Set line-height to 1 for tighter spacing */
+    border-bottom: 1px solid #737373;
 }
 h1 {
     font-size: 1.5em;
     margin: 0;
 }
 #menu-container {
-    padding: 20px;
+    padding: 10px;
 }
 .switch-container {
     display: flex;
@@ -100,12 +102,12 @@ h1 {
   }
 
   #sidebar {
-    width: 16vw;
+    width: 18vw;
     background-color: #f0f0f000;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
   }
 
   .folder,
@@ -137,7 +139,7 @@ h1 {
   #chat-container {
     font-size: 18px;
     width: 60vw;
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
     padding: 10px;
     background-color: rgba(236, 236, 236, 0.603);
@@ -147,6 +149,7 @@ h1 {
     bottom: 70px; /* Adjusted position */
     scrollbar-width: thin;
     scrollbar-color: transparent transparent; /* Transparent thumb on transparent track */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
 
     /* WebKit (Chrome, Safari) */
     &::-webkit-scrollbar {
@@ -202,12 +205,7 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
   }
 
-  .bot-content-container {
-    display: flex;
-    align-items: flex-start; /* Align items to the top */
-  }
-
-  .bot-icon {
+  .bot-content-container .bot-icon {
     flex-shrink: 0; /* Do not allow the ball to shrink */
     width: 18px;
     height: 18px;
@@ -225,8 +223,7 @@ h1 {
     flex-shrink: 0; /* Do not allow the ball to shrink */
     width: 18px;
     height: 18px;
-    background-color: rgba(255, 0, 191, 0.5);
-    backdrop-filter: saturate(180%) blur(20px);
+    background-color: rgb(255, 0, 191);
     border-radius: 30%;
     margin-top:2px;
     margin-right: 8px; /* Add margin for spacing */
@@ -268,9 +265,11 @@ h1 {
   .rotate {
     transform: rotate(90deg); /* Apply the rotation when the "rotate" class is present */
   }
-  
 
-  /* THIS IS FOR THE GALLERY VIEW SWITCH */
+  #fileTree {
+    overflow-y: auto; /* or overflow-y: scroll; */
+    max-height: 65vh; /* Adjust the maximum height as needed */
+  }
 
 .switch {
   position: relative;
@@ -341,7 +340,7 @@ input:checked + .slider:before {
 
 .spinner {
   border: 6px solid rgba(0, 0, 0, 0.1);
-  border-left: 6px solid blue;
+  border-left: 6px solid rgb(9, 55, 239);
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -428,3 +427,37 @@ input:checked + .slider:before {
   -ms-transform: translateX(13px);
   transform: translateX(13px);
 }
+
+#selectDirectoryButton {
+  width: 30px; 
+  height: 30px;
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: rgba(206, 206, 206, 0); /* Apple-like blue color */
+  color: #fff; /* White text color */
+  border: 2px solid rgba(212, 212, 212, 0); /* Border color matching the background color */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  
+  /* Font Awesome icon */
+  background-image: url('./Assets/icons/new folder LM.png'); /* Replace with your icon path */
+  background-repeat: no-repeat;
+  background-position: center; /* Adjust the position of the icon */
+  background-size: 75%; /* Adjust the size of the icon */
+}
+
+#selectDirectoryButton:hover {
+  background-color: #d5d5d5; /* Darker blue on hover */
+  border-color: #d9d9d9;
+}
+
+#selectDirectoryButton:active {
+  background-color: #d9d9d9; /* Darker blue on hover */
+  border-color: #d3d3d3;
+}
+

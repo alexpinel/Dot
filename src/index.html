@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Dot</title>
   <link href="index.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="markdown-styles.css">
 </head>
 <body>
   <div id="backgroundOverlay"></div>
@@ -12,9 +13,9 @@
       <div id="menu-container">      
         <div class="header">
           <h1>My Documents</h1>
+          <button id="selectDirectoryButton"></button>
         </div>
-        <button id="selectDirectoryButton">Select Archive</button>
-
+        
         <div id="loadingSpinner" class="spinner"></div>
         <!-- Rest of the menu content... -->
       </div>
@@ -26,6 +27,14 @@
       </div>
       <div id="Switchboard">
         <div class="switch-group">
+          <img src="./Assets/icons/chat LM.png" alt="Icon" class="switch-icon">
+          <p class="switch-text">Big Dot</p>
+          <label class="switch">
+            <input type="checkbox" id="scriptToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="switch-group">
           <img src="./Assets/icons/art LM.png" alt="Icon" class="switch-icon">
           <p class="switch-text">Gallery view</p>
           <label class="switch">
@@ -33,19 +42,10 @@
             <span class="slider round"></span>
           </label>
         </div>
-      
-        <div class="switch-group">
-          <img src="./Assets/icons/chat LM.png" alt="Icon" class="switch-icon">
-          <p class="switch-text">Casual dot</p>
-          <label class="switch">
-            <input type="checkbox" id="scriptToggle">
-            <span class="slider round"></span>
-          </label>
-        </div>
       </div>
 
       <div id="Ass">
-        <img src="./Assets/logo.png" alt="Logo" id="menu-logo">
+        <img src="./Assets/logo2.png" alt="Logo" id="menu-logo">
       </div>
     </div>
     <div id="chat-side">
@@ -60,7 +60,10 @@
       </div>
     </div>
   </div>
+
+
   <script src="./render.js"></script>
-  <script src="C:\Users\alexp\Desktop\Bluepoint-Dot\node_modules\jquery\dist\jquery.min.js"></script>
+  <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="../node_modules/marked/marked.min.js"></script>
 </body>
 </html>

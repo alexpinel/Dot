@@ -1,6 +1,12 @@
+const path = require('path');
+const fs = require('fs');
+const ncp = require('ncp').ncp;
+
 module.exports = {
   packagerConfig: {
+    icon: "./src/Assets/icon.icns",
     asar: true,
+    name: "dot",
   },
   rebuildConfig: {},
   makers: [
@@ -9,8 +15,10 @@ module.exports = {
       config: {},
     },
     {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      name: '@electron-forge/maker-dmg',
+      config: {
+        name: 'dot', // Replace with your app name
+      },
     },
     {
       name: '@electron-forge/maker-deb',
