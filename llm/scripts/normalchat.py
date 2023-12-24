@@ -5,6 +5,7 @@ import textwrap
 import os
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
 #print("Current working directory:", os.getcwd())
 
 n_gpu_layers = 1  # Metal set to 1 is enough.
@@ -32,44 +33,25 @@ llm = LlamaCpp(
     n_ctx=2048,
 )
 
-#chat_history = []
+#Sets the template globally
+template = """
+System: You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
+User: {prompt}
+Assistant:
+"""
 
-def qa(text: str, full=False):
-    text = textwrap.dedent(f"""\
-        Your name is Dot. You are a helpful, respectful, slightly sarcastic, and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, sexist, racist, and otherwise offensive content.
-        If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you do not know the answer to a question, make it clear you do not know the answer instead of making up false information.
-                                
-        ### Instruction:
-        {text}
+#Also sets prompt template globally using the module above
+prompt = PromptTemplate(template=template, input_variables=["prompt"])
 
-        ### Response:
-        """)
-
-    result = llm(user_input)
-    return result
-
-
-def chat(input_text):
-    user_input = str(input_text)
-    result = qa(user_input)
-    #chat_history.append((user_input, result["result"]))
-
-    if isinstance(result, str):
-        return result
-    elif isinstance(result, dict) and 'result' in result:
-        return result['result']
-    else:
-        return "Invalid result format from the language model."
-    
-        
+# More direct method of fetching information from stdin, processing with llm function and dumping the json into stdout
 if __name__ == "__main__":
     while True:
-        line = sys.stdin.readline().strip()
-        if not line:
+        user_input = sys.stdin.readline().strip()
+        if not user_input:
             break
 
-        user_input = line
-        result = chat(user_input)
+        prompt = user_input
+        result = llm(prompt)
 
         result_json = json.dumps({"result": result})
         print(result_json)

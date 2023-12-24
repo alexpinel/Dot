@@ -11,7 +11,7 @@ from langchain.llms import LlamaCpp
 from langchain import PromptTemplate
 from langchain.callbacks.manager import CallbackManager
 import os
-#print("Current working directory:", os.getcwd())
+
 
 def embeddings():
     #**Step 1: Load the PDF File from Data Path****
