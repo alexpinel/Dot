@@ -1,7 +1,6 @@
 import sys
 import json
 from langchain.llms import LlamaCpp
-import textwrap
 import os
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory

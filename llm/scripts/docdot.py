@@ -13,42 +13,6 @@ from langchain.callbacks.manager import CallbackManager
 import os
 
 
-def embeddings():
-    #**Step 1: Load the PDF File from Data Path****
-    loader=DirectoryLoader('src\mystuff',
-                        glob="*.pdf",
-                        loader_cls=PyPDFLoader,
-                        show_progress=True,
-                        use_multithreading=True,
-                        recursive=True)
-
-    documents=loader.load()
-
-
-    #print(documents)
-
-    #***Step 2: Split Text into Chunks***
-
-    text_splitter=RecursiveCharacterTextSplitter(
-                                                chunk_size=2048,
-                                                chunk_overlap=256)
-
-
-    text_chunks=text_splitter.split_documents(documents)
-
-    print(len(text_chunks))
-    #**Step 3: Load the Embedding Model***
-
-
-    embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2', model_kwargs={'device':'mps'})
-
-
-    #**Step 4: Convert the Text Chunks into Embeddings and Create a FAISS Vector Store***
-    vector_store=FAISS.from_documents(text_chunks, embeddings)
-    vector_store.save_local("vectors")
-#embeddings()
-
-
 # Specify the desktop path
 desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
 

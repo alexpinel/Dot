@@ -4,7 +4,7 @@ from langchain.vectorstores import FAISS
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader, UnstructuredWordDocumentLoader, TextLoader, UnstructuredPowerPointLoader, UnstructuredMarkdownLoader, Docx2txtLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
-import faiss
+#import faiss
 
 
 

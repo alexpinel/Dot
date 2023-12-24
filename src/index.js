@@ -39,7 +39,7 @@ console.log('Python Path:', pythonPath);
 
 
 
-let currentScript = path.join(__dirname,  '..', 'llm', 'scripts', 'script.py');
+let currentScript = path.join(__dirname,  '..', 'llm', 'scripts', 'docdot.py');
 //let currentScript = path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'script.py'); // Default script
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
@@ -77,7 +77,7 @@ ipcMain.on('switch-script', (event) => {
   // Toggle between 'script.py' and 'normalchat.py'
   
   //currentScript = currentScript.endsWith('script.py') ? path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'normalchat.py') : path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'script.py');
-  currentScript = currentScript.endsWith('script.py') ? path.join(__dirname,  '..', 'llm', 'scripts', 'normalchat.py') : path.join(__dirname,  '..', 'llm', 'scripts', 'script.py');
+  currentScript = currentScript.endsWith('docdot.py') ? path.join(__dirname,  '..', 'llm', 'scripts', 'bigdot.py') : path.join(__dirname,  '..', 'llm', 'scripts', 'docdot.py');
 
   // If the Python process is running, kill it and spawn a new one with the updated script
   if (pythonProcess) {
