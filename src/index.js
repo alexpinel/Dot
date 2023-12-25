@@ -108,10 +108,16 @@ ipcMain.handle('open-dialog', async (event) => {
     title: 'Select Directory',
   });
 
+  // Check if the user selected a directory
+  if (!result.canceled && result.filePaths.length > 0) {
+    const chosenDirectory = result.filePaths[0];
+    console.log('Chosen Directory:', chosenDirectory);
+  } else {
+    console.log('No directory selected.');
+  }
+
   return result;
 });
-
-
 
 
 
@@ -197,8 +203,10 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
     //const pythonScriptPath = path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'embeddings.py');
     const pythonScriptPath = path.join(__dirname, '..', 'llm', 'scripts', 'embeddings.py');
 
+    // Quote the directory path to handle spaces
+    const quotedDirectory = `"${directory}"`;
     // Spawn the Python process
-    const pythonProcess = spawn(pythonPath, [pythonScriptPath, directory], { shell: true });
+    const pythonProcess = spawn(pythonPath, [pythonScriptPath, quotedDirectory], { shell: true });
 
     // Handle the output and errors if needed
     pythonProcess.stdout.on('data', (data) => {
