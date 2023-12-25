@@ -74,7 +74,7 @@ def generate_prompt(prompt: str, system_prompt: str = DEFAULT_SYSTEM_PROMPT) -> 
     {prompt} [/INST]
     """.strip()
 
-SYSTEM_PROMPT ="Use the following pieces of conext to answer the question at the end. If you do not know the answer, just say you don't know, don't try to make up an answer."
+SYSTEM_PROMPT ="Use the following pieces of context to answer the question at the end. If you do not know the answer, just say you don't know, don't try to make up an answer."
 
 template = generate_prompt(
     """
