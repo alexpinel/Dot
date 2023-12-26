@@ -132,7 +132,6 @@ input.addEventListener("keyup", function(event) {
 });
 
 
-
 // SIDEBAR AND FILE TREE!!!!
 
 const { dialog } = require('electron');
@@ -228,6 +227,10 @@ $(document).ready(() => {
       console.error(err);
     } finally {
       $loadingSpinner.hide();
+      //RESETTING SCRIPT
+      const selectedScript = scriptToggle.checked ? 'normalchat.py' : 'script.py';
+      ipcRenderer.send('switch-script', selectedScript);
+      ipcRenderer.send('switch-script', selectedScript);
     }
   }
 

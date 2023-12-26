@@ -99,7 +99,6 @@ ipcMain.on('switch-script', (event) => {
 });
 
 
-
 //OPEN FOLDER THING!!!!
 
 ipcMain.handle('open-dialog', async (event) => {
@@ -115,7 +114,6 @@ ipcMain.handle('open-dialog', async (event) => {
   } else {
     console.log('No directory selected.');
   }
-
   return result;
 });
 
