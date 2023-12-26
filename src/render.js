@@ -66,7 +66,7 @@ function showTypingIndicator() {
     chatContainer.appendChild(typingIndicatorDiv);
 
     chatContainer.scrollTop = chatContainer.scrollHeight;
-  }, 2000); // Adjust the delay time as needed
+  }, 0); // Adjust the delay time as needed
 }
 
 function hideTypingIndicator() {
