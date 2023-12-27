@@ -1,4 +1,3 @@
-from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
@@ -6,8 +5,7 @@ import sys
 import json
 from langchain.llms import LlamaCpp
 import os
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
+from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
 
 
@@ -44,7 +42,7 @@ New human question: {question}
 Response:"""
 prompt = PromptTemplate.from_template(template)
 # Notice that we need to align the `memory_key`
-memory = ConversationBufferMemory(memory_key="chat_history")
+memory = ConversationBufferWindowMemory(memory_key="chat_history", k=2)
 conversation = LLMChain(
     llm=llm,
     prompt=prompt,
