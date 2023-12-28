@@ -2,14 +2,16 @@
   "name": "dot",
   "productName": "dot",
   "version": "1.0.0",
-  "description": "DOOOOOOOOOOOOOOOT BAREBONES VERSION",
+  "description": "dot, a surprisingly useful tool?",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "keywords": [],
   "author": {
@@ -50,6 +52,13 @@
       "target": "dmg",
       "icon": "./src/Assets/icon2.icns",
       "identity": "Apple Development: alexpinel28@gmail.com (863FT89FMU)"
+    },
+    "extraResources": {
+      "from": "/Users/alexpinel/Desktop/llm",
+      "to": "llm",
+      "filter": [
+        "**/*"
+      ]
     }
   },
   "config": {
