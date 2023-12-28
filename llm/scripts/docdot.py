@@ -39,7 +39,7 @@ n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of yo
 script_dir = os.path.dirname(__file__)
 
 # Construct the relative path
-relative_model_path = "mistral-7b-instruct-v0.1.Q4_K_M.gguf"
+relative_model_path = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
 model_path = os.path.join(script_dir, relative_model_path)
 
 

@@ -2,7 +2,7 @@ python/
 llama-2-7b-chat.Q4_K_M.gguf
 node_modules/
 mistral-7b-v0.1.Q4_K_M.gguf
-mistral-7b-instruct-v0.1.Q4_K_M.gguf
+mistral-7b-instruct-v0.2.Q4_K_M.gguf
 src/mystuff/
 src/.env
 dist
