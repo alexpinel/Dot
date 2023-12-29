@@ -54,6 +54,8 @@
     "postcss": "^8.4.32",
     "postcss-cli": "^11.0.0",
     "postcss-loader": "^7.3.4",
+    "prettier": "^3.1.1",
+    "prettier-plugin-tailwindcss": "^0.5.10",
     "tailwindcss": "^3.4.0",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
