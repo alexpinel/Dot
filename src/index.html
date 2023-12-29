@@ -10,27 +10,34 @@
             <!-- Your other content goes here -->
 
             <div
+                id="menu-side"
                 class="flex h-full w-1/5 flex-col justify-between border-x border-gray-400 bg-gray-50"
             >
-                <h1 class="mx-1.5 text-2xl font-bold dark:text-white">
-                    Load documents
+                <h1
+                    id="title"
+                    class="mx-1.5 text-2xl font-bold dark:text-white"
+                >
+                    My Documents
                 </h1>
-                <div class="flex grow flex-col items-center justify-end">
+                <div
+                    id="switches and logo"
+                    class="flex grow flex-col items-center justify-end"
+                >
                     <label
                         class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center rtl:ml-0"
                     >
-                        <input type="checkbox" value="" class="peer sr-only" />
-                        <div
-                            class="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-50 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-green-800"
-                        ></div>
-                        <span
-                            class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-                            >Big dot</span
-                        >
                         <img
                             src="Assets/icons/chat LM.png"
                             class="mx-1 size-5"
                         />
+                        <span
+                            class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+                            >Big Dot</span
+                        >
+                        <input type="checkbox" value="" class="peer sr-only" />
+                        <div
+                            class="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-50 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-green-800"
+                        ></div>
                     </label>
                     <!--
                     <label
@@ -50,7 +57,7 @@
                         />
                     </label>
                     -->
-                    <img src="Assets/logo2.png" alt="Logo" class="w-3/4" />
+                    <img src="Assets/logo2.png" alt="Logo" class="w-3/5" />
                     <p
                         class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400"
                     >
@@ -60,24 +67,29 @@
                 </div>
             </div>
 
-            <div class="relative flex-grow">
+            <div id="chat-side" class="relative flex-grow">
                 <!-- Content of the 80% width container -->
                 <div
+                    id="user input and button"
                     class="absolute inset-x-0 bottom-0 mb-4 ml-4 mr-4 flex items-center"
                 >
                     <input
                         type="text"
                         id="default-input"
-                        class="h-9.5 block flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                        class="h-9.5 focus:ring-none block flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     />
                     <!-- send button -->
                     <button
-                        class="group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-cyan-200 group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
+                        class="0 group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
                     >
                         <span
                             class="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900"
                         >
-                            Send
+                            <img
+                                src="Assets/arrow.svg"
+                                alt="Arrow send icon"
+                                class="h-5 w-5 text-gray-900 dark:text-white"
+                            />
                         </span>
                     </button>
                 </div>
