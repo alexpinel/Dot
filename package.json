@@ -5,6 +5,7 @@
   "description": "DOOOOOOOOOOOOOOOT BAREBONES VERSION",
   "main": "src/index.js",
   "scripts": {
+    "tail": "tailwindcss -i ./src/index.css -o ./src/dist/output.css --watch",
     "build": "webpack",
     "start": "electron-forge start",
     "package": "electron-forge package",
