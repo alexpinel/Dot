@@ -1,69 +1,371 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Dot</title>
-  <link href="index.css" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="markdown-styles.css">
-</head>
-<body>
-  <div id="backgroundOverlay"></div>
-  <div id="screen">
-    <div id="menu-side" class="no-horizontal-scroll">
-      <div id="menu-container">      
-        <div class="header">
-          <h1>My Documents</h1>
-          <button id="selectDirectoryButton"></button>
-        </div>
-        
-        <div id="loadingSpinner" class="spinner"></div>
-        <!-- Rest of the menu content... -->
-      </div>
-      <div id="sidebar" class="no-horizontal-scroll">
-        <!-- Sidebar content will be dynamically generated using JavaScript -->
-      </div>
-      <div id="fileTree" class="no-horizontal-scroll">
-        <!-- File tree content goes here -->
-      </div>
-      <div id="Switchboard">
-        <div class="switch-group">
-          <img src="./Assets/icons/chat LM.png" alt="Icon" class="switch-icon">
-          <p class="switch-text">Big Dot</p>
-          <label class="switch">
-            <input type="checkbox" id="scriptToggle">
-            <span class="slider round"></span>
-          </label>
-        </div>
-        <div class="switch-group">
-          <img src="./Assets/icons/art LM.png" alt="Icon" class="switch-icon">
-          <p class="switch-text">Gallery view</p>
-          <label class="switch">
-            <input type="checkbox" id="galleryToggle">
-            <span class="slider round"></span>
-          </label>
-        </div>
-      </div>
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="dist/output.css" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css" href="markdown-styles.css" />
+    </head>
+    <body>
+        <div id="backgroundOverlay"></div>
+        <div class="flex h-screen">
+            <!-- Your other content goes here -->
 
-      <div id="Ass">
-        <img src="./Assets/logo2.png" alt="Logo" id="menu-logo">
-      </div>
-    </div>
-    <div id="chat-side">
-      <div id="chat-container">
-        <div id="bot-message"></div>
-      </div>
-      <div id="user-input-container">
-        <input type="text" id="user-input" placeholder="Type your message...">
-        <button id="send-button" onclick="sendMessage('')">
-          <img src="./Assets/arrow.svg" alt="Send Icon" style="width: 18px; height: 18px;">
-        </button>
-      </div>
-    </div>
-  </div>
+            <div
+                id="menu-side"
+                class="flex h-full w-1/5 flex-col justify-between border-x border-gray-400 bg-gray-50"
+            >
+                <div class="flex justify-between">
+                    <h1
+                        id="title"
+                        class="mx-1.5 my-1.5 text-2xl font-bold dark:text-white"
+                    >
+                        My Documents
+                    </h1>
+                    <button
+                        id="selectDirectoryButton"
+                        class="group relative my-1.5 me-2 ml-1 inline-flex h-11 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
+                    >
+                        <span
+                            class="relative rounded-md bg-white px-1 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900"
+                        >
+                            <svg
+                                class="h-6 w-8 text-gray-800 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 18 18"
+                            >
+                                <path
+                                    d="M9.043.8a2.009 2.009 0 0 0-1.6-.8H2a2 2 0 0 0-2 2v2h11.443L9.043.8ZM0 6v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6H0Zm11 7h-1v1a1 1 0 1 1-2 0v-1H7a1 1 0 0 1 0-2h1v-1a1 1 0 0 1 2 0v1h1a1 1 0 0 1 0 2Z"
+                                />
+                            </svg>
+                        </span>
+                    </button>
+                </div>
 
+                <div
+                    role="status"
+                    class="my-2 max-w-md animate-pulse space-y-4 divide-y divide-gray-200 rounded border border-gray-200 p-4 shadow md:p-6 dark:divide-gray-700 dark:border-gray-700"
+                >
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div
+                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
+                            ></div>
+                            <div
+                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
+                            ></div>
+                        </div>
+                        <div
+                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
+                        ></div>
+                    </div>
+                    <div class="flex items-center justify-between pt-4">
+                        <div>
+                            <div
+                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
+                            ></div>
+                            <div
+                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
+                            ></div>
+                        </div>
+                        <div
+                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
+                        ></div>
+                    </div>
+                    <div class="flex items-center justify-between pt-4">
+                        <div>
+                            <div
+                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
+                            ></div>
+                            <div
+                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
+                            ></div>
+                        </div>
+                        <div
+                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
+                        ></div>
+                    </div>
+                    <div class="flex items-center justify-between pt-4">
+                        <div>
+                            <div
+                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
+                            ></div>
+                            <div
+                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
+                            ></div>
+                        </div>
+                        <div
+                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
+                        ></div>
+                    </div>
+                    <div class="flex items-center justify-between pt-4">
+                        <div>
+                            <div
+                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
+                            ></div>
+                            <div
+                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
+                            ></div>
+                        </div>
+                        <div
+                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
+                        ></div>
+                    </div>
+                    <span class="sr-only">Loading...</span>
+                </div>
 
-  <script src="./render.js"></script>
-  <script src="../node_modules/jquery/dist/jquery.min.js"></script>
-  <script src="../node_modules/marked/marked.min.js"></script>
-</body>
+                <!-- Rest of the menu content... -->
+                <div id="sidebar" class="no-horizontal-scroll">
+                    <!-- Sidebar content will be dynamically generated using JavaScript -->
+                </div>
+                <div id="fileTree" class="no-horizontal-scroll">
+                    <!-- File tree content goes here -->
+                </div>
+                <div
+                    id="switches and logo"
+                    class="flex grow flex-col items-center justify-end"
+                >
+                    <label
+                        class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center rtl:ml-0"
+                    >
+                        <input
+                            id="scriptToggle"
+                            type="checkbox"
+                            value=""
+                            class="peer sr-only"
+                        />
+                        <div
+                            class="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-50 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-green-800"
+                        ></div>
+                        <span
+                            class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+                            >Big Dot</span
+                        >
+                        <svg
+                            class="mx-2 size-5 text-gray-800 dark:text-white"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 18"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M18 4H16V9C16 10.0609 15.5786 11.0783 14.8284 11.8284C14.0783 12.5786 13.0609 13 12 13H9L6.846 14.615C7.17993 14.8628 7.58418 14.9977 8 15H11.667L15.4 17.8C15.5731 17.9298 15.7836 18 16 18C16.2652 18 16.5196 17.8946 16.7071 17.7071C16.8946 17.5196 17 17.2652 17 17V15H18C18.5304 15 19.0391 14.7893 19.4142 14.4142C19.7893 14.0391 20 13.5304 20 13V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4Z"
+                                fill="currentColor"
+                            />
+                            <path
+                                d="M12 0H2C1.46957 0 0.960859 0.210714 0.585786 0.585786C0.210714 0.960859 0 1.46957 0 2V9C0 9.53043 0.210714 10.0391 0.585786 10.4142C0.960859 10.7893 1.46957 11 2 11H3V13C3 13.1857 3.05171 13.3678 3.14935 13.5257C3.24698 13.6837 3.38668 13.8114 3.55279 13.8944C3.71889 13.9775 3.90484 14.0126 4.08981 13.996C4.27477 13.9793 4.45143 13.9114 4.6 13.8L8.333 11H12C12.5304 11 13.0391 10.7893 13.4142 10.4142C13.7893 10.0391 14 9.53043 14 9V2C14 1.46957 13.7893 0.960859 13.4142 0.585786C13.0391 0.210714 12.5304 0 12 0Z"
+                                fill="currentColor"
+                            />
+                        </svg>
+                    </label>
+                    <!--
+                    <label
+                        class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center"
+                    >
+                        <input type="checkbox" value="" class="peer sr-only" />
+                        <div
+                            class="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-50 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-green-800"
+                        ></div>
+                        <span
+                            class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+                            >Gallery</span
+                        >
+                        <img
+                            src="Assets/icons/art LM.png"
+                            class="mx-1 size-5"
+                        />
+                    </label>
+                -->
+
+                    <img src="Assets/logo2.png" alt="Logo" class="w-3/5" />
+                    <p
+                        class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400"
+                    >
+                        Answers may not be completely accurate, consider
+                        checking important information.
+                    </p>
+                </div>
+            </div>
+
+            <div id="chat-side" class="relative w-4/5 flex-grow">
+                <!-- Content of the 80% width container -->
+                <div
+                    id="chat-container"
+                    class="flex h-[90vh] flex-grow flex-col-reverse overflow-y-auto bg-white"
+                >
+                    <!-- Add these classes to your HTML elements -->
+                    <div
+                        id="bot-message"
+                        class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base"
+                    >
+                        <!-- ... existing code ... -->
+                    </div>
+                </div>
+
+                <style>
+                    .message {
+                        width: 90vw;
+                        margin-left: auto;
+                        margin-right: auto;
+                        overflow: hidden; /* Ensure overflow is hidden for rounded corners */
+                    }
+
+                    .user-content-container {
+                        display: flex;
+                        align-items: flex-start;
+                    }
+
+                    .user-bubble {
+                        width: 70vw; /* Adjust the width of the bot's bubble */
+                        padding: 10px;
+                        background-color: rgba(236, 236, 236, 0.603);
+                        backdrop-filter: saturate(180%) blur(20px);
+                        color: #000; /* Set the text color to black */
+                        border-radius: 10px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
+                    }
+
+                    .bot-content-container {
+                        display: flex;
+                        align-items: flex-end;
+                    }
+
+                    .bot-bubble {
+                        width: 70vw; /* Adjust the width of the bot's bubble */
+                        padding: 10px;
+                        background-color: rgba(236, 236, 236, 0.603);
+                        backdrop-filter: saturate(180%) blur(20px);
+                        color: #000; /* Set the text color to black */
+                        border-radius: 10px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
+                    }
+
+                    .typing-indicator {
+                        font-style: italic;
+                        color: #6b7280; /* Adjust color based on your design */
+                    }
+
+                    .user-icon {
+                        /* Customize user's icon styles */
+                        background-image: url('./Assets/icons/user-icon.png');
+                        background-size: cover; /* Adjust as needed */
+                        width: 24px; /* Adjust the width of the icon */
+                        height: 24px; /* Adjust the height of the icon */
+                        border-radius: 0%; /* Make it a circle */
+                        margin-right: 12px; /* Adjust as needed */
+                    }
+
+                    .bot-icon {
+                        /* Customize bot's icon styles */
+                        background-image: url('./Assets/icons/bot-icon.png');
+                        background-size: cover; /* Adjust as needed */
+                        width: 20px; /* Adjust the width of the icon */
+                        height: 20px; /* Adjust the height of the icon */
+                        border-radius: 0%; /* Make it a circle */
+                        margin-right: 15px; /* Adjust as needed */
+                    }
+                    .custom-shadow-md-up {
+                        box-shadow:
+                            0 -10px 15px -3px rgba(0, 0, 0, 0.1),
+                            0 -4px 6px -2px rgba(0, 0, 0, 0.05);
+                    }
+
+                    .typing-indicator {
+                        position: absolute;
+                        bottom: 10vh; /* Adjust the value as needed for the desired lift */
+                        left: 50%;
+                        transform: translateX(-50%);
+                        font-style: italic;
+                        color: #6b7280; /* Adjust color based on your design */
+                    }
+
+                    @keyframes bounce {
+                        0%,
+                        20%,
+                        50%,
+                        80%,
+                        100% {
+                            transform: translateY(0);
+                        }
+                        40% {
+                            transform: translateY(-5px);
+                        }
+                        60% {
+                            transform: translateY(-3px);
+                        }
+                    }
+
+                    .typing-indicator span {
+                        display: inline-block;
+                        animation: bounce 1s infinite;
+                    }
+
+                    .typing-indicator span:nth-child(1) {
+                        animation-delay: 0.1s;
+                    }
+
+                    .typing-indicator span:nth-child(2) {
+                        animation-delay: 0.2s;
+                    }
+
+                    .typing-indicator span:nth-child(3) {
+                        animation-delay: 0.3s;
+                    }
+
+                    /* Add or customize other styles as needed */
+                </style>
+                <div
+                    id="user-input-and-button"
+                    class="flex flex-shrink-0 items-center justify-center"
+                    style="
+                        box-shadow:
+                            0 -4px 6px -1px rgba(0, 0, 0, 0.08),
+                            0 -2px 4px -1px rgba(0, 0, 0, 0.02);
+                    "
+                >
+                    <div class="input-container mt-3 w-3/4">
+                        <!-- Adjust the width and margin-top as needed -->
+                        <input
+                            type="text"
+                            id="user-input"
+                            class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        />
+                    </div>
+                    <!-- send button -->
+                    <button
+                        id="send-button"
+                        onclick="sendMessage('')"
+                        class="0 group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
+                    >
+                        <span
+                            class="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900"
+                        >
+                            <svg
+                                class="h-5 w-5 text-gray-800 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 10 14"
+                            >
+                                <path
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5 13V1m0 0L1 5m4-4 4 4"
+                                />
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="./render.js"></script>
+        <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="../node_modules/marked/marked.min.js"></script>
+        <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
+    </body>
 </html>

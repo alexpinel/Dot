@@ -123,8 +123,10 @@ ipcMain.handle('open-dialog', async (event) => {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 1100,
+    width: 1250,
     height: 700,
+    minWidth: 1250,
+    minHeight: 700,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
