@@ -54,7 +54,7 @@ llm = LlamaCpp(
     #verbose=True, # Verbose is required to pass to the callback manager,
     max_tokens=2048,
     temperature= 0.01,
-    n_ctx=2048,
+    n_ctx=8000,
 )
 
 #print('llm loaded')
