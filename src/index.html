@@ -7,6 +7,7 @@
         <link rel="stylesheet" type="text/css" href="markdown-styles.css" />
     </head>
     <body>
+        <div id="backgroundOverlay"></div>
         <div class="flex h-screen">
             <!-- Your other content goes here -->
 
@@ -178,25 +179,102 @@
 
             <div id="chat-side" class="relative w-4/5 flex-grow">
                 <!-- Content of the 80% width container -->
-
-                <div id="chat-container">
-                    <div id="bot-message"></div>
+                <div
+                    id="chat-container"
+                    class="flex h-[90vh] flex-grow flex-col-reverse overflow-y-auto bg-white"
+                >
+                    <!-- Add these classes to your HTML elements -->
+                    <div id="bot-message" class="flex flex-col space-y-2 p-4">
+                        <!-- ... existing code ... -->
+                    </div>
                 </div>
 
-                <div
-                    id="user input and button"
-                    class="absolute inset-x-0 bottom-0 mb-4 ml-4 mr-4 flex items-center"
-                >
+                <style>
+                    .message {
+                        width: 80vw;
+                        margin-left: auto;
+                        margin-right: auto;
+                        overflow: hidden; /* Ensure overflow is hidden for rounded corners */
+                    }
+
+                    .user-content-container {
+                        display: flex;
+                        align-items: flex-start;
+                    }
+
+                    .user-bubble {
+                        width: 70vw; /* Adjust the width of the user's bubble */
+                        padding: 10px;
+                        background-color: #3490dc;
+                        color: #fff;
+                        border-radius: 10px;
+                    }
+
+                    .bot-content-container {
+                        display: flex;
+                        align-items: flex-end;
+                    }
+
+                    .bot-bubble {
+                        width: 70vw; /* Adjust the width of the bot's bubble */
+                        padding: 10px;
+                        background-color: #38a169;
+                        color: #fff;
+                        border-radius: 10px;
+                    }
+
+                    .typing-indicator {
+                        font-style: italic;
+                        color: #6b7280; /* Adjust color based on your design */
+                    }
+
+                    .user-icon {
+                        /* Customize user's icon styles */
+                        background-image: url('path/to/user-icon.png');
+                        background-size: cover; /* Adjust as needed */
+                        width: 30px; /* Adjust the width of the icon */
+                        height: 30px; /* Adjust the height of the icon */
+                        border-radius: 50%; /* Make it a circle */
+                        margin-right: 10px; /* Adjust as needed */
+                    }
+
+                    .bot-icon {
+                        /* Customize bot's icon styles */
+                        background-image: url('path/to/bot-icon.png');
+                        background-size: cover; /* Adjust as needed */
+                        width: 30px; /* Adjust the width of the icon */
+                        height: 30px; /* Adjust the height of the icon */
+                        border-radius: 50%; /* Make it a circle */
+                        margin-right: 10px; /* Adjust as needed */
+                    }
+                    .custom-shadow-md-up {
+                        box-shadow:
+                            0 -10px 15px -3px rgba(0, 0, 0, 0.1),
+                            0 -4px 6px -2px rgba(0, 0, 0, 0.05);
+                    }
+                    /* Add or customize other styles as needed */
+                </style>
+
+                <div id="user-input-and-button" class="flex-shrink-0 flex items-center" style="box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.04);">
                     <input
                         type="text"
                         id="user-input"
+<<<<<<< Updated upstream
                         class="focus:ring-none block h-11 flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     />
+=======
+                        class="h-9.5 w-9/10 focus:ring-none block flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mt-2"
+                        />
+>>>>>>> Stashed changes
                     <!-- send button -->
                     <button
                         id="send-button"
                         onclick="sendMessage('')"
+<<<<<<< Updated upstream
                         class="mx-2 inline-flex items-center rounded-lg bg-blue-700 p-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+=======
+                        class="0 group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800 mt-2"
+>>>>>>> Stashed changes
                     >
                         <svg
                             class="h-6 w-6 -rotate-90"
@@ -238,7 +316,7 @@
                         <span class="sr-only">Icon description</span>
                     </button>
                 </div>
-            </div>
+
         </div>
 
         <script src="./render.js"></script>

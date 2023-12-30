@@ -12,39 +12,27 @@ function appendMessage(sender, message, isMarkdown) {
         const userContentContainer = document.createElement('div')
         userContentContainer.classList.add('user-content-container')
 
-        const userIcon = document.createElement('div')
-        userIcon.classList.add('user-icon')
+        const userBubble = document.createElement('div')
+        userBubble.classList.add('user-bubble')
+        userBubble.innerHTML = `<strong>${message}</strong>`
 
-        const contentDiv = document.createElement('div')
-        contentDiv.classList.add('bold-text')
-        contentDiv.innerHTML = `<strong>${message}</strong>` // Wrap user's message in <strong> tag for bold text
-
-        userContentContainer.appendChild(userIcon)
-        userContentContainer.appendChild(contentDiv)
-
+        userContentContainer.appendChild(userBubble)
         messageDiv.appendChild(userContentContainer)
     } else if (sender === 'Bot') {
-        const botIcon = document.createElement('div')
-        botIcon.classList.add('bot-icon')
-        botIcon.style.marginTop = '10px' // Adjust the value as needed
-
         const botContentContainer = document.createElement('div')
         botContentContainer.classList.add('bot-content-container')
 
-        botContentContainer.appendChild(botIcon)
-
-        const contentDiv = document.createElement('div')
-        contentDiv.style.marginTop = '-9px' // Adjust the value as needed
+        const botBubble = document.createElement('div')
+        botBubble.classList.add('bot-bubble')
 
         // Check if the content should be rendered as Markdown
         if (isMarkdown) {
-            contentDiv.innerHTML = marked(message)
+            botBubble.innerHTML = marked(message)
         } else {
-            contentDiv.innerText = message
+            botBubble.innerText = message
         }
 
-        botContentContainer.appendChild(contentDiv)
-
+        botContentContainer.appendChild(botBubble)
         messageDiv.appendChild(botContentContainer)
     }
 
