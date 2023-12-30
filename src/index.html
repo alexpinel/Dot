@@ -14,25 +14,31 @@
                 id="menu-side"
                 class="flex h-full w-1/5 flex-col justify-between border-x border-gray-400 bg-gray-50"
             >
-                <div class="flex items-center">
+                <div class="flex justify-between">
                     <h1
                         id="title"
-                        class="mx-1.5 text-2xl font-bold dark:text-white"
+                        class="mx-1.5 my-1.5 text-2xl font-bold dark:text-white"
                     >
                         My Documents
                     </h1>
                     <button
                         id="selectDirectoryButton"
-                        class="0 group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
+                        class="group relative my-1.5 me-2 ml-1 inline-flex h-11 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
                     >
                         <span
-                            class="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900"
+                            class="relative rounded-md bg-white px-1 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900"
                         >
-                            <img
-                                src="Assets/arrow.svg"
-                                alt="Arrow send icon"
-                                class="h-5 w-5 text-gray-900 dark:text-white"
-                            />
+                            <svg
+                                class="h-6 w-8 text-gray-800 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 18 18"
+                            >
+                                <path
+                                    d="M9.043.8a2.009 2.009 0 0 0-1.6-.8H2a2 2 0 0 0-2 2v2h11.443L9.043.8ZM0 6v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6H0Zm11 7h-1v1a1 1 0 1 1-2 0v-1H7a1 1 0 0 1 0-2h1v-1a1 1 0 0 1 2 0v1h1a1 1 0 0 1 0 2Z"
+                                />
+                            </svg>
                         </span>
                     </button>
                 </div>
@@ -133,23 +139,52 @@
                     <input
                         type="text"
                         id="user-input"
-                        class="h-9.5 focus:ring-none block flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        class="focus:ring-none block h-11 flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     />
                     <!-- send button -->
                     <button
                         id="send-button"
                         onclick="sendMessage('')"
-                        class="0 group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
+                        class="mx-2 inline-flex items-center rounded-lg bg-blue-700 p-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
-                        <span
-                            class="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900"
+                        <svg
+                            class="h-6 w-6 -rotate-90"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 14 10"
                         >
-                            <img
-                                src="Assets/arrow.svg"
-                                alt="Arrow send icon"
-                                class="h-5 w-5 text-gray-900 dark:text-white"
+                            <path
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M1 5h12m0 0L9 1m4 4L9 9"
                             />
-                        </span>
+                        </svg>
+                        <span class="sr-only">Icon description</span>
+                    </button>
+                    <button
+                        id="reset-button"
+                        onclick=""
+                        class="me-2 inline-flex items-center rounded-lg bg-yellow-300 p-2.5 text-center text-sm font-medium text-white hover:bg-yellow-800 focus:ring-yellow-300 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
+                    >
+                        <svg
+                            class="h-6 w-6 text-gray-800 dark:text-white"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 18 20"
+                        >
+                            <path
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97"
+                            />
+                        </svg>
+                        <span class="sr-only">Icon description</span>
                     </button>
                 </div>
             </div>
