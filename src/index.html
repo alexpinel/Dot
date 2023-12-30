@@ -143,10 +143,22 @@
                             class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
                             >Big Dot</span
                         >
-                        <img
-                            src="Assets/icons/chat LM.png"
-                            class="mx-1 size-5"
-                        />
+                        <svg
+                            class="mx-2 size-5 text-gray-800 dark:text-white"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 18"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M18 4H16V9C16 10.0609 15.5786 11.0783 14.8284 11.8284C14.0783 12.5786 13.0609 13 12 13H9L6.846 14.615C7.17993 14.8628 7.58418 14.9977 8 15H11.667L15.4 17.8C15.5731 17.9298 15.7836 18 16 18C16.2652 18 16.5196 17.8946 16.7071 17.7071C16.8946 17.5196 17 17.2652 17 17V15H18C18.5304 15 19.0391 14.7893 19.4142 14.4142C19.7893 14.0391 20 13.5304 20 13V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4Z"
+                                fill="currentColor"
+                            />
+                            <path
+                                d="M12 0H2C1.46957 0 0.960859 0.210714 0.585786 0.585786C0.210714 0.960859 0 1.46957 0 2V9C0 9.53043 0.210714 10.0391 0.585786 10.4142C0.960859 10.7893 1.46957 11 2 11H3V13C3 13.1857 3.05171 13.3678 3.14935 13.5257C3.24698 13.6837 3.38668 13.8114 3.55279 13.8944C3.71889 13.9775 3.90484 14.0126 4.08981 13.996C4.27477 13.9793 4.45143 13.9114 4.6 13.8L8.333 11H12C12.5304 11 13.0391 10.7893 13.4142 10.4142C13.7893 10.0391 14 9.53043 14 9V2C14 1.46957 13.7893 0.960859 13.4142 0.585786C13.0391 0.210714 12.5304 0 12 0Z"
+                                fill="currentColor"
+                            />
+                        </svg>
                     </label>
                     <!--
                     <label
@@ -184,7 +196,10 @@
                     class="flex h-[90vh] flex-grow flex-col-reverse overflow-y-auto bg-white"
                 >
                     <!-- Add these classes to your HTML elements -->
-                    <div id="bot-message" class="flex w-[vw] flex-col space-y-2 p-6 items-center justify-start text-base">
+                    <div
+                        id="bot-message"
+                        class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base"
+                    >
                         <!-- ... existing code ... -->
                     </div>
                 </div>
@@ -227,7 +242,6 @@
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
                     }
 
-
                     .typing-indicator {
                         font-style: italic;
                         color: #6b7280; /* Adjust color based on your design */
@@ -257,7 +271,7 @@
                             0 -10px 15px -3px rgba(0, 0, 0, 0.1),
                             0 -4px 6px -2px rgba(0, 0, 0, 0.05);
                     }
-                    
+
                     .typing-indicator {
                         position: absolute;
                         bottom: 10vh; /* Adjust the value as needed for the desired lift */
@@ -269,35 +283,51 @@
 
                     /* Add or customize other styles as needed */
                 </style>
-                <div id="user-input-and-button" class="flex-shrink-0 flex items-center justify-center" style="box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.08), 0 -2px 4px -1px rgba(0, 0, 0, 0.02);">
-                    <div class="input-container w-3/4 mt-3"> <!-- Adjust the width and margin-top as needed -->
+                <div
+                    id="user-input-and-button"
+                    class="flex flex-shrink-0 items-center justify-center"
+                    style="
+                        box-shadow:
+                            0 -4px 6px -1px rgba(0, 0, 0, 0.08),
+                            0 -2px 4px -1px rgba(0, 0, 0, 0.02);
+                    "
+                >
+                    <div class="input-container mt-3 w-3/4">
+                        <!-- Adjust the width and margin-top as needed -->
                         <input
                             type="text"
                             id="user-input"
-                            class="h-9.5 w-full focus:ring-none block rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                            class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                         />
                     </div>
                     <!-- send button -->
                     <button
                         id="send-button"
                         onclick="sendMessage('')"
-                        class="0 group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800 mt-3" 
+                        class="0 group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
                     >
                         <span
                             class="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900"
                         >
-                            <img
-                                src="Assets/arrow.svg"
-                                alt="Arrow send icon"
-                                class="h-5 w-5 text-gray-900 dark:text-white"
-                            />
+                            <svg
+                                class="h-5 w-5 text-gray-800 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 10 14"
+                            >
+                                <path
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5 13V1m0 0L1 5m4-4 4 4"
+                                />
+                            </svg>
                         </span>
                     </button>
                 </div>
-
-
-
-
+            </div>
         </div>
 
         <script src="./render.js"></script>
