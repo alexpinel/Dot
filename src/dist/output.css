@@ -1310,6 +1310,14 @@ input:checked + .toggle-bg {
   width: 100%;
 }
 
+.w-10 {
+  width: 2.5rem;
+}
+
+.w-4\/5 {
+  width: 80%;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -1362,6 +1370,16 @@ input:checked + .toggle-bg {
 
 .transform-none {
   transform: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 .cursor-default {
@@ -1558,6 +1576,10 @@ input:checked + .toggle-bg {
 
 .to-blue-500 {
   --tw-gradient-to: #3F83F8 var(--tw-gradient-to-position);
+}
+
+.fill-blue-600 {
+  fill: #1C64F2;
 }
 
 .p-0 {
@@ -2077,6 +2099,11 @@ input:checked + .toggle-bg {
 :is(:where(.dark) .dark\:text-white) {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+:is(:where(.dark) .dark\:text-gray-600) {
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity));
 }
 
 :is(:where(.dark) .dark\:placeholder-gray-400)::-moz-placeholder {
