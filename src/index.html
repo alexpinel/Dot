@@ -13,12 +13,27 @@
                 id="menu-side"
                 class="flex h-full w-1/5 flex-col justify-between border-x border-gray-400 bg-gray-50"
             >
-                <h1
-                    id="title"
-                    class="mx-1.5 text-2xl font-bold dark:text-white"
-                >
-                    My Documents
-                </h1>
+                <div class="flex items-center">
+                    <h1
+                        id="title"
+                        class="mx-1.5 text-2xl font-bold dark:text-white"
+                    >
+                        My Documents
+                    </h1>
+                    <button
+                        id="selectDirectoryButton"
+                        type="button"
+                        class="me-2 inline-flex items-center rounded-lg bg-blue-700 p-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                        <img
+                            src="./Assets/icons/new folder LM.png"
+                            alt="Icon"
+                            class="h-5 w-5"
+                        />
+                        <span class="sr-only">Icon description</span>
+                    </button>
+                </div>
+
                 <div
                     id="switches and logo"
                     class="flex grow flex-col items-center justify-end"
@@ -76,11 +91,12 @@
                 >
                     <input
                         type="text"
-                        id="default-input"
+                        id="user-input"
                         class="h-9.5 focus:ring-none block flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     />
                     <!-- send button -->
                     <button
+                        id="send-button"
                         class="0 group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
                     >
                         <span
@@ -97,6 +113,9 @@
             </div>
         </div>
 
-        <script src="/node_modules/flowbite/dist/flowbite.min.js"></script>
+        <script src="./render.js"></script>
+        <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="../node_modules/marked/marked.min.js"></script>
+        <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
     </body>
 </html>
