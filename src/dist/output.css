@@ -1199,6 +1199,10 @@ input:checked + .toggle-bg {
   margin-top: 0.75rem;
 }
 
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
 .block {
   display: block;
 }
