@@ -12,15 +12,26 @@ function appendMessage(sender, message, isMarkdown) {
         const userContentContainer = document.createElement('div')
         userContentContainer.classList.add('user-content-container')
 
+        const userIcon = document.createElement('div')
+        userIcon.classList.add('user-icon')
+        userIcon.style.marginTop = '10px' // Adjust the value as needed
+
         const userBubble = document.createElement('div')
         userBubble.classList.add('user-bubble')
         userBubble.innerHTML = `<strong>${message}</strong>`
 
+        userContentContainer.appendChild(userIcon)
         userContentContainer.appendChild(userBubble)
         messageDiv.appendChild(userContentContainer)
     } else if (sender === 'Bot') {
+        const botIcon = document.createElement('div')
+        botIcon.classList.add('bot-icon')
+        botIcon.style.marginTop = '10px' // Adjust the value as needed
+
         const botContentContainer = document.createElement('div')
         botContentContainer.classList.add('bot-content-container')
+
+        botContentContainer.appendChild(botIcon)
 
         const botBubble = document.createElement('div')
         botBubble.classList.add('bot-bubble')
@@ -45,11 +56,19 @@ function showTypingIndicator() {
 
     // Display "Bot is typing..." with a 1-second delay
     setTimeout(() => {
+        hideTypingIndicator() // Remove any existing typing indicator
+
         const typingIndicatorDiv = document.createElement('div')
         typingIndicatorDiv.className = 'typing-indicator'
-        typingIndicatorDiv.innerHTML = '<em>  Dot is typing...</em>'
+
+        // Create three spans for each dot in the ellipsis
+        typingIndicatorDiv.innerHTML =
+            '<em> Dot is typing <span>.</span><span>.</span><span>.</span> </em>'
+
+        // Append the typing indicator at the end of the chat container
         chatContainer.appendChild(typingIndicatorDiv)
 
+        // Scroll to the bottom after adding the typing indicator
         chatContainer.scrollTop = chatContainer.scrollHeight
     }, 0) // Adjust the delay time as needed
 }

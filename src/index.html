@@ -184,14 +184,14 @@
                     class="flex h-[90vh] flex-grow flex-col-reverse overflow-y-auto bg-white"
                 >
                     <!-- Add these classes to your HTML elements -->
-                    <div id="bot-message" class="flex flex-col space-y-2 p-4">
+                    <div id="bot-message" class="flex w-[vw] flex-col space-y-2 p-6 items-center justify-start text-base">
                         <!-- ... existing code ... -->
                     </div>
                 </div>
 
                 <style>
                     .message {
-                        width: 80vw;
+                        width: 90vw;
                         margin-left: auto;
                         margin-right: auto;
                         overflow: hidden; /* Ensure overflow is hidden for rounded corners */
@@ -203,11 +203,13 @@
                     }
 
                     .user-bubble {
-                        width: 70vw; /* Adjust the width of the user's bubble */
+                        width: 70vw; /* Adjust the width of the bot's bubble */
                         padding: 10px;
-                        background-color: #3490dc;
-                        color: #fff;
+                        background-color: rgba(236, 236, 236, 0.603);
+                        backdrop-filter: saturate(180%) blur(20px);
+                        color: #000; /* Set the text color to black */
                         border-radius: 10px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
                     }
 
                     .bot-content-container {
@@ -218,10 +220,13 @@
                     .bot-bubble {
                         width: 70vw; /* Adjust the width of the bot's bubble */
                         padding: 10px;
-                        background-color: #38a169;
-                        color: #fff;
+                        background-color: rgba(236, 236, 236, 0.603);
+                        backdrop-filter: saturate(180%) blur(20px);
+                        color: #000; /* Set the text color to black */
                         border-radius: 10px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
                     }
+
 
                     .typing-indicator {
                         font-style: italic;
@@ -230,92 +235,68 @@
 
                     .user-icon {
                         /* Customize user's icon styles */
-                        background-image: url('path/to/user-icon.png');
+                        background-image: url('./Assets/icons/user-icon.png');
                         background-size: cover; /* Adjust as needed */
-                        width: 30px; /* Adjust the width of the icon */
-                        height: 30px; /* Adjust the height of the icon */
-                        border-radius: 50%; /* Make it a circle */
-                        margin-right: 10px; /* Adjust as needed */
+                        width: 24px; /* Adjust the width of the icon */
+                        height: 24px; /* Adjust the height of the icon */
+                        border-radius: 0%; /* Make it a circle */
+                        margin-right: 12px; /* Adjust as needed */
                     }
 
                     .bot-icon {
                         /* Customize bot's icon styles */
-                        background-image: url('path/to/bot-icon.png');
+                        background-image: url('./Assets/icons/bot-icon.png');
                         background-size: cover; /* Adjust as needed */
-                        width: 30px; /* Adjust the width of the icon */
-                        height: 30px; /* Adjust the height of the icon */
-                        border-radius: 50%; /* Make it a circle */
-                        margin-right: 10px; /* Adjust as needed */
+                        width: 20px; /* Adjust the width of the icon */
+                        height: 20px; /* Adjust the height of the icon */
+                        border-radius: 0%; /* Make it a circle */
+                        margin-right: 15px; /* Adjust as needed */
                     }
                     .custom-shadow-md-up {
                         box-shadow:
                             0 -10px 15px -3px rgba(0, 0, 0, 0.1),
                             0 -4px 6px -2px rgba(0, 0, 0, 0.05);
                     }
+                    
+                    .typing-indicator {
+                        position: absolute;
+                        bottom: 10vh; /* Adjust the value as needed for the desired lift */
+                        left: 50%;
+                        transform: translateX(-50%);
+                        font-style: italic;
+                        color: #6b7280; /* Adjust color based on your design */
+                    }
+
                     /* Add or customize other styles as needed */
                 </style>
-
-                <div id="user-input-and-button" class="flex-shrink-0 flex items-center" style="box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.04);">
-                    <input
-                        type="text"
-                        id="user-input"
-<<<<<<< Updated upstream
-                        class="focus:ring-none block h-11 flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                    />
-=======
-                        class="h-9.5 w-9/10 focus:ring-none block flex-grow rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mt-2"
+                <div id="user-input-and-button" class="flex-shrink-0 flex items-center justify-center" style="box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.08), 0 -2px 4px -1px rgba(0, 0, 0, 0.02);">
+                    <div class="input-container w-3/4 mt-3"> <!-- Adjust the width and margin-top as needed -->
+                        <input
+                            type="text"
+                            id="user-input"
+                            class="h-9.5 w-full focus:ring-none block rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                         />
->>>>>>> Stashed changes
+                    </div>
                     <!-- send button -->
                     <button
                         id="send-button"
                         onclick="sendMessage('')"
-<<<<<<< Updated upstream
-                        class="mx-2 inline-flex items-center rounded-lg bg-blue-700 p-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-=======
-                        class="0 group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800 mt-2"
->>>>>>> Stashed changes
+                        class="0 group relative me-2 ml-1 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 text-sm font-medium text-gray-900 shadow-md hover:text-white focus:border-none focus:outline-none group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800 mt-3" 
                     >
-                        <svg
-                            class="h-6 w-6 -rotate-90"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 14 10"
+                        <span
+                            class="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900"
                         >
-                            <path
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M1 5h12m0 0L9 1m4 4L9 9"
+                            <img
+                                src="Assets/arrow.svg"
+                                alt="Arrow send icon"
+                                class="h-5 w-5 text-gray-900 dark:text-white"
                             />
-                        </svg>
-                        <span class="sr-only">Icon description</span>
-                    </button>
-                    <button
-                        id="reset-button"
-                        onclick=""
-                        class="me-2 inline-flex items-center rounded-lg bg-yellow-300 p-2.5 text-center text-sm font-medium text-white hover:bg-yellow-800 focus:ring-yellow-300 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
-                    >
-                        <svg
-                            class="h-6 w-6 text-gray-800 dark:text-white"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 18 20"
-                        >
-                            <path
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97"
-                            />
-                        </svg>
-                        <span class="sr-only">Icon description</span>
+                        </span>
                     </button>
                 </div>
+
+
+
 
         </div>
 

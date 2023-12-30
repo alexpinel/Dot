@@ -4,4 +4,3 @@ node_modules/
 mistral-7b-v0.1.Q4_K_M.gguf
 src/mystuff/
 src/.env
-src/dist
