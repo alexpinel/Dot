@@ -158,7 +158,8 @@ $(document).ready(() => {
 
                 files.forEach((file) => {
                     const fullPath = path.join(rootPath, file)
-                    const li = $('<li>').addClass(
+                    const li = $('<li>').addClass('folder flex flex-col')
+                    const shit = $('<div>').addClass(
                         'folder flex flex-row items-center'
                     ) // Changed from div to li
                     const icon = $('<div>') // Container for the icon
@@ -167,8 +168,10 @@ $(document).ready(() => {
                         'text-container mx-1 text-gray-500'
                     ) // Container for text
 
+                    // Append li to shit
+                    li.append(shit)
                     // Append items to li
-                    li.append(arrow, icon, textContainer)
+                    shit.append(arrow, icon, textContainer)
                     // Append li to ul
                     ul.append(li)
 
