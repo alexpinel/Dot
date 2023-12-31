@@ -73,9 +73,10 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
 
 
 // Switch between the two scripts
-ipcMain.on('switch-script', (event) => {
+ipcMain.on('switch-script', (event, selectedScript) => {
   // Toggle between 'script.py' and 'normalchat.py'
-  
+  console.log('Switching script to:', selectedScript);
+
   //currentScript = currentScript.endsWith('docdot.py') ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py') : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
   currentScript = currentScript.endsWith('docdot.py') ? path.join(__dirname,  '..', 'llm', 'scripts', 'bigdot.py') : path.join(__dirname,  '..', 'llm', 'scripts', 'docdot.py');
 
