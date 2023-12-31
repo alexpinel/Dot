@@ -14,7 +14,7 @@ def embeddings(chosen_directory):
     embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2', model_kwargs={'device':'mps'})
 
     text_splitter=RecursiveCharacterTextSplitter(
-                                                chunk_size=2048,
+                                                chunk_size=8000,
                                                 chunk_overlap=256)
     
 

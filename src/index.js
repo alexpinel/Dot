@@ -61,28 +61,31 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
 //BIG DOT TOGGLE!!!!
 
 // Switch between the two scripts
-ipcMain.on('switch-script', (event, selectedScript) => {
-    // Toggle between 'script.py' and 'normalchat.py'
 
-    //currentScript = currentScript.endsWith('docdot.py') ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py') : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
-    currentScript = currentScript.endsWith('docdot.py')
-        ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
-        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
+  // Toggle between 'script.py' and 'normalchat.py'
+  console.log('Switching script to:', selectedScript);
 
-    // If the Python process is running, kill it and spawn a new one with the updated script
-    if (pythonProcess) {
-        pythonProcess.kill()
-        pythonProcess = spawn(pythonPath, [currentScript], { shell: true })
+  //currentScript = currentScript.endsWith('docdot.py') ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py') : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
+  currentScript = currentScript.endsWith('docdot.py') ? path.join(__dirname,  '..', 'llm', 'scripts', 'bigdot.py') : path.join(__dirname,  '..', 'llm', 'scripts', 'docdot.py');
 
-        pythonProcess.stdout.on('data', (data) => {
-            const message = data.toString().trim()
-            mainWindow.webContents.send('python-reply', message)
-        })
+  // If the Python process is running, kill it and spawn a new one with the updated script
+  if (pythonProcess) {
+    pythonProcess.kill();
+    pythonProcess = spawn(pythonPath, [currentScript], { shell: true });
 
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Script Error: ${data}`)
-        })
-    }
+    pythonProcess.stdout.on('data', (data) => {
+      const message = data.toString().trim();
+      mainWindow.webContents.send('python-reply', message);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`Python Script Error: ${data}`);
+    });
+  }
+
+  // Optionally, you can inform the renderer process about the script switch
+  mainWindow.webContents.send('script-switched', currentScript);
+});
 
     // Optionally, you can inform the renderer process about the script switch
     mainWindow.webContents.send('script-switched', currentScript)

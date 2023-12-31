@@ -280,7 +280,7 @@ $(document).ready(() => {
 })
 
 // GALLERY VIEW!!!!
-
+/*
 ipcRenderer.on('update-background', (event, imagePath) => {
     const backgroundOverlay = document.getElementById('backgroundOverlay')
     backgroundOverlay.style.backgroundImage = `url(${imagePath.replace(
@@ -305,12 +305,27 @@ document
     .addEventListener('change', function () {
         toggleGalleryView(this.checked)
     })
+*/
 
 // BIG DOT TOGGLE!!!!!
 
-const scriptToggle = document.getElementById('scriptToggle')
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
 
-scriptToggle.addEventListener('change', () => {
-    const selectedScript = scriptToggle.checked ? 'normalchat.py' : 'script.py'
-    ipcRenderer.send('switch-script', selectedScript)
-})
+    const scriptToggle = document.getElementById('scriptToggle');
+
+    if (scriptToggle) {
+        console.log('scriptToggle found:', scriptToggle);
+
+        scriptToggle.addEventListener('change', function() {
+            console.log('Script toggle changed');
+
+            const selectedScript = scriptToggle.checked ? 'normalchat.py' : 'script.py';
+            console.log('Selected script:', selectedScript);
+
+            ipcRenderer.send('switch-script', selectedScript);
+        });
+    } else {
+        console.error('Element with ID "scriptToggle" not found.');
+    }
+});
