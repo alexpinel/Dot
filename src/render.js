@@ -54,7 +54,7 @@ function appendMessage(sender, message, isMarkdown) {
 function showTypingIndicator() {
     const chatContainer = document.getElementById('chat-container')
 
-    // Display "Bot is typing..." with a 1-second delay
+    // Display "Bot is typing..."
     setTimeout(() => {
         hideTypingIndicator() // Remove any existing typing indicator
 
@@ -171,10 +171,10 @@ $(document).ready(() => {
                                 li.addClass('folder')
 
                                 // Add folder icon and arrow icon
-                                icon.attr('src', './Assets/icons/folder LM.png') // Adjust the path to your folder icon
-                                icon.addClass('icon')
+                                icon.attr('src', './Assets/Dot-folder-icon.svg') // Adjust the path to your folder icon
+                                icon.addClass('icon size-7 ')
                                 arrow.attr('src', './Assets/icons/arrow LM.png') // Adjust the path to your arrow icon
-                                arrow.addClass('arrow-icon')
+                                arrow.addClass('arrow-icon size-5')
                                 textContainer.text(truncateText(file, 15)) // Adjust the maximum length as needed
                                 textContainer.addClass('text-container')
 
@@ -191,11 +191,8 @@ $(document).ready(() => {
                                 li.addClass('file')
 
                                 // Add document icon
-                                icon.attr(
-                                    'src',
-                                    './Assets/icons/document1 LM.png'
-                                ) // Adjust the path to your document icon
-                                icon.addClass('icon')
+                                icon.attr('src', './Assets/Dot-file-icon.svg') // Adjust the path to your document icon
+                                icon.addClass('icon size-6')
                                 textContainer.text(truncateText(file, 20)) // Adjust the maximum length as needed
                                 textContainer.addClass('text-container')
 
@@ -250,7 +247,28 @@ $(document).ready(() => {
             .then((result) => {
                 if (!result.canceled && result.filePaths.length > 0) {
                     const selectedDirectory = result.filePaths[0]
+
+                    document.getElementById('fileTree').innerHTML = ''
+                    // Show the loading animation after the directory has been selected
+
+                    document.getElementById('loadingAnimation').style.display =
+                        'block'
+
+                    // Now call the function to process the directory
                     executePythonScript(selectedDirectory)
+                        .then(() => {
+                            // Hide the loading animation after the folder is loaded and displayed
+                            document.getElementById(
+                                'loadingAnimation'
+                            ).style.display = 'none'
+                        })
+                        .catch((err) => {
+                            // Hide the loading animation also in case of error
+                            document.getElementById(
+                                'loadingAnimation'
+                            ).style.display = 'none'
+                            console.error(err)
+                        })
                 }
             })
             .catch((err) => {
