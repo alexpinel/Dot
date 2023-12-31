@@ -11,14 +11,7 @@ let pythonProcess // Declare pythonProcess globally
 function findPython() {
     const possibilities = [
         // In packaged app
-        path.join(
-            process.resourcesPath,
-            'app',
-            'llm',
-            'python',
-            'bin',
-            'python3'
-        ),
+        path.join(process.resourcesPath, 'llm', 'python', 'bin', 'python3'),
         // In development
         path.join(__dirname, '..', 'llm', 'python', 'bin', 'python3'),
     ]
@@ -37,7 +30,7 @@ console.log('Python Path:', pythonPath)
 // RUNS DOT THROUGHT  script.py
 
 let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
-//let currentScript = path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'script.py'); // Default script
+//let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py'); // Default script
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
     // Check if the Python process is already running
@@ -71,7 +64,7 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
 ipcMain.on('switch-script', (event) => {
     // Toggle between 'script.py' and 'normalchat.py'
 
-    //currentScript = currentScript.endsWith('script.py') ? path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'normalchat.py') : path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'script.py');
+    //currentScript = currentScript.endsWith('docdot.py') ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py') : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
     currentScript = currentScript.endsWith('docdot.py')
         ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
         : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
@@ -188,7 +181,7 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
         // Construct paths relative to the script's location
         // const pythonExecutablePath = path.join(__dirname, 'python', 'bin', 'python3');
 
-        //const pythonScriptPath = path.join(process.resourcesPath, 'app', 'llm', 'scripts', 'embeddings.py');
+        //const pythonScriptPath = path.join(process.resourcesPath, 'llm', 'scripts', 'embeddings.py');
         const pythonScriptPath = path.join(
             __dirname,
             '..',

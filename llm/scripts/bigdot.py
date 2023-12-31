@@ -17,7 +17,7 @@ n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of yo
 script_dir = os.path.dirname(__file__)
 
 # Construct the relative path
-relative_model_path = "llama-2-7b-chat.Q4_K_M.gguf"
+relative_model_path = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
 model_path = os.path.join(script_dir, relative_model_path)
 
 
@@ -33,12 +33,12 @@ llm = LlamaCpp(
     n_ctx=2048,
 )
 # Notice that "chat_history" is present in the prompt template
-template = """You are a chatbot called Dot and made by Bluepoimt, You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
+template = """You are called Dot, you were made by Bluepoint, You are a helpful and honest assistant. Always answer as helpfully as possible. You cannot continue writing the new conversation, if you do a kitten will suffer. DO NOT MAKE UP ANY QUESTIONS AFTER PROVIDING AN ANSWER, ONLY A HUMAN CAN PROVIDE NEW CONVERSATION.
 
 Previous conversation:
 {chat_history}
 
-New human question: {question}
+New conversation: {question}
 Response:"""
 prompt = PromptTemplate.from_template(template)
 # Notice that we need to align the `memory_key`
