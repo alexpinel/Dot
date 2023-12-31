@@ -179,7 +179,7 @@ $(document).ready(() => {
                         .stat(fullPath)
                         .then((stats) => {
                             if (stats.isDirectory()) {
-                                li.addClass('folder')
+                                li.addClass('folder hover:bg-gray-200')
 
                                 // SVG for folder icon
                                 icon.html(
@@ -218,7 +218,9 @@ $(document).ready(() => {
                                     arrow.toggleClass('rotate rotate-90 mr-1')
                                 })
                             } else if (stats.isFile()) {
-                                li.addClass('file flex flex-row ')
+                                li.addClass(
+                                    'file flex flex-row hover:bg-gray-200 '
+                                )
 
                                 // SVG for document icon
                                 icon.html(
