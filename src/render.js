@@ -184,7 +184,7 @@ $(document).ready(() => {
                         .stat(fullPath)
                         .then((stats) => {
                             if (stats.isDirectory()) {
-                                li.addClass('folder')
+                                li.addClass('folder hover:bg-gray-200')
 
                                 // SVG for folder icon
                                 icon.html(
@@ -220,10 +220,12 @@ $(document).ready(() => {
                                         populateTree(fullPath, subUl)
                                     }
                                     subUl.slideToggle()
-                                    arrow.toggleClass('rotate-90')
+                                    arrow.toggleClass('rotate-90 mr-1')
                                 })
                             } else if (stats.isFile()) {
-                                li.addClass('file flex flex-row ')
+                                li.addClass(
+                                    'file flex flex-row hover:bg-gray-200 '
+                                )
 
                                 // SVG for document icon
                                 icon.html(
@@ -231,7 +233,7 @@ $(document).ready(() => {
                                 <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
                                 <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2Z"/>
                                 </svg>`
-                                ).addClass('icon size-7 inline-block')
+                                ).addClass('icon size-7 inline-block ml-1')
 
                                 // Text for files
                                 textContainer.text(truncateText(file, 20))
