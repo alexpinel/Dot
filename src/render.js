@@ -151,18 +151,26 @@ $(document).ready(() => {
     }
 
     function populateTree(rootPath, parentElement) {
-        // Use fs.promises to work with promises for file system operations
         fs.promises
             .readdir(rootPath)
             .then((files) => {
-                const ul = $('<ul>').css('list-style-type', 'none') // Explicitly set list-style-type to none
+                const ul = $('<ul>').css('list-style-type', 'none')
 
                 files.forEach((file) => {
                     const fullPath = path.join(rootPath, file)
-                    const li = $('<li>')
-                    const icon = $('<img>')
-                    const arrow = $('<img>')
-                    const textContainer = $('<div>') // Container for text to be vertically centered
+                    const li = $('<li>').addClass(
+                        'folder flex flex-row items-center'
+                    ) // Changed from div to li
+                    const icon = $('<div>') // Container for the icon
+                    const arrow = $('<div>') // Container for the arrow
+                    const textContainer = $('<div>').addClass(
+                        'text-container mx-1 text-gray-500'
+                    ) // Container for text
+
+                    // Append items to li
+                    li.append(arrow, icon, textContainer)
+                    // Append li to ul
+                    ul.append(li)
 
                     fs.promises
                         .stat(fullPath)
@@ -170,36 +178,56 @@ $(document).ready(() => {
                             if (stats.isDirectory()) {
                                 li.addClass('folder')
 
-                                // Add folder icon and arrow icon
-                                icon.attr('src', './Assets/Dot-folder-icon.svg') // Adjust the path to your folder icon
-                                icon.addClass('icon size-7 ')
-                                arrow.attr('src', './Assets/icons/arrow LM.png') // Adjust the path to your arrow icon
-                                arrow.addClass('arrow-icon size-5')
-                                textContainer.text(truncateText(file, 15)) // Adjust the maximum length as needed
-                                textContainer.addClass('text-container')
+                                // SVG for folder icon
+                                icon.html(
+                                    `<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                                <path d="M18 5H0v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5Zm-7.258-2L9.092.8a2.009 2.009 0 0 0-1.6-.8H2.049a2 2 0 0 0-2 2v1h10.693Z"/>
+                              </svg>`
+                                ).addClass('icon size-7')
 
-                                li.append(arrow, icon, textContainer)
+                                // SVG for arrow icon
+                                arrow
+                                    .html(
+                                        `<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"/>
+                                  </svg>`
+                                    )
+                                    .addClass('arrow-icon size-7')
 
+                                // Create a nested ul for subdirectories
+                                const subUl = $('<ul>')
+                                    .css({
+                                        'list-style-type': 'none',
+                                        'padding-left': '20px',
+                                    })
+                                    .hide()
+                                li.append(subUl) // Append nested ul to li
+
+                                // Text
+                                textContainer.text(truncateText(file, 15))
+
+                                // Click event for arrows
                                 arrow.click(() => {
-                                    if (li.children('ul').length === 0) {
-                                        populateTree(fullPath, li)
+                                    if (!subUl.children().length) {
+                                        populateTree(fullPath, subUl)
                                     }
-                                    li.children('ul').slideToggle()
-                                    arrow.toggleClass('rotate') // Toggle the rotate class
+                                    subUl.slideToggle()
+                                    arrow.toggleClass('rotate rotate-90')
                                 })
                             } else if (stats.isFile()) {
-                                li.addClass('file')
+                                li.addClass('file flex flex-row ')
 
-                                // Add document icon
-                                icon.attr('src', './Assets/Dot-file-icon.svg') // Adjust the path to your document icon
-                                icon.addClass('icon size-6')
-                                textContainer.text(truncateText(file, 20)) // Adjust the maximum length as needed
-                                textContainer.addClass('text-container')
+                                // SVG for document icon
+                                icon.html(
+                                    `<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                                <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
+                                <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2Z"/>
+                                </svg>`
+                                ).addClass('icon size-7')
 
-                                li.append(icon, textContainer)
+                                // Text for files
+                                textContainer.text(truncateText(file, 20))
                             }
-
-                            ul.append(li)
                         })
                         .catch((err) => {
                             console.error(err)
@@ -309,23 +337,25 @@ document
 
 // BIG DOT TOGGLE!!!!!
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOM fully loaded')
 
-    const scriptToggle = document.getElementById('scriptToggle');
+    const scriptToggle = document.getElementById('scriptToggle')
 
     if (scriptToggle) {
-        console.log('scriptToggle found:', scriptToggle);
+        console.log('scriptToggle found:', scriptToggle)
 
-        scriptToggle.addEventListener('change', function() {
-            console.log('Script toggle changed');
+        scriptToggle.addEventListener('change', function () {
+            console.log('Script toggle changed')
 
-            const selectedScript = scriptToggle.checked ? 'normalchat.py' : 'script.py';
-            console.log('Selected script:', selectedScript);
+            const selectedScript = scriptToggle.checked
+                ? 'normalchat.py'
+                : 'script.py'
+            console.log('Selected script:', selectedScript)
 
-            ipcRenderer.send('switch-script', selectedScript);
-        });
+            ipcRenderer.send('switch-script', selectedScript)
+        })
     } else {
-        console.error('Element with ID "scriptToggle" not found.');
+        console.error('Element with ID "scriptToggle" not found.')
     }
-});
+})

@@ -61,31 +61,29 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
 //BIG DOT TOGGLE!!!!
 
 // Switch between the two scripts
+ipcMain.on('switch-script', (event, selectedScript) => {
+    // Toggle between 'script.py' and 'normalchat.py'
+    console.log('Switching script to:', selectedScript)
 
-  // Toggle between 'script.py' and 'normalchat.py'
-  console.log('Switching script to:', selectedScript);
+    //currentScript = currentScript.endsWith('docdot.py') ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py') : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
+    currentScript = currentScript.endsWith('docdot.py')
+        ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
+        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
 
-  //currentScript = currentScript.endsWith('docdot.py') ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py') : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
-  currentScript = currentScript.endsWith('docdot.py') ? path.join(__dirname,  '..', 'llm', 'scripts', 'bigdot.py') : path.join(__dirname,  '..', 'llm', 'scripts', 'docdot.py');
+    // If the Python process is running, kill it and spawn a new one with the updated script
+    if (pythonProcess) {
+        pythonProcess.kill()
+        pythonProcess = spawn(pythonPath, [currentScript], { shell: true })
 
-  // If the Python process is running, kill it and spawn a new one with the updated script
-  if (pythonProcess) {
-    pythonProcess.kill();
-    pythonProcess = spawn(pythonPath, [currentScript], { shell: true });
+        pythonProcess.stdout.on('data', (data) => {
+            const message = data.toString().trim()
+            mainWindow.webContents.send('python-reply', message)
+        })
 
-    pythonProcess.stdout.on('data', (data) => {
-      const message = data.toString().trim();
-      mainWindow.webContents.send('python-reply', message);
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-      console.error(`Python Script Error: ${data}`);
-    });
-  }
-
-  // Optionally, you can inform the renderer process about the script switch
-  mainWindow.webContents.send('script-switched', currentScript);
-});
+        pythonProcess.stderr.on('data', (data) => {
+            console.error(`Python Script Error: ${data}`)
+        })
+    }
 
     // Optionally, you can inform the renderer process about the script switch
     mainWindow.webContents.send('script-switched', currentScript)
