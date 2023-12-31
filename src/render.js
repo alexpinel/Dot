@@ -158,7 +158,12 @@ $(document).ready(() => {
 
                 files.forEach((file) => {
                     const fullPath = path.join(rootPath, file)
-                    const li = $('<li>').addClass('folder flex flex-col')
+                    const li = $('<li>')
+                        .addClass('folder flex flex-col mb-2')
+                        .css({
+                            'list-style-type': 'none',
+                            'padding-left': '20px',
+                        })
                     const shit = $('<div>').addClass(
                         'folder flex flex-row items-center'
                     ) // Changed from div to li
@@ -183,19 +188,19 @@ $(document).ready(() => {
 
                                 // SVG for folder icon
                                 icon.html(
-                                    `<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                                    `<svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
                                 <path d="M18 5H0v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5Zm-7.258-2L9.092.8a2.009 2.009 0 0 0-1.6-.8H2.049a2 2 0 0 0-2 2v1h10.693Z"/>
                               </svg>`
-                                ).addClass('icon size-7')
+                                ).addClass('icon size-7 inline-block')
 
                                 // SVG for arrow icon
                                 arrow
                                     .html(
-                                        `<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+                                        `<svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"/>
                                   </svg>`
                                     )
-                                    .addClass('arrow-icon size-7')
+                                    .addClass('arrow-icon size-7 inline-block')
 
                                 // Create a nested ul for subdirectories
                                 const subUl = $('<ul>')
@@ -215,18 +220,18 @@ $(document).ready(() => {
                                         populateTree(fullPath, subUl)
                                     }
                                     subUl.slideToggle()
-                                    arrow.toggleClass('rotate rotate-90')
+                                    arrow.toggleClass('rotate-90')
                                 })
                             } else if (stats.isFile()) {
                                 li.addClass('file flex flex-row ')
 
                                 // SVG for document icon
                                 icon.html(
-                                    `<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                                    `<svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
                                 <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
                                 <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2Z"/>
                                 </svg>`
-                                ).addClass('icon size-7')
+                                ).addClass('icon size-7 inline-block')
 
                                 // Text for files
                                 textContainer.text(truncateText(file, 20))
