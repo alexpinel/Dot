@@ -1,5 +1,15 @@
 const { ipcRenderer } = require('electron')
 
+// renderer
+window.addEventListener('contextmenu', (e) => {
+    e.preventDefault()
+    ipcRenderer.send('show-context-menu')
+})
+
+ipcRenderer.on('context-menu-command', (e, command) => {
+    // ...
+})
+
 //// CHATTY CHAT CHAT STUFF!!!!
 
 function appendMessage(sender, message, isMarkdown) {
@@ -323,32 +333,13 @@ $(document).ready(() => {
 })
 
 // GALLERY VIEW!!!!
-/*
 ipcRenderer.on('update-background', (event, imagePath) => {
-    const backgroundOverlay = document.getElementById('backgroundOverlay')
-    backgroundOverlay.style.backgroundImage = `url(${imagePath.replace(
-        /\\/g,
-        '/'
-    )})`
+    // Update the background of the chat-container div with the selected image
+    const chatContainer = document.getElementById('chat-container')
+    if (chatContainer) {
+        chatContainer.style.backgroundImage = `url('file://${imagePath}')`
+    }
 })
-
-function toggleGalleryView(isGalleryView) {
-    ipcRenderer
-        .invoke('toggle-gallery-view', isGalleryView)
-        .then(() => {
-            console.log('Gallery view toggled:', isGalleryView)
-        })
-        .catch((err) => {
-            console.error(err)
-        })
-}
-
-document
-    .getElementById('galleryToggle')
-    .addEventListener('change', function () {
-        toggleGalleryView(this.checked)
-    })
-*/
 
 // BIG DOT TOGGLE!!!!!
 

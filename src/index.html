@@ -195,7 +195,7 @@
                 <!-- Content of the 80% width container -->
                 <div
                     id="chat-container"
-                    class="flex h-[90vh] flex-grow flex-col-reverse overflow-y-auto bg-white"
+                    class="flex h-[90vh] flex-grow transform flex-col-reverse overflow-y-auto bg-cover bg-center transition-transform duration-500 ease-in-out"
                 >
                     <!-- Add these classes to your HTML elements -->
                     <div
@@ -276,7 +276,7 @@
 
                     .typing-indicator {
                         position: absolute;
-                        bottom: 10vh; /* Adjust the value as needed for the desired lift */
+                        bottom: 0vh; /* Adjust the value as needed for the desired lift */
                         left: 50%;
                         transform: translateX(-50%);
                         font-style: italic;

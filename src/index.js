@@ -1,7 +1,114 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
 const fs = require('fs')
+
+const isMac = process.platform === 'darwin'
+let galleryViewInterval // Declare galleryViewInterval globally
+const template = [
+    // { role: 'appMenu' }
+    ...(isMac
+        ? [
+              {
+                  label: app.name,
+                  submenu: [
+                      { role: 'about' },
+                      { type: 'separator' },
+                      { role: 'services' },
+                      { type: 'separator' },
+                      { role: 'hide' },
+                      { role: 'hideOthers' },
+                      { role: 'unhide' },
+                      { type: 'separator' },
+                      { role: 'quit' },
+                  ],
+              },
+          ]
+        : []),
+    // { role: 'fileMenu' }
+    {
+        label: 'File',
+        submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
+    },
+    // { role: 'editMenu' }
+    {
+        label: 'Edit',
+        submenu: [
+            { role: 'undo' },
+            { role: 'redo' },
+            { type: 'separator' },
+            { role: 'cut' },
+            { role: 'copy' },
+            { role: 'paste' },
+            ...(isMac
+                ? [
+                      { role: 'pasteAndMatchStyle' },
+                      { role: 'delete' },
+                      { role: 'selectAll' },
+                      { type: 'separator' },
+                      {
+                          label: 'Speech',
+                          submenu: [
+                              { role: 'startSpeaking' },
+                              { role: 'stopSpeaking' },
+                          ],
+                      },
+                  ]
+                : [
+                      { role: 'delete' },
+                      { type: 'separator' },
+                      { role: 'selectAll' },
+                  ]),
+        ],
+    },
+    // { role: 'viewMenu' }
+    {
+        label: 'View',
+        submenu: [
+            { label: 'Gallery View', click: () => toggleGalleryView() },
+            { role: 'reload' },
+            { role: 'forceReload' },
+            { role: 'toggleDevTools' },
+            { type: 'separator' },
+            { role: 'resetZoom' },
+            { role: 'zoomIn' },
+            { role: 'zoomOut' },
+            { type: 'separator' },
+            { role: 'togglefullscreen' },
+        ],
+    },
+    // { role: 'windowMenu' }
+    {
+        label: 'Window',
+        submenu: [
+            { role: 'minimize' },
+            { role: 'zoom' },
+            ...(isMac
+                ? [
+                      { type: 'separator' },
+                      { role: 'front' },
+                      { type: 'separator' },
+                      { role: 'window' },
+                  ]
+                : [{ role: 'close' }]),
+        ],
+    },
+    {
+        role: 'help',
+        submenu: [
+            {
+                label: 'Learn More',
+                click: async () => {
+                    const { shell } = require('electron')
+                    await shell.openExternal('https://bluepointai.com/')
+                },
+            },
+        ],
+    },
+]
+
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)
 
 let mainWindow
 let pythonProcess // Declare pythonProcess globally
@@ -26,7 +133,21 @@ function findPython() {
 
 const pythonPath = findPython()
 console.log('Python Path:', pythonPath)
-
+// main
+ipcMain.on('show-context-menu', (event) => {
+    const template = [
+        {
+            label: 'Menu Item 1',
+            click: () => {
+                event.sender.send('context-menu-command', 'menu-item-1')
+            },
+        },
+        { type: 'separator' },
+        { label: 'Menu Item 2', type: 'checkbox', checked: true },
+    ]
+    const menu = Menu.buildFromTemplate(template)
+    menu.popup({ window: BrowserWindow.fromWebContents(event.sender) })
+})
 // RUNS DOT THROUGHT  script.py
 
 let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
@@ -128,10 +249,8 @@ const createWindow = () => {
 
 // GALLERY VIEW!!!!
 
-let galleryViewInterval
-
-ipcMain.handle('toggle-gallery-view', (event, toggle) => {
-    if (toggle) {
+function toggleGalleryView() {
+    if (!galleryViewInterval) {
         // Start the image rotation
         galleryViewInterval = setInterval(() => {
             const imagePath = getRandomImage()
@@ -144,8 +263,9 @@ ipcMain.handle('toggle-gallery-view', (event, toggle) => {
     } else {
         // Stop the image rotation
         clearInterval(galleryViewInterval)
+        galleryViewInterval = null
     }
-})
+}
 
 function getRandomImage() {
     const imagesFolder = path.join(__dirname, 'Assets', 'wallpapers')
@@ -154,14 +274,31 @@ function getRandomImage() {
     return path.join(imagesFolder, imageFiles[randomIndex])
 }
 
-// MOAR ELECTRON STUFF!!!! TINKER AT RISK LMAO
+app.whenReady().then(createWindow)
 
-app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') app.quit()
+ipcMain.on('show-context-menu', (event) => {
+    const template = [
+        {
+            label: 'Menu Item 1',
+            click: () => {
+                event.sender.send('context-menu-command', 'menu-item-1')
+            },
+        },
+        { type: 'separator' },
+        { label: 'Menu Item 2', type: 'checkbox', checked: true },
+    ]
+    const menu = Menu.buildFromTemplate(template)
+    menu.popup({ window: BrowserWindow.fromWebContents(event.sender) })
 })
 
-app.whenReady().then(() => {
-    createWindow()
+ipcMain.on('toggle-gallery-view', () => {
+    toggleGalleryView()
+})
+
+ipcMain.on('update-background', (event, imagePath) => {
+    mainWindow.webContents.send('update-background', imagePath)
+
+    // MOAR ELECTRON STUFF!!!! TINKER AT RISK LMAO
 
     const pythonPath = findPython()
     console.log('Python Path:', pythonPath)
