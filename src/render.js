@@ -364,8 +364,8 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Script toggle changed')
 
             const selectedScript = scriptToggle.checked
-                ? 'normalchat.py'
-                : 'script.py'
+                ? 'bigdot.py'
+                : 'docdot.py'
             console.log('Selected script:', selectedScript)
 
             ipcRenderer.send('switch-script', selectedScript)
