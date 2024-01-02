@@ -184,14 +184,16 @@ $(document).ready(() => {
                         .stat(fullPath)
                         .then((stats) => {
                             if (stats.isDirectory()) {
-                                li.addClass('folder hover:bg-gray-200')
+                                li.addClass(
+                                    'folder hover:bg-gray-200 transition align-center'
+                                )
 
                                 // SVG for folder icon
                                 icon.html(
-                                    `<svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                                    `<svg class="w-4 h-4  text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
                                 <path d="M18 5H0v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5Zm-7.258-2L9.092.8a2.009 2.009 0 0 0-1.6-.8H2.049a2 2 0 0 0-2 2v1h10.693Z"/>
                               </svg>`
-                                ).addClass('icon size-7 inline-block')
+                                ).addClass('icon size-7 mt-2 inline-block ')
 
                                 // SVG for arrow icon
                                 arrow
@@ -200,7 +202,9 @@ $(document).ready(() => {
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"/>
                                   </svg>`
                                     )
-                                    .addClass('arrow-icon size-7 inline-block')
+                                    .addClass(
+                                        'mt-2 size-7 inline-block transition mr-1'
+                                    )
 
                                 // Create a nested ul for subdirectories
                                 const subUl = $('<ul>')
@@ -221,12 +225,11 @@ $(document).ready(() => {
                                     }
                                     subUl.slideToggle()
 
-                                    arrow.toggleClass('rotate rotate-90 mr-1')
-
+                                    arrow.toggleClass('transition rotate-90 ')
                                 })
                             } else if (stats.isFile()) {
                                 li.addClass(
-                                    'file flex flex-row hover:bg-gray-200 '
+                                    'file flex flex-row hover:bg-gray-200 transition '
                                 )
 
                                 // SVG for document icon
@@ -235,9 +238,7 @@ $(document).ready(() => {
                                 <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
                                 <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2Z"/>
                                 </svg>`
-
-                                ).addClass('icon size-7 inline-block ml-1')
-
+                                ).addClass('icon size-7 mt-2 inline-block ml-1')
 
                                 // Text for files
                                 textContainer.text(truncateText(file, 20))
