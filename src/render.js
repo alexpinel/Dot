@@ -277,8 +277,8 @@ $(document).ready(() => {
             $loadingSpinner.hide()
             //RESETTING SCRIPT
             const selectedScript = scriptToggle.checked
-                ? 'normalchat.py'
-                : 'script.py'
+                ? 'bigdot.py'
+                : 'docdot.py'
             ipcRenderer.send('switch-script', selectedScript)
             ipcRenderer.send('switch-script', selectedScript)
         }
