@@ -1,7 +1,7 @@
 import sys
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
-from langchain.document_loaders import PyPDFLoader, DirectoryLoader, UnstructuredWordDocumentLoader, TextLoader, UnstructuredPowerPointLoader, UnstructuredMarkdownLoader, Docx2txtLoader
+from langchain.document_loaders import PyPDFLoader, DirectoryLoader, UnstructuredExcelLoader, TextLoader, UnstructuredPowerPointLoader, UnstructuredMarkdownLoader, Docx2txtLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
 #import faiss
@@ -108,18 +108,38 @@ def embeddings(chosen_directory):
     except Exception as error:
         print("NO POWER POINTS FOUND" + str(error))
 
+    ### EXCEL
+    try:
+        loader4=DirectoryLoader(directory,
+                        glob="*.xlsx",
+                        loader_cls=UnstructuredExcelLoader,
+                        show_progress=True,
+                        use_multithreading=True,
+                        recursive=True)
+        
+        documents_xlsx = loader4.load()
+        text_chunks_xlsx=text_splitter.split_documents(documents_xlsx)
 
+        print(len(text_chunks_ppt))
+
+        #**Step 4: Convert the Text Chunks into Embeddings and Create a FAISS Vector Store***
+        vector_store_xlsx=FAISS.from_documents(text_chunks_xlsx, embeddings)
+        #vector_store_ppt.save_local(os.path.join(folder_path, "Dot-data-ppt"))
+        victor.merge_from(vector_store_xlsx)
+
+    except Exception as error:
+        print("NO EXCEL FOUND" + str(error))
 
     # MARKDOWN
     try:
-        loader4=DirectoryLoader(directory,
+        loader5=DirectoryLoader(directory,
                         glob="*.md",
                         loader_cls=UnstructuredMarkdownLoader,
                         show_progress=True,
                         use_multithreading=True,
                         recursive=True)
         
-        documents_md = loader4.load()
+        documents_md = loader5.load()
         text_chunks_md=text_splitter.split_documents(documents_md)
 
         print(len(text_chunks_md))
