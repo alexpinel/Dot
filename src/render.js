@@ -30,6 +30,8 @@ function appendMessage(sender, message, isMarkdown) {
         userBubble.classList.add('user-bubble')
         userBubble.innerHTML = `<strong>${message}</strong>`
 
+        messageDiv.classList.add('message') // Add the "message" class for the animation
+
         userContentContainer.appendChild(userIcon)
         userContentContainer.appendChild(userBubble)
         messageDiv.appendChild(userContentContainer)
@@ -52,6 +54,7 @@ function appendMessage(sender, message, isMarkdown) {
         } else {
             botBubble.innerText = message
         }
+        messageDiv.classList.add('message') // Add the "message" class for the animation
 
         botContentContainer.appendChild(botBubble)
         messageDiv.appendChild(botContentContainer)
