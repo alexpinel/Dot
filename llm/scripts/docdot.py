@@ -29,7 +29,7 @@ if not os.path.exists(folder_path):
 
 
 
-embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2', model_kwargs={'device': 'mps'})
+embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2', model_kwargs={'device': 'mps'})
 vector_store = FAISS.load_local(os.path.join(folder_path, "Dot-data"), embeddings)
 n_gpu_layers = 1  # Metal set to 1 is enough.
 n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
@@ -92,7 +92,7 @@ qa_prompt=PromptTemplate(template=template, input_variables=['context', 'questio
 
 chain = RetrievalQA.from_chain_type(llm=llm,
                                 chain_type='stuff',
-                                retriever=vector_store.as_retriever(search_kwargs={'k': 2}),
+                                retriever=vector_store.as_retriever(search_kwargs={'k': 1}),
                                 return_source_documents=True,
                                 chain_type_kwargs={'prompt': qa_prompt})
 

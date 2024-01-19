@@ -11,11 +11,11 @@ import os
 def embeddings(chosen_directory):
 
     ### LOAD EMBEDDING SETTINGS
-    embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2', model_kwargs={'device':'mps'})
+    embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2', model_kwargs={'device':'mps'})
 
     text_splitter=RecursiveCharacterTextSplitter(
                                                 chunk_size=8000,
-                                                chunk_overlap=256)
+                                                chunk_overlap=1024)
     
 
     victor = FAISS.from_texts(["foo"], embeddings)

@@ -100,7 +100,7 @@ const template = [
                 label: 'Learn More',
                 click: async () => {
                     const { shell } = require('electron')
-                    await shell.openExternal('https://bluepointai.com/')
+                    await shell.openExternal('https://bluepointdotbeta.web.app/index.html')
                 },
             },
         ],
@@ -128,7 +128,7 @@ function findPython() {
         }
     }
     console.log('Could not find python3, checked', possibilities)
-    app.quit()
+    //app.quit()
 }
 
 const pythonPath = findPython()
@@ -151,7 +151,12 @@ ipcMain.on('show-context-menu', (event) => {
 // RUNS DOT THROUGHT  script.py
 
 let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
-//let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py'); // Default script
+/*let currentScript = path.join(
+    process.resourcesPath,
+    'llm',
+    'scripts',
+    'docdot.py'
+) // Default script*/
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
     // Check if the Python process is already running
@@ -186,8 +191,10 @@ ipcMain.on('switch-script', (event, selectedScript) => {
     // Toggle between 'script.py' and 'normalchat.py'
     console.log('Switching script to:', selectedScript)
 
-    //currentScript = currentScript.endsWith('docdot.py') ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py') : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
-    currentScript = currentScript.endsWith('docdot.py')
+    /*currentScript = currentScript.endsWith('docdot.py')
+        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
+        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
+    currentScript = currentScript.endsWith('docdot.py')*/
         ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
         : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
 
@@ -255,7 +262,7 @@ function toggleGalleryView() {
         galleryViewInterval = setInterval(() => {
             const imagePath = getRandomImage()
             mainWindow.webContents.send('update-background', imagePath)
-        }, 20000) // Change image every 20 seconds
+        }, 60000) // Change image every 20 seconds
 
         // Send the first image immediately
         const firstImagePath = getRandomImage()
@@ -319,7 +326,12 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
         // Construct paths relative to the script's location
         // const pythonExecutablePath = path.join(__dirname, 'python', 'bin', 'python3');
 
-        //const pythonScriptPath = path.join(process.resourcesPath, 'llm', 'scripts', 'embeddings.py');
+        /*const pythonScriptPath = path.join(
+            process.resourcesPath,
+            'llm',
+            'scripts',
+            'embeddings.py'
+        )*/
         const pythonScriptPath = path.join(
             __dirname,
             '..',
