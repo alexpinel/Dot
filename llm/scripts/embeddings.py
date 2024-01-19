@@ -162,9 +162,8 @@ def embeddings(chosen_directory):
 
 if __name__ == "__main__":
     # Check if the correct number of command-line arguments is provided
-    if len(sys.argv) != 2:
-        print("Usage: python your_script.py <directory_path>")
-        sys.exit(1)
+
+    print("Usage: python your_script.py <directory_path>")
 
     # Get the directory path from the command-line argument
     directory_path = sys.argv[1]
