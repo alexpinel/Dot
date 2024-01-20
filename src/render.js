@@ -198,26 +198,24 @@ $(document).ready(() => {
                         .then((stats) => {
                             if (stats.isDirectory()) {
                                 li.addClass(
-                                    'folder hover:bg-gray-200 transition align-center'
+                                    'folder rounded-lg hover:bg-gray-200 transition align-center'
                                 )
-
-                                // SVG for folder icon
-                                icon.html(
-                                    `<svg class="w-4 h-4  text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
-                                <path d="M18 5H0v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5Zm-7.258-2L9.092.8a2.009 2.009 0 0 0-1.6-.8H2.049a2 2 0 0 0-2 2v1h10.693Z"/>
-                              </svg>`
-                                ).addClass('icon size-7 mt-2 inline-block ')
-
                                 // SVG for arrow icon
-                                arrow
-                                    .html(
-                                        `<svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"/>
-                                  </svg>`
-                                    )
-                                    .addClass(
-                                        'mt-2 size-7 inline-block transition mr-1'
-                                    )
+                                arrow.html(
+                                    `<svg class="w-3 h-3 text-black dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"/>
+                                    </svg>`
+                                )
+                                .addClass('inline-block transition mr-1 rotate-0') // Added rotate-0 class
+                                .click(() => {
+                                    if (!subUl.children().length) {
+                                        populateTree(fullPath, subUl);
+                                    }
+                                    subUl.slideToggle();
+
+                                    // Toggle the rotate class
+                                    arrow.toggleClass('rotate-90');
+                                });
 
                                 // Create a nested ul for subdirectories
                                 const subUl = $('<ul>')
@@ -231,15 +229,6 @@ $(document).ready(() => {
                                 // Text
                                 textContainer.text(truncateText(file, 15))
 
-                                // Click event for arrows
-                                arrow.click(() => {
-                                    if (!subUl.children().length) {
-                                        populateTree(fullPath, subUl)
-                                    }
-                                    subUl.slideToggle()
-
-                                    arrow.toggleClass('transition rotate-90 ')
-                                })
                             } else if (stats.isFile()) {
                                 li.addClass(
                                     'file flex flex-row hover:bg-gray-200 transition '
@@ -247,14 +236,13 @@ $(document).ready(() => {
 
                                 // SVG for document icon
                                 icon.html(
-                                    `<svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
-                                <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
-                                <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2Z"/>
-                                </svg>`
-                                ).addClass('icon size-7 mt-2 inline-block ml-1')
+                                    `<svg class="w-3 h-3 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">
+                                    <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M6 1v4a1 1 0 0 1-1 1H1m14-4v16a.97.97 0 0 1-.933 1H1.933A.97.97 0 0 1 1 18V5.828a2 2 0 0 1 .586-1.414l2.828-2.828A2 2 0 0 1 5.828 1h8.239A.97.97 0 0 1 15 2Z"/>
+                                  </svg>`
+                                ).addClass('icon  inline-block ml-1')
 
                                 // Text for files
-                                textContainer.text(truncateText(file, 20))
+                                textContainer.text(truncateText(file, 15))
                             }
                         })
                         .catch((err) => {
@@ -368,3 +356,9 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Element with ID "scriptToggle" not found.')
     }
 })
+
+
+
+
+
+
