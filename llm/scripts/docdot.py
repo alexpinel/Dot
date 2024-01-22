@@ -92,7 +92,7 @@ qa_prompt=PromptTemplate(template=template, input_variables=['context', 'questio
 
 chain = RetrievalQA.from_chain_type(llm=llm,
                                 chain_type='stuff',
-                                retriever=vector_store.as_retriever(search_kwargs={'k': 1}),
+                                retriever=vector_store.as_retriever(search_kwargs={'k': 2}),
                                 return_source_documents=True,
                                 chain_type_kwargs={'prompt': qa_prompt})
 
