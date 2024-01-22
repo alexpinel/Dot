@@ -159,9 +159,26 @@ const $loadingSpinner = $('#loadingSpinner')
 $(document).ready(() => {
     const $fileTree = $('#fileTree')
 
-    function truncateText(text, maxLength) {
-        return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
+    function truncateText(textContainer, maxWidth) {
+        const text = textContainer.text();
+        const originalText = textContainer.data('original-text');
+    
+        if (!originalText) {
+            textContainer.data('original-text', text);
+        }
+    
+        const isTruncated = textContainer[0].scrollWidth > maxWidth;
+    
+        if (isTruncated) {
+            const truncatedText = originalText.slice(0, -1);
+            textContainer.text(truncatedText);
+        } else {
+            textContainer.text(originalText);
+        }
+    
+        return isTruncated;
     }
+    
 
     function populateTree(rootPath, parentElement) {
         fs.promises
@@ -183,7 +200,7 @@ $(document).ready(() => {
                     const icon = $('<div>') // Container for the icon
                     const arrow = $('<div>') // Container for the arrow
                     const textContainer = $('<div>').addClass(
-                        'text-container mx-1 text-gray-500'
+                        'text-container mx-1 text-gray-500 file-name'
                     ) // Container for text
 
                     // Append li to shit
@@ -227,7 +244,15 @@ $(document).ready(() => {
                                 li.append(subUl) // Append nested ul to li
 
                                 // Text
-                                textContainer.text(truncateText(file, 15))
+                                // Text for folders
+                                textContainer.text(file);
+                                const isTruncated = truncateText(textContainer, textContainer.width());
+                                if (isTruncated) {
+                                    textContainer.attr('title', file);
+                                } else {
+                                    textContainer.removeAttr('title');
+                                }
+
 
                             } else if (stats.isFile()) {
                                 li.addClass(
@@ -242,7 +267,15 @@ $(document).ready(() => {
                                 ).addClass('icon  inline-block ml-1')
 
                                 // Text for files
-                                textContainer.text(truncateText(file, 15))
+                                // Text for folders
+                                    textContainer.text(file);
+                                    const isTruncated = truncateText(textContainer, textContainer.width());
+                                    if (isTruncated) {
+                                        textContainer.attr('title', file);
+                                    } else {
+                                        textContainer.removeAttr('title');
+                                    }
+
                             }
                         })
                         .catch((err) => {
