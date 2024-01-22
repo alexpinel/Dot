@@ -193,29 +193,29 @@ ipcMain.on('switch-script', (event, selectedScript) => {
 
     /*currentScript = currentScript.endsWith('docdot.py')
         ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
-        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
-    currentScript = currentScript.endsWith('docdot.py')*/
+        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');*/
+    currentScript = currentScript.endsWith('docdot.py')
         ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
-        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
+        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');
 
     // If the Python process is running, kill it and spawn a new one with the updated script
     if (pythonProcess) {
-        pythonProcess.kill()
-        pythonProcess = spawn(pythonPath, [currentScript], { shell: true })
+        pythonProcess.kill();
+        pythonProcess = spawn(pythonPath, [currentScript], { shell: true });
 
         pythonProcess.stdout.on('data', (data) => {
-            const message = data.toString().trim()
-            mainWindow.webContents.send('python-reply', message)
-        })
+            const message = data.toString().trim();
+            mainWindow.webContents.send('python-reply', message);
+        });
 
         pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Script Error: ${data}`)
-        })
+            console.error(`Python Script Error: ${data}`);
+        });
     }
 
     // Optionally, you can inform the renderer process about the script switch
-    mainWindow.webContents.send('script-switched', currentScript)
-})
+    mainWindow.webContents.send('script-switched', currentScript);
+});
 
 //OPEN FOLDER THING!!!!
 

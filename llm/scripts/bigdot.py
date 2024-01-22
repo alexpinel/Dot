@@ -30,7 +30,7 @@ llm = LlamaCpp(
     #verbose=True, # Verbose is required to pass to the callback manager,
     max_tokens=2048,
     temperature= 0.6,
-    n_ctx=2048,
+    n_ctx=8000,
 )
 # Notice that "chat_history" is present in the prompt template
 template = """You are called Dot, you were made by Bluepoint, You are a helpful and honest assistant. Always answer as helpfully as possible. You cannot continue writing the new conversation, if you do a kitten will suffer. DO NOT MAKE UP ANY QUESTIONS AFTER PROVIDING AN ANSWER, ONLY A HUMAN CAN PROVIDE NEW CONVERSATION.

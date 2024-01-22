@@ -187,6 +187,10 @@ $(document).ready(() => {
                 const ul = $('<ul>').css('list-style-type', 'none')
 
                 files.forEach((file) => {
+                        // Skip .DS_Store files
+                        if (file === '.DS_Store') {
+                            return;
+                        }
                     const fullPath = path.join(rootPath, file)
                     const li = $('<li>')
                         .addClass('folder flex flex-col mb-2')
