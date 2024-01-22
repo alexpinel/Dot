@@ -4,6 +4,7 @@ from langchain.vectorstores import FAISS
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader, UnstructuredExcelLoader, TextLoader, UnstructuredPowerPointLoader, UnstructuredMarkdownLoader, Docx2txtLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
+
 #import faiss
 
 
@@ -22,7 +23,7 @@ def embeddings(chosen_directory):
 
     ###LOCATE DIRECTORY
     # Specify the desktop path
-    desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+    desktop_path = os.path.join(os.path.expanduser("~"), "Documents")
 
     # Specify the folder name
     folder_name = "Dot-data"

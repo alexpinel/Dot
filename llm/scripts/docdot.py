@@ -14,7 +14,7 @@ import os
 
 
 # Specify the desktop path
-desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+desktop_path = os.path.join(os.path.expanduser("~"), "Documents")
 
 # Specify the folder name
 folder_name = "Dot-data"
