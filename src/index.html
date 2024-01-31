@@ -1,155 +1,110 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="dist/output.css" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css" href="markdown-styles.css" />
-    </head>
-    <body>
-        <div id="backgroundOverlay"></div>
-        <div class="flex h-screen">
-            <!-- Your other content goes here -->
 
-            <div
-                id="menu-side"
-                class="flex h-full w-1/5 flex-col justify-between border-x border-gray-400 bg-gray-50"
-            >
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="dist/output.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="markdown-styles.css" />
+</head>
+
+<body>
+    <div id="backgroundOverlay"></div>
+    <div class="flex h-screen">
+        <!-- Your other content goes here -->
+
+        <div id="menu-side" class="flex h-full w-1/5 flex-col justify-between border-x border-gray-400 bg-gray-50">
             <div class="flex items-center justify-center mt-2">
-                <button id="selectDirectoryButton" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 min-w-10 min-h-10 shadow-md bg-white text-gray-900 hover:bg-black hover:text-white">
-                    <span class="text-md font-medium">Select your documents</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
-                    </svg>                
+                <button id="selectDirectoryButton"
+                    class="flex items-center justify-between gap-1.5 rounded-lg px-3 py-1.5 w-11/12 min-w-10 min-h-10 shadow-md bg-white text-gray-900 hover:bg-blue-600 hover:text-white">
+                    <span class="text-md font-medium">Upload documents</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                    </svg>
                 </button>
             </div>
-            
-            
-                           
-                <hr class="my-2 h-px border-0 bg-gray-200 dark:bg-gray-700" />
 
-                <div
-                    role="status"
-                    id="loadingAnimation"
-                    class="-my-2 hidden max-w-md animate-pulse space-y-4 divide-y divide-gray-200 rounded border border-gray-200 p-4 shadow md:p-6 dark:divide-gray-700 dark:border-gray-700"
-                >
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <div
-                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
-                            ></div>
-                            <div
-                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
-                            ></div>
-                        </div>
-                        <div
-                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
-                        ></div>
-                    </div>
-                    <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <div
-                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
-                            ></div>
-                            <div
-                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
-                            ></div>
-                        </div>
-                        <div
-                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
-                        ></div>
-                    </div>
-                    <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <div
-                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
-                            ></div>
-                            <div
-                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
-                            ></div>
-                        </div>
-                        <div
-                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
-                        ></div>
-                    </div>
-                    <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <div
-                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
-                            ></div>
-                            <div
-                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
-                            ></div>
-                        </div>
-                        <div
-                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
-                        ></div>
-                    </div>
-                    <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <div
-                                class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"
-                            ></div>
-                            <div
-                                class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"
-                            ></div>
-                        </div>
-                        <div
-                            class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"
-                        ></div>
-                    </div>
-                    <span class="sr-only">Loading...</span>
-                </div>
 
-                <!-- Rest of the menu content... -->
-                <div id="sidebar" class="no-horizontal-scroll">
-                    <!-- Sidebar content will be dynamically generated using JavaScript -->
-                </div>
-                <div id="fileTree" class="no-horizontal-scroll overflow-y-auto">
-                    <!-- File tree content goes here -->
-                </div>
-                <div
-                    id="switches and logo"
-                    class="flex grow flex-col items-center justify-end"
-                >
-                    <label
-                        class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center rtl:ml-0"
-                    >
-                        <input
-                            id="scriptToggle"
-                            type="checkbox"
-                            value=""
-                            class="peer sr-only"
-                        />
-                        <div
-                            class="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-50 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-green-800"
-                        ></div>
-                        <span
-                            class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-                            >Big Dot</span
-                        >
 
-                        <div class="group inline-block relative">
-                            <!-- The second icon with its classes -->
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                class="mx-2 size-4 text-gray-800 dark:text-white"
-                            >
-                                <g data-name="27.Question">
-                                    <path d="M12 24a12 12 0 1 1 12-12 12.013 12.013 0 0 1-12 12zm0-22a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2z" />
-                                    <path d="M13 16h-2v-4h1a3 3 0 1 0-3-3H7a5 5 0 1 1 6 4.9zM11 18h2v2h-2z" />
-                                </g>
-                            </svg>
-                            
-                            <div class="hidden group-hover:block absolute bg-white text-gray-800 dark:text-white p-4 rounded shadow-lg text-sm min-w-[180px]">
-                                <!-- Description text goes here -->
-                                Use Big Dot for any tasks and questions unrelated to your documents.
-                            </div>
+            <hr class="my-2 h-px border-0 bg-gray-200 dark:bg-gray-700" />
+
+            <div role="status" id="loadingAnimation"
+                class="-my-2 hidden max-w-md animate-pulse space-y-4 divide-y divide-gray-200 rounded border border-gray-200 p-4 shadow md:p-6 dark:divide-gray-700 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <span class="sr-only">Loading...</span>
+            </div>
+
+            <!-- Rest of the menu content... -->
+            <div id="sidebar" class="no-horizontal-scroll">
+                <!-- Sidebar content will be dynamically generated using JavaScript -->
+            </div>
+            <div id="fileTree" class="no-horizontal-scroll overflow-y-auto">
+                <!-- File tree content goes here -->
+            </div>
+            <div id="switches and logo" class="flex grow flex-col items-center justify-end">
+                <label class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center rtl:ml-0">
+                    <input id="scriptToggle" type="checkbox" value="" class="peer sr-only" />
+                    <div
+                        class="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-50 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-green-800">
+                    </div>
+                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Big Dot</span>
+
+                    <div class="group inline-block relative">
+                        <!-- The second icon with its classes -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            class="mx-2 size-4 text-gray-800 dark:text-white">
+                            <g data-name="27.Question">
+                                <path
+                                    d="M12 24a12 12 0 1 1 12-12 12.013 12.013 0 0 1-12 12zm0-22a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2z" />
+                                <path d="M13 16h-2v-4h1a3 3 0 1 0-3-3H7a5 5 0 1 1 6 4.9zM11 18h2v2h-2z" />
+                            </g>
+                        </svg>
+
+                        <div
+                            class="hidden group-hover:block absolute bg-white text-gray-800 dark:text-white p-4 rounded shadow-lg text-sm min-w-[180px]">
+                            <!-- Description text goes here -->
+                            Use Big Dot for any tasks and questions unrelated to your documents.
                         </div>
-                        
-                    </label>
-                    <!--
+                    </div>
+
+                </label>
+                <!--
                     <label
                         class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center"
                     >
@@ -168,215 +123,218 @@
                     </label>
                 -->
 
-                    <img src="Assets/logo2.png" alt="Logo" class="w-3/5" />
-                    <p
-                        class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400"
-                    >
-                        Answers may not be completely accurate, consider
-                        checking important information.
-                    </p>
-                </div>
-            </div>
-
-            <div id="chat-side" class="relative w-4/5 flex-grow">
-                <!-- Content of the 80% width container -->
-                <div
-                    id="chat-container"
-                    class="flex h-[90vh] flex-grow transform flex-col-reverse overflow-y-auto overflow-x-hidden bg-cover bg-center transition-transform duration-500 ease-in-out"
-                >
-                    <!-- Add these classes to your HTML elements -->
-                    <div
-                        id="bot-message"
-                        class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base"
-                    >
-                        <!-- ... existing code ... -->
-                    </div>
-                </div>
-
-                <style>
-                    .message {
-                        width: 90vw;
-                        margin-left: auto;
-                        margin-right: auto;
-                        overflow: hidden; /* Ensure overflow is hidden for rounded corners */
-                        animation: fadeIn 0.3s ease-in-out;
-                    }
-                    @keyframes fadeIn {
-                        from {
-                            opacity: 0;
-                            transform: translateY(10px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-
-                    .user-content-container {
-                        display: flex;
-                        align-items: flex-start;
-                    }
-
-                    .user-bubble {
-                        width: 70vw; /* Adjust the width of the bot's bubble */
-                        padding: 10px;
-                        background-color: rgba(236, 236, 236, 0.603);
-                        backdrop-filter: saturate(180%) blur(20px);
-                        color: #000; /* Set the text color to black */
-                        border-radius: 10px;
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
-                    }
-
-                    .bot-content-container {
-                        display: flex;
-                        align-items: flex-end;
-                    }
-
-                    .bot-bubble {
-                        width: 70vw; /* Adjust the width of the bot's bubble */
-                        padding: 10px;
-                        background-color: rgba(236, 236, 236, 0.603);
-                        backdrop-filter: saturate(180%) blur(20px);
-                        color: #000; /* Set the text color to black */
-                        border-radius: 10px;
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
-                    }
-
-                    .typing-indicator {
-                        font-style: italic;
-                        color: #6b7280; /* Adjust color based on your design */
-                    }
-
-                    .user-icon {
-                        /* Customize user's icon styles */
-                        background-image: url('./Assets/icons/user-icon.png');
-                        background-size: cover; /* Adjust as needed */
-                        width: 24px; /* Adjust the width of the icon */
-                        height: 24px; /* Adjust the height of the icon */
-                        border-radius: 0%; /* Make it a circle */
-                        margin-right: 12px; /* Adjust as needed */
-                    }
-
-                    .bot-icon {
-                        /* Customize bot's icon styles */
-                        background-image: url('./Assets/icons/bot-icon.png');
-                        background-size: cover; /* Adjust as needed */
-                        width: 20px; /* Adjust the width of the icon */
-                        height: 20px; /* Adjust the height of the icon */
-                        border-radius: 0%; /* Make it a circle */
-                        margin-right: 15px; /* Adjust as needed */
-                    }
-                    .custom-shadow-md-up {
-                        box-shadow:
-                            0 -10px 15px -3px rgba(0, 0, 0, 0.1),
-                            0 -4px 6px -2px rgba(0, 0, 0, 0.05);
-                    }
-
-                    .typing-indicator {
-                        position: absolute;
-                        bottom: 0vh; /* Adjust the value as needed for the desired lift */
-                        left: 50%;
-                        transform: translateX(-50%);
-                        font-style: italic;
-                        color: #6b7280; /* Adjust color based on your design */
-                    }
-
-                    @keyframes bounce {
-                        0%,
-                        20%,
-                        50%,
-                        80%,
-                        100% {
-                            transform: translateY(0);
-                        }
-                        40% {
-                            transform: translateY(-5px);
-                        }
-                        60% {
-                            transform: translateY(-3px);
-                        }
-                    }
-
-                    .typing-indicator span {
-                        display: inline-block;
-                        animation: bounce 1s infinite;
-                    }
-
-                    .typing-indicator span:nth-child(1) {
-                        animation-delay: 0.1s;
-                    }
-
-                    .typing-indicator span:nth-child(2) {
-                        animation-delay: 0.2s;
-                    }
-
-                    .typing-indicator span:nth-child(3) {
-                        animation-delay: 0.3s;
-                    }
-                    .rotate-90 {
-                        transform: rotate(90deg);
-                        transform-origin: center; /* Set the transform origin to the center of the element */
-                        transition: transform 0.3s ease; /* Adjust the transition duration and easing as needed */
-                    }
-                    .file-name {
-                        overflow: hidden;
-                        white-space: nowrap;
-                        text-overflow: ellipsis;
-                    }
-
-                    /* Add or customize other styles as needed */
-                </style>
-                <div
-                    id="user-input-and-button"
-                    class="flex flex-shrink-0 items-center justify-center"
-                    style="
-                        box-shadow:
-                            0 -4px 6px -1px rgba(0, 0, 0, 0.08),
-                            0 -2px 4px -1px rgba(0, 0, 0, 0.02);
-                    "
-                >
-                    <div class="input-container mt-3 w-3/4">
-                        <!-- Adjust the width and margin-top as needed -->
-                        <input
-                            type="text"
-                            id="user-input"
-                            class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                        />
-                    </div>
-                    <!-- send button -->
-                    <button
-                        id="send-button"
-                        onclick="sendMessage('')"
-                        class="0 group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-black shadow-md bg-white text-gray-900 hover:bg-black hover:text-white transition-all duration-75 ease-in"
-                        >
-                        <span
-                            class="relative rounded-md px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0"
-                        >
-                            <svg
-                            class="h-5 w-5 transition-all duration-75 ease-in"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 10 14"
-                            >
-                            <path
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M5 13V1m0 0L1 5m4-4 4 4"
-                            />
-                            </svg>
-                        </span>
-                        </button>
-
-                </div>
+                <img src="Assets/logo2.png" alt="Logo" class="w-3/5" />
+                <p class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400">
+                    Answers may not be accurate, please consider
+                    checking important information.
+                </p>
             </div>
         </div>
 
-        <script src="./render.js"></script>
-        <script src="../node_modules/jquery/dist/jquery.min.js"></script>
-        <script src="../node_modules/marked/marked.min.js"></script>
-        <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
-    </body>
+        <div id="chat-side" class="relative w-4/5 flex-grow">
+            <!-- Content of the 80% width container -->
+            <div id="chat-container"
+                class="flex h-[90vh] flex-grow transform flex-col-reverse overflow-y-auto overflow-x-hidden bg-cover bg-center transition-transform duration-500 ease-in-out">
+                <!-- Add these classes to your HTML elements -->
+                <div id="bot-message" class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base">
+                    <!-- ... existing code ... -->
+                </div>
+            </div>
+
+            <style>
+                .message {
+                    width: 90vw;
+                    margin-left: auto;
+                    margin-right: auto;
+                    overflow: hidden;
+                    /* Ensure overflow is hidden for rounded corners */
+                    animation: fadeIn 0.3s ease-in-out;
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .user-content-container {
+                    display: flex;
+                    align-items: flex-start;
+                }
+
+                .user-bubble {
+                    width: 70vw;
+                    /* Adjust the width of the bot's bubble */
+                    padding: 10px;
+                    background-color: rgba(236, 236, 236, 0.603);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    color: #000;
+                    /* Set the text color to black */
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    /* Shadow effect */
+                }
+
+                .bot-content-container {
+                    display: flex;
+                    align-items: flex-end;
+                }
+
+                .bot-bubble {
+                    width: 70vw;
+                    /* Adjust the width of the bot's bubble */
+                    padding: 10px;
+                    background-color: rgba(236, 236, 236, 0.603);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    color: #000;
+                    /* Set the text color to black */
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    /* Shadow effect */
+                }
+
+                .typing-indicator {
+                    font-style: italic;
+                    color: #6b7280;
+                    /* Adjust color based on your design */
+                }
+
+                .user-icon {
+                    /* Customize user's icon styles */
+                    background-image: url('./Assets/icons/user-icon.png');
+                    background-size: cover;
+                    /* Adjust as needed */
+                    width: 24px;
+                    /* Adjust the width of the icon */
+                    height: 24px;
+                    /* Adjust the height of the icon */
+                    border-radius: 0%;
+                    /* Make it a circle */
+                    margin-right: 12px;
+                    /* Adjust as needed */
+                }
+
+                .bot-icon {
+                    /* Customize bot's icon styles */
+                    background-image: url('./Assets/icons/bot-icon.png');
+                    background-size: cover;
+                    /* Adjust as needed */
+                    width: 20px;
+                    /* Adjust the width of the icon */
+                    height: 20px;
+                    /* Adjust the height of the icon */
+                    border-radius: 0%;
+                    /* Make it a circle */
+                    margin-right: 15px;
+                    /* Adjust as needed */
+                }
+
+                .custom-shadow-md-up {
+                    box-shadow:
+                        0 -10px 15px -3px rgba(0, 0, 0, 0.1),
+                        0 -4px 6px -2px rgba(0, 0, 0, 0.05);
+                }
+
+                .typing-indicator {
+                    position: absolute;
+                    bottom: 0vh;
+                    /* Adjust the value as needed for the desired lift */
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-style: italic;
+                    color: #6b7280;
+                    /* Adjust color based on your design */
+                }
+
+                @keyframes bounce {
+
+                    0%,
+                    20%,
+                    50%,
+                    80%,
+                    100% {
+                        transform: translateY(0);
+                    }
+
+                    40% {
+                        transform: translateY(-5px);
+                    }
+
+                    60% {
+                        transform: translateY(-3px);
+                    }
+                }
+
+                .typing-indicator span {
+                    display: inline-block;
+                    animation: bounce 1s infinite;
+                }
+
+                .typing-indicator span:nth-child(1) {
+                    animation-delay: 0.1s;
+                }
+
+                .typing-indicator span:nth-child(2) {
+                    animation-delay: 0.2s;
+                }
+
+                .typing-indicator span:nth-child(3) {
+                    animation-delay: 0.3s;
+                }
+
+                .rotate-90 {
+                    transform: rotate(90deg);
+                    transform-origin: center;
+                    /* Set the transform origin to the center of the element */
+                    transition: transform 0.3s ease;
+                    /* Adjust the transition duration and easing as needed */
+                }
+
+                .file-name {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+                /* Add or customize other styles as needed */
+            </style>
+            <div id="user-input-and-button" class="flex flex-shrink-0 items-center justify-center" style="
+                        box-shadow:
+                            0 -4px 6px -1px rgba(0, 0, 0, 0.08),
+                            0 -2px 4px -1px rgba(0, 0, 0, 0.02);
+                    ">
+                <div class="input-container mt-3 w-3/4">
+                    <!-- Adjust the width and margin-top as needed -->
+                    <input type="text" id="user-input" placeholder="Type your message..."
+                        class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-md focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
+                </div>
+                <!-- send button -->
+                <button id="send-button" onclick="sendMessage('')"
+                    class="0 group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 shadow-md bg-white text-black hover:bg-blue-700 hover:text-white transition-all duration-75 ease-in">
+                    <span
+                        class="relative rounded-md px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0">
+                        <svg class="h-5 w-5 transition-all duration-75 ease-in" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 13V1m0 0L1 5m4-4 4 4" />
+                        </svg>
+                    </span>
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="./render.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/marked/marked.min.js"></script>
+    <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
+</body>
+
 </html>

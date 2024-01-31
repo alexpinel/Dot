@@ -7,3 +7,4 @@ src/mystuff/
 src/.env
 dist
 .DS_Store
+mpnet/

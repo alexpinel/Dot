@@ -29,7 +29,13 @@ if not os.path.exists(folder_path):
 
 
 
-embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2', model_kwargs={'device': 'mps'})
+current_directory = os.path.dirname(os.path.realpath(__file__))
+model_directory = os.path.join(current_directory, '..', 'mpnet')
+
+#print("Model Directory:", os.path.abspath(model_directory))
+
+### LOAD EMBEDDING SETTINGS
+embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'mps'})
 vector_store = FAISS.load_local(os.path.join(folder_path, "Dot-data"), embeddings)
 n_gpu_layers = 1  # Metal set to 1 is enough.
 n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.

@@ -1,7 +1,7 @@
 {
     "name": "dot",
     "productName": "dot",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Dot second release",
     "main": "src/index.js",
     "scripts": {
@@ -70,7 +70,15 @@
         "productName": "dot",
         "mac": {
             "category": "public.app-category.utilities",
-            "target": "dmg",
+            "target": [
+                {
+                  "target": "default",
+                  "arch": [
+                    "x64",
+                    "arm64"
+                  ]
+                }
+              ],
             "icon": "./src/Assets/icon2.icns",
             "hardenedRuntime": true,
             "gatekeeperAssess": false,

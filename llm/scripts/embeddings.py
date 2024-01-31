@@ -11,12 +11,17 @@ import os
 
 def embeddings(chosen_directory):
 
+    current_directory = os.path.dirname(os.path.realpath(__file__))
+    model_directory = os.path.join(current_directory, '..', 'mpnet')
+
+    print("Model Directory:", os.path.abspath(model_directory))
+
     ### LOAD EMBEDDING SETTINGS
-    embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2', model_kwargs={'device':'mps'})
+    embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'mps'})
 
     text_splitter=RecursiveCharacterTextSplitter(
                                                 chunk_size=8000,
-                                                chunk_overlap=1024)
+                                                chunk_overlap=4000)
     
 
     victor = FAISS.from_texts(["foo"], embeddings)

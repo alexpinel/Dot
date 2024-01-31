@@ -324,7 +324,6 @@ const appPath = app.getAppPath()
 ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
         // Construct paths relative to the script's location
-        // const pythonExecutablePath = path.join(__dirname, 'python', 'bin', 'python3');
 
         /*const pythonScriptPath = path.join(
             process.resourcesPath,
