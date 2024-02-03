@@ -9,14 +9,16 @@
 </head>
 
 <body>
+    <div id="titlebar" class="border-gray-200 border-x bg-gray-50 z-50"></div>
     <div id="backgroundOverlay"></div>
+
     <div class="flex h-screen">
         <!-- Your other content goes here -->
 
-        <div id="menu-side" class="flex h-full w-1/5 flex-col justify-between border-x border-gray-400 bg-gray-50">
+        <div id="menu-side" class="flex h-full w-1/5 flex-col justify-between border-x border-gray-200 bg-gray-50">
             <div class="flex items-center justify-center mt-2">
                 <button id="selectDirectoryButton"
-                    class="flex items-center justify-between gap-1.5 rounded-lg px-3 py-1.5 w-11/12 min-w-10 min-h-10 shadow-md bg-white text-gray-900 hover:bg-blue-700 hover:text-white">
+                    class="mt-6 flex items-center justify-between gap-1.5 rounded-lg px-3 py-1.5 w-11/12 min-w-10 min-h-10 shadow-md bg-white text-gray-900 hover:bg-blue-700 hover:text-white">
                     <span class="text-md font-medium">Upload documents</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-6 h-6">
@@ -301,6 +303,21 @@
                     white-space: nowrap;
                     text-overflow: ellipsis;
                 }
+
+                #titlebar {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 30px;
+                    /* Adjust height as needed */
+                    -webkit-app-region: drag;
+                    /* Allow dragging the window by clicking the title bar */
+                    text-align: center;
+                    line-height: 30px;
+                    user-select: none;
+                }
+
 
                 /* Add or customize other styles as needed */
             </style>

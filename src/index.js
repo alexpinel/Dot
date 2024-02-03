@@ -243,6 +243,7 @@ const createWindow = () => {
         height: 700,
         minWidth: 1250,
         minHeight: 700,
+        titleBarStyle: 'hidden',
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
