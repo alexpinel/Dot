@@ -132,6 +132,61 @@
                     id="switches and logo"
                     class="flex grow flex-col items-center justify-end"
                 >
+                <div class= "relative inline-block text-left">
+                    <div>
+                      <button type="button" onclick="toggleDropdown()" class="inline-flex justify-center w-32 rounded-lg bg-white bg-transparent-500 px-3 py-1.5 text-gray-900 " id="options-menu">
+                        <span class="capitalize" id="selected-option">Doc Dot</span>
+                        <!-- Heroicon name: solid/chevron-down -->
+                        <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0l4 4a1 1 0 001.414 0l4-4a1 1 0 011.414 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  
+                    <!-- The dropdown options are initially hidden -->
+                    <div class="origin-top-right absolute  mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden" id="dropdown">
+                        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                          <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none" role="menuitem" onclick="selectOption('Doc Dot')">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M9 8v3c0 .6-.4 1-1 1H5m11 4h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-7a1 1 0 0 0-1 1v1m4 3v10c0 .6-.4 1-1 1H6a1 1 0 0 1-1-1v-7.1c0-.3 0-.5.2-.7l2.5-2.9c.2-.2.5-.3.8-.3H13c.6 0 1 .4 1 1Z"/>
+                                </svg>
+                                <div class="ml-0"> <!-- Adjusted margin-left to 0 -->
+                                    <span class="font-bold">Doc Dot</span>
+                                    <span class="text-xs text-gray-500 block">Chat and interact with your documents</span>
+                                </div>
+                            </div>
+                            
+                          </button>
+                          <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none" role="menuitem" onclick="selectOption('Big Dot')">
+                            <div class="flex items-start">
+                              <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 10.5h0m-4 0h0m-4 0h0M5 5h14c.6 0 1 .4 1 1v9c0 .6-.4 1-1 1h-6.6a1 1 0 0 0-.7.3L8.8 19c-.3.3-.8 0-.8-.4V17c0-.6-.4-1-1-1H5a1 1 0 0 1-1-1V6c0-.6.4-1 1-1Z"/>
+                              </svg>
+                              <div class="ml-0">
+                                <span class="font-bold">Big Dot</span>
+                                <span class="text-xs text-gray-500 block">Chat freely about anything!</span>
+                              </div>
+                            </div>
+                          </button>
+                        </div>
+                      </div> 
+                  </div>
+                  
+                  <script>
+                    function toggleDropdown() {
+                      // Toggle the 'hidden' class to show/hide the dropdown
+                      document.getElementById('dropdown').classList.toggle('hidden');
+                    }
+                  
+                    function selectOption(option) {
+                      // Update the selected option text
+                      document.getElementById('selected-option').textContent = option;
+                      
+                      // Close the dropdown
+                      document.getElementById('dropdown').classList.add('hidden');
+                    }
+                  </script>    
                     <label
                         class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center rtl:ml-0"
                     >
@@ -176,36 +231,7 @@
                         </div>
                     </label>
 
-                    <div class="relative inline-block text-left">
-                        <div>
-                          <button type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500" id="options-menu">
-                            <span class="capitalize" id="selected-option">Document Dot</span>
-                            <!-- Heroicon name: solid/chevron-down -->
-                            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0l4 4a1 1 0 001.414 0l4-4a1 1 0 011.414 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                          </button>
-                        </div>
-                      
-                        <!-- The dropdown options are initially hidden -->
-                        <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden" id="dropdown">
-                          <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                            <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none" role="menuitem" onclick="selectOption('Document Dot')">Document Dot</button>
-                            <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none" role="menuitem" onclick="selectOption('Big Dot')">Big Dot</button>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <script>
-                        function selectOption(option) {
-                          // Update the selected option text
-                          document.getElementById('selected-option').textContent = option;
-                          
-                          // Close the dropdown
-                          document.getElementById('dropdown').classList.add('hidden');
-                        }
-                      </script>
-                      
+
                     <!--
                     <label
                         class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center"
@@ -235,7 +261,7 @@
                 </div>
             </div>
 
-            <div id="chat-side" class="relative w-4/5 flex-grow">
+            <div id="chat-side" class="relative w-4/5 flex-grow">           
                 <!-- Content of the 80% width container -->
                 <div
                     id="chat-container"
