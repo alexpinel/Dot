@@ -9,27 +9,24 @@
 </head>
 
 <body>
-    <div id="titlebar" class="z-50  bg-gray-50">
-
-        <div class="mt-2 flex items-center justify-center">
-            <button id="selectDirectoryButton"
-                class="mt-6 flex min-h-10 w-11/12 min-w-10 items-center justify-between gap-1.5 rounded-lg bg-white px-3 py-1.5 text-gray-900 shadow-md hover:bg-blue-700 hover:text-white">
-                <span class="text-md font-medium">Upload documents</span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="h-6 w-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
-                </svg>
-            </button>
-        </div>
-    </div>
+    <div id="titlebar" class="z-50 border-x border-gray-200 bg-gray-50"></div>
     <div id="backgroundOverlay"></div>
 
     <div class="flex h-screen">
         <!-- Your other content goes here -->
 
-        <div id="menu-side" class="flex h-full w-1/5 flex-col justify-between bg-gray-50">
-
+        <div id="menu-side" class="flex h-full w-1/5 flex-col justify-between border-x border-gray-200 bg-gray-50">
+            <div class="mt-2 flex items-center justify-center">
+                <button id="selectDirectoryButton"
+                    class="mt-6 flex min-h-10 w-11/12 min-w-10 items-center justify-between gap-1.5 rounded-lg bg-white px-3 py-1.5 text-gray-900 shadow-md hover:bg-blue-700 hover:text-white">
+                    <span class="text-md font-medium">Upload documents</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="h-6 w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                    </svg>
+                </button>
+            </div>
 
             <hr class="my-2 h-px border-0 bg-gray-200 dark:bg-gray-700" />
 
@@ -159,7 +156,6 @@
                 </script>
 
 
-
                 <!--
                     <label
                         class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center"
@@ -192,7 +188,8 @@
             <div id="chat-container"
                 class="flex h-[90vh] flex-grow transform flex-col-reverse overflow-y-auto overflow-x-hidden bg-cover bg-center transition-transform duration-500 ease-in-out">
                 <!-- Add these classes to your HTML elements -->
-                <div id="bot-message" class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base">
+                <div id="bot-message"
+                    class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base ml-4">
                     <!-- ... existing code ... -->
                 </div>
             </div>
@@ -382,11 +379,11 @@
                 <div class="input-container mt-3 w-3/4">
                     <!-- Adjust the width and margin-top as needed -->
                     <input type="text" id="user-input" placeholder="Type your message..."
-                        class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900  focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
+                        class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-sm focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
                 </div>
                 <!-- send button -->
                 <button id="send-button" onclick="sendMessage('')"
-                    class="0 group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 bg-white text-black  transition-all duration-75 ease-in hover:bg-blue-700 hover:text-white">
+                    class="0 group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 bg-white text-black shadow-sm transition-all duration-75 ease-in hover:bg-blue-700 hover:text-white">
                     <span
                         class="relative rounded-md px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0">
                         <svg class="h-5 w-5 transition-all duration-75 ease-in" aria-hidden="true"
