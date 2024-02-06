@@ -397,5 +397,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('dropdown');
+    const optionsMenu = document.getElementById('options-menu');
+
+        if (!dropdown.contains(event.target) && !optionsMenu.contains(event.target)) {
+            // Click is outside of the dropdown and the options menu button
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    function toggleDropdown() {
+        const dropdown = document.getElementById('dropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
+    function selectOption(option) {
+        document.getElementById('selected-option').textContent = option;
+        const selectedScript = option === 'Doc Dot' ? 'docdot.py' : 'bigdot.py';
+        ipcRenderer.send('switch-script', selectedScript);
+        document.getElementById('dropdown').classList.add('hidden');
+    }
+
+
+
+
 
 

@@ -78,82 +78,7 @@
                 <!-- File tree content goes here -->
             </div>
             <div id="switches and logo" class="flex grow flex-col items-center justify-end">
-                <!-- Dropdown HTML -->
-                <div class="mb-10 relative inline-block text-left">
-                    <div>
-                        <button type="button" onclick="toggleDropdown()"
-                            class="inline-flex justify-center w-32 rounded-lg hover:bg-gray-100  px-3 py-1.5 text-gray-900 "
-                            id="options-menu">
-                            <span class="text-md font-medium" id="selected-option">Doc Dot</span>
-                            <!-- Heroicon name: solid/chevron-down -->
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="m19 9-7 7-7-7" />
-                            </svg>
-                        </button>
-                    </div>
 
-                    <!-- The dropdown options are initially hidden -->
-                    <div class="origin-top-right absolute mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden"
-                        id="dropdown">
-                        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                            <button
-                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
-                                role="menuitem" onclick="selectOption('Doc Dot')">
-                                <div class="flex items-start">
-                                    <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 8v3c0 .6-.4 1-1 1H5m11 4h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-7a1 1 0 0 0-1 1v1m4 3v10c0 .6-.4 1-1 1H6a1 1 0 0 1-1-1v-7.1c0-.3 0-.5.2-.7l2.5-2.9c.2-.2.5-.3.8-.3H13c.6 0 1 .4 1 1Z" />
-                                    </svg>
-                                    <div class="ml-0">
-                                        <span class="font-bold">Doc Dot</span>
-                                        <span class="text-xs text-gray-500 block">Chat and interact with your
-                                            documents</span>
-                                    </div>
-                                </div>
-                            </button>
-                            <button
-                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
-                                role="menuitem" onclick="selectOption('Big Dot')">
-                                <div class="flex items-start">
-                                    <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M16 10.5h0m-4 0h0m-4 0h0M5 5h14c.6 0 1 .4 1 1v9c0 .6-.4 1-1 1h-6.6a1 1 0 0 0-.7.3L8.8 19c-.3.3-.8 0-.8-.4V17c0-.6-.4-1-1-1H5a1 1 0 0 1-1-1V6c0-.6.4-1 1-1Z" />
-                                    </svg>
-                                    <div class="ml-0">
-                                        <span class="font-bold">Big Dot</span>
-                                        <span class="text-xs text-gray-500 block">Chat freely about anything!</span>
-                                    </div>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <script>
-                    function toggleDropdown() {
-                        // Toggle the 'hidden' class to show/hide the dropdown
-                        document.getElementById('dropdown').classList.toggle('hidden');
-                    }
-
-                    function selectOption(option) {
-                        // Update the selected option text
-                        document.getElementById('selected-option').textContent = option;
-
-                        // Map selected option to corresponding script
-                        const selectedScript = option === 'Doc Dot' ? 'docdot.py' : 'bigdot.py';
-
-                        // Send the selected script to the main process
-                        ipcRenderer.send('switch-script', selectedScript);
-
-                        // Close the dropdown
-                        document.getElementById('dropdown').classList.add('hidden');
-                    }
-                </script>
 
 
                 <!--
@@ -184,19 +109,86 @@
         </div>
 
         <div id="chat-side" class="relative w-4/5 flex-grow">
+
+
+            <!-- Dropdown HTML -->
+            <div class="fixed top-3 left-1/2 z-50 transform  mt-5">
+                <div class="relative inline-block text-left">
+
+                    <button type="button" onclick="toggleDropdown()"
+                        class="inline-flex justify-center w-28 rounded-lg backdrop-blur-xl bg-white/30 hover:bg-blue-700 hover:text-white border-gray-200 px-2 py-1.5 text-gray-800"
+                        id="options-menu">
+                        <span class="text-md font-medium " id="selected-option">Doc Dot</span>
+                        <!-- Heroicon name: solid/chevron-down -->
+                        <svg class="w-6 h-6  dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 9-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- The dropdown options are initially hidden -->
+                <div class="origin-top-right absolute mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden"
+                    id="dropdown" style="left: calc(50% - 7rem);">
+                    <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                        <button
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+                            role="menuitem" onclick="selectOption('Doc Dot')">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-blue-700 dark:text-white" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 8v3c0 .6-.4 1-1 1H5m11 4h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-7a1 1 0 0 0-1 1v1m4 3v10c0 .6-.4 1-1 1H6a1 1 0 0 1-1-1v-7.1c0-.3 0-.5.2-.7l2.5-2.9c.2-.2.5-.3.8-.3H13c.6 0 1 .4 1 1Z" />
+                                </svg>
+                                <div class="ml-0">
+                                    <span class="font-bold ">Doc Dot</span>
+                                    <span class="text-xs text-gray-500 block">Chat and interact with your
+                                        documents</span>
+                                </div>
+                            </div>
+                        </button>
+                        <button
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+                            role="menuitem" onclick="selectOption('Big Dot')">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-blue-700 dark:text-white" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M16 10.5h0m-4 0h0m-4 0h0M5 5h14c.6 0 1 .4 1 1v9c0 .6-.4 1-1 1h-6.6a1 1 0 0 0-.7.3L8.8 19c-.3.3-.8 0-.8-.4V17c0-.6-.4-1-1-1H5a1 1 0 0 1-1-1V6c0-.6.4-1 1-1Z" />
+                                </svg>
+                                <div class="ml-0">
+                                    <span class="font-bold">Big Dot</span>
+                                    <span class="text-xs text-gray-500 block">Chat freely about anything!</span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
             <!-- Content of the 80% width container -->
             <div id="chat-container"
                 class="flex h-[90vh] flex-grow transform flex-col-reverse overflow-y-auto overflow-x-hidden bg-cover bg-center transition-transform duration-500 ease-in-out">
+
+
+
                 <!-- Add these classes to your HTML elements -->
-                <div id="bot-message"
-                    class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base ml-4">
+                <div id="bot-message" class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base">
                     <!-- ... existing code ... -->
                 </div>
             </div>
 
+
+
             <style>
                 .message {
-                    width: 90vw;
+                    width: 75vw;
                     margin-left: auto;
                     margin-right: auto;
                     overflow: hidden;
@@ -383,7 +375,7 @@
                 </div>
                 <!-- send button -->
                 <button id="send-button" onclick="sendMessage('')"
-                    class="0 group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 bg-white text-black shadow-sm transition-all duration-75 ease-in hover:bg-blue-700 hover:text-white">
+                    class=" group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 bg-white text-black shadow-sm transition-all duration-75 ease-in hover:bg-blue-700 hover:text-white">
                     <span
                         class="relative rounded-md px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0">
                         <svg class="h-5 w-5 transition-all duration-75 ease-in" aria-hidden="true"
