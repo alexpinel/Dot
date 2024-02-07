@@ -104,7 +104,7 @@
                 <!-- HTML code -->
                 <img src="Assets/logo2.png" alt="Light Logo" class="w-3/5 dark:hidden" />
                 <img src="Assets/logo-dark.png" alt="Dark Logo" class="w-3/5 dark:block hidden" />
-                <p class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400 dark:text-gray-300">
+                <p class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400 p-2 dark:text-gray-300">
                     Answers may not be accurate, please consider checking
                     important information.
                 </p>
@@ -119,7 +119,7 @@
                 <div class="relative inline-block text-left">
 
                     <button type="button" onclick="toggleDropdown()"
-                        class="inline-flex justify-center w-28 rounded-lg backdrop-blur-xl bg-white/30 dark:bg-white/0 hover:bg-blue-700 hover:text-gray-300 border-gray-200 px-2 py-1.5 text-gray-800"
+                        class="inline-flex justify-center w-28 rounded-lg backdrop-blur-xl  bg-white/30 dark:bg-white/0 hover:bg-blue-700 hover:text-white border-gray-200 px-2 py-1.5 text-gray-800"
                         id="options-menu">
                         <span class="text-md font-medium dark:text-gray-300" id="selected-option">Doc Dot</span>
                         <!-- Heroicon name: solid/chevron-down -->
@@ -136,7 +136,7 @@
                     id="dropdown" style="left: calc(50% - 7rem);">
                     <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                         <button
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-200 dark:text-gray-300  focus:outline-none"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100  dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-200 dark:text-gray-300  focus:outline-none"
                             role="menuitem" onclick="selectOption('Doc Dot')">
                             <div class="flex items-start">
                                 <svg class="w-5 h-5 text-blue-700 dark:text-blue-700" aria-hidden="true"
@@ -242,6 +242,19 @@
                     /* Shadow effect */
                 }
 
+                .dark .user-bubble {
+                    width: 70vw;
+                    /* Adjust the width of the bot's bubble */
+                    padding: 10px;
+                    background-color: rgba(129, 129, 129, 0.603);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    color: #dae7ff;
+                    /* Set the text color to black */
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    /* Shadow effect */
+                }
+
                 .bot-content-container {
                     display: flex;
                     align-items: flex-end;
@@ -260,9 +273,29 @@
                     /* Shadow effect */
                 }
 
+                .dark .bot-bubble {
+                    width: 70vw;
+                    /* Adjust the width of the bot's bubble */
+                    padding: 10px;
+                    background-color: rgba(129, 129, 129, 0.603);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    color: #d9e6ff;
+                    /* Set the text color to black */
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    /* Shadow effect */
+                }
+
+
                 .typing-indicator {
                     font-style: italic;
                     color: #6b7280;
+                    /* Adjust color based on your design */
+                }
+
+                .dark .typing-indicator {
+                    font-style: italic;
+                    color: #bfcadf;
                     /* Adjust color based on your design */
                 }
 
