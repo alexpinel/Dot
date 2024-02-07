@@ -9,16 +9,17 @@
 </head>
 
 <body>
-    <div id="titlebar" class="z-50 border-x border-gray-200 bg-gray-50"></div>
+    <div id="titlebar" class="z-50 border-x border-gray-200 dark:border-slate-800 dark:bg-slate-800 bg-gray-50"></div>
     <div id="backgroundOverlay"></div>
 
-    <div class="flex h-screen">
+    <div class="flex h-screen dark:bg-slate-700">
         <!-- Your other content goes here -->
 
-        <div id="menu-side" class="flex h-full w-1/5 flex-col justify-between border-x border-gray-200 bg-gray-50">
+        <div id="menu-side"
+            class="flex h-full w-1/5 flex-col justify-between border-x border-gray-200 dark:border-slate-900 dark:bg-slate-800 bg-gray-50">
             <div class="mt-2 flex items-center justify-center">
                 <button id="selectDirectoryButton"
-                    class="mt-6 flex min-h-10 w-11/12 min-w-10 items-center justify-between gap-1.5 rounded-lg bg-white px-3 py-1.5 text-gray-900 shadow-md hover:bg-blue-700 hover:text-white">
+                    class="mt-6 flex min-h-10 w-11/12 min-w-10 items-center justify-between gap-1.5 rounded-lg dark:bg-slate-700 bg-white px-3 py-1.5 text-gray-900 shadow-md hover:bg-blue-700 dark:text-gray-300 hover:text-white">
                     <span class="text-md font-medium">Upload documents</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="h-6 w-6">
@@ -100,8 +101,10 @@
                     </label>
                 -->
 
-                <img src="Assets/logo2.png" alt="Logo" class="w-3/5" />
-                <p class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400">
+                <!-- HTML code -->
+                <img src="Assets/logo2.png" alt="Light Logo" class="w-3/5 dark:hidden" />
+                <img src="Assets/logo-dark.png" alt="Dark Logo" class="w-3/5 dark:block hidden" />
+                <p class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400 dark:text-gray-300">
                     Answers may not be accurate, please consider checking
                     important information.
                 </p>
@@ -116,9 +119,9 @@
                 <div class="relative inline-block text-left">
 
                     <button type="button" onclick="toggleDropdown()"
-                        class="inline-flex justify-center w-28 rounded-lg backdrop-blur-xl bg-white/30 hover:bg-blue-700 hover:text-white border-gray-200 px-2 py-1.5 text-gray-800"
+                        class="inline-flex justify-center w-28 rounded-lg backdrop-blur-xl bg-white/30 dark:bg-white/0 hover:bg-blue-700 hover:text-gray-300 border-gray-200 px-2 py-1.5 text-gray-800"
                         id="options-menu">
-                        <span class="text-md font-medium " id="selected-option">Doc Dot</span>
+                        <span class="text-md font-medium dark:text-gray-300" id="selected-option">Doc Dot</span>
                         <!-- Heroicon name: solid/chevron-down -->
                         <svg class="w-6 h-6  dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                             fill="none" viewBox="0 0 24 24">
@@ -129,14 +132,14 @@
                 </div>
 
                 <!-- The dropdown options are initially hidden -->
-                <div class="origin-top-right absolute mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden"
+                <div class="origin-top-right absolute mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black dark:bg-slate-800 ring-opacity-5 hidden"
                     id="dropdown" style="left: calc(50% - 7rem);">
                     <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                         <button
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-200 dark:text-gray-300  focus:outline-none"
                             role="menuitem" onclick="selectOption('Doc Dot')">
                             <div class="flex items-start">
-                                <svg class="w-5 h-5 text-blue-700 dark:text-white" aria-hidden="true"
+                                <svg class="w-5 h-5 text-blue-700 dark:text-blue-700" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linejoin="round" stroke-width="2"
                                         d="M9 8v3c0 .6-.4 1-1 1H5m11 4h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-7a1 1 0 0 0-1 1v1m4 3v10c0 .6-.4 1-1 1H6a1 1 0 0 1-1-1v-7.1c0-.3 0-.5.2-.7l2.5-2.9c.2-.2.5-.3.8-.3H13c.6 0 1 .4 1 1Z" />
@@ -149,10 +152,10 @@
                             </div>
                         </button>
                         <button
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-200 dark:text-gray-300  focus:outline-none"
                             role="menuitem" onclick="selectOption('Big Dot')">
                             <div class="flex items-start">
-                                <svg class="w-5 h-5 text-blue-700 dark:text-white" aria-hidden="true"
+                                <svg class="w-5 h-5 text-blue-700 dark:text-blue-700" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2"
@@ -168,14 +171,27 @@
                 </div>
             </div>
 
-
-
-
+            <div id="toggleDarkMode" class="fixed top-3 right-0 z-50 pr-2 mt-2">
+                <input type="checkbox" name="light-switch" class="light-switch sr-only" />
+                <label class="relative cursor-pointer p-2" for="light-switch">
+                    <svg class="dark:hidden" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                        <path class="fill-slate-600"
+                            d="M7 0h2v2H7zM12.88 1.637l1.414 1.415-1.415 1.413-1.413-1.414zM14 7h2v2h-2zM12.95 14.433l-1.414-1.413 1.413-1.415 1.415 1.414zM7 14h2v2H7zM2.98 14.364l-1.413-1.415 1.414-1.414 1.414 1.415zM0 7h2v2H0zM3.05 1.706 4.463 3.12 3.05 4.535 1.636 3.12z" />
+                        <path class="fill-slate-700" d="M8 4C5.8 4 4 5.8 4 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Z" />
+                    </svg>
+                    <svg class="hidden dark:block" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                        <path class="fill-slate-400"
+                            d="M6.2 1C3.2 1.8 1 4.6 1 7.9 1 11.8 4.2 15 8.1 15c3.3 0 6-2.2 6.9-5.2C9.7 11.2 4.8 6.3 6.2 1Z" />
+                        <path class="fill-slate-500"
+                            d="M12.5 5a.625.625 0 0 1-.625-.625 1.252 1.252 0 0 0-1.25-1.25.625.625 0 1 1 0-1.25 1.252 1.252 0 0 0 1.25-1.25.625.625 0 1 1 1.25 0c.001.69.56 1.249 1.25 1.25a.625.625 0 1 1 0 1.25c-.69.001-1.249.56-1.25 1.25A.625.625 0 0 1 12.5 5Z" />
+                    </svg>
+                    <span class="sr-only">Switch to light / dark version</span>
+                </label>
+            </div>
 
             <!-- Content of the 80% width container -->
             <div id="chat-container"
                 class="flex h-[90vh] flex-grow transform flex-col-reverse overflow-y-auto overflow-x-hidden bg-cover bg-center transition-transform duration-500 ease-in-out">
-
 
 
                 <!-- Add these classes to your HTML elements -->
@@ -371,11 +387,11 @@
                 <div class="input-container mt-3 w-3/4">
                     <!-- Adjust the width and margin-top as needed -->
                     <input type="text" id="user-input" placeholder="Type your message..."
-                        class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-sm focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
+                        class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-sm focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder-gray-400" />
                 </div>
                 <!-- send button -->
                 <button id="send-button" onclick="sendMessage('')"
-                    class=" group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 bg-white text-black shadow-sm transition-all duration-75 ease-in hover:bg-blue-700 hover:text-white">
+                    class=" group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 bg-white text-black shadow-sm dark:bg-slate-700 transition-all dark:text-gray-300 duration-75 ease-in hover:bg-blue-700 hover:text-white">
                     <span
                         class="relative rounded-md px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0">
                         <svg class="h-5 w-5 transition-all duration-75 ease-in" aria-hidden="true"

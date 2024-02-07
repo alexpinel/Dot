@@ -9,21 +9,21 @@ const template = [
     // { role: 'appMenu' }
     ...(isMac
         ? [
-              {
-                  label: app.name,
-                  submenu: [
-                      { role: 'about' },
-                      { type: 'separator' },
-                      { role: 'services' },
-                      { type: 'separator' },
-                      { role: 'hide' },
-                      { role: 'hideOthers' },
-                      { role: 'unhide' },
-                      { type: 'separator' },
-                      { role: 'quit' },
-                  ],
-              },
-          ]
+            {
+                label: app.name,
+                submenu: [
+                    { role: 'about' },
+                    { type: 'separator' },
+                    { role: 'services' },
+                    { type: 'separator' },
+                    { role: 'hide' },
+                    { role: 'hideOthers' },
+                    { role: 'unhide' },
+                    { type: 'separator' },
+                    { role: 'quit' },
+                ],
+            },
+        ]
         : []),
     // { role: 'fileMenu' }
     {
@@ -42,23 +42,23 @@ const template = [
             { role: 'paste' },
             ...(isMac
                 ? [
-                      { role: 'pasteAndMatchStyle' },
-                      { role: 'delete' },
-                      { role: 'selectAll' },
-                      { type: 'separator' },
-                      {
-                          label: 'Speech',
-                          submenu: [
-                              { role: 'startSpeaking' },
-                              { role: 'stopSpeaking' },
-                          ],
-                      },
-                  ]
+                    { role: 'pasteAndMatchStyle' },
+                    { role: 'delete' },
+                    { role: 'selectAll' },
+                    { type: 'separator' },
+                    {
+                        label: 'Speech',
+                        submenu: [
+                            { role: 'startSpeaking' },
+                            { role: 'stopSpeaking' },
+                        ],
+                    },
+                ]
                 : [
-                      { role: 'delete' },
-                      { type: 'separator' },
-                      { role: 'selectAll' },
-                  ]),
+                    { role: 'delete' },
+                    { type: 'separator' },
+                    { role: 'selectAll' },
+                ]),
         ],
     },
     // { role: 'viewMenu' }
@@ -85,11 +85,11 @@ const template = [
             { role: 'zoom' },
             ...(isMac
                 ? [
-                      { type: 'separator' },
-                      { role: 'front' },
-                      { type: 'separator' },
-                      { role: 'window' },
-                  ]
+                    { type: 'separator' },
+                    { role: 'front' },
+                    { type: 'separator' },
+                    { role: 'window' },
+                ]
                 : [{ role: 'close' }]),
         ],
     },
@@ -237,6 +237,10 @@ ipcMain.handle('open-dialog', async (event) => {
 
 // ELECTRON STUFF, CREATE THE WINDOW BLA BLA !!!!
 
+
+// Flag to track whether dark mode is enabled or not
+let isDarkModeEnabled = false;
+
 const createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 1250,
@@ -252,6 +256,14 @@ const createWindow = () => {
     })
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'))
+    // Listen for 'toggle-dark-mode' message from renderer process
+    ipcMain.on('toggle-dark-mode', (event) => {
+        // Toggle the dark mode flag
+        isDarkModeEnabled = !isDarkModeEnabled;
+        // Send message back to renderer process with the new state
+        event.sender.send('dark-mode-toggled', isDarkModeEnabled);
+    });
+
     //mainWindow.webContents.openDevTools();
 }
 

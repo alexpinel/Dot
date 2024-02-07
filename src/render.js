@@ -162,23 +162,23 @@ $(document).ready(() => {
     function truncateText(textContainer, maxWidth) {
         const text = textContainer.text();
         const originalText = textContainer.data('original-text');
-    
+
         if (!originalText) {
             textContainer.data('original-text', text);
         }
-    
+
         const isTruncated = textContainer[0].scrollWidth > maxWidth;
-    
+
         if (isTruncated) {
             const truncatedText = originalText.slice(0, -1);
             textContainer.text(truncatedText);
         } else {
             textContainer.text(originalText);
         }
-    
+
         return isTruncated;
     }
-    
+
 
     function populateTree(rootPath, parentElement) {
         fs.promises
@@ -187,10 +187,10 @@ $(document).ready(() => {
                 const ul = $('<ul>').css('list-style-type', 'none')
 
                 files.forEach((file) => {
-                        // Skip .DS_Store files
-                        if (file === '.DS_Store') {
-                            return;
-                        }
+                    // Skip .DS_Store files
+                    if (file === '.DS_Store') {
+                        return;
+                    }
                     const fullPath = path.join(rootPath, file)
                     const li = $('<li>')
                         .addClass('folder flex flex-col mb-2')
@@ -227,16 +227,16 @@ $(document).ready(() => {
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"/>
                                     </svg>`
                                 )
-                                .addClass('inline-block transition mr-1 rotate-0') // Added rotate-0 class
-                                .click(() => {
-                                    if (!subUl.children().length) {
-                                        populateTree(fullPath, subUl);
-                                    }
-                                    subUl.slideToggle();
+                                    .addClass('inline-block transition mr-1 rotate-0') // Added rotate-0 class
+                                    .click(() => {
+                                        if (!subUl.children().length) {
+                                            populateTree(fullPath, subUl);
+                                        }
+                                        subUl.slideToggle();
 
-                                    // Toggle the rotate class
-                                    arrow.toggleClass('rotate-90');
-                                });
+                                        // Toggle the rotate class
+                                        arrow.toggleClass('rotate-90');
+                                    });
 
                                 // Create a nested ul for subdirectories
                                 const subUl = $('<ul>')
@@ -272,13 +272,13 @@ $(document).ready(() => {
 
                                 // Text for files
                                 // Text for folders
-                                    textContainer.text(file);
-                                    const isTruncated = truncateText(textContainer, textContainer.width());
-                                    if (isTruncated) {
-                                        textContainer.attr('title', file);
-                                    } else {
-                                        textContainer.removeAttr('title');
-                                    }
+                                textContainer.text(file);
+                                const isTruncated = truncateText(textContainer, textContainer.width());
+                                if (isTruncated) {
+                                    textContainer.attr('title', file);
+                                } else {
+                                    textContainer.removeAttr('title');
+                                }
 
                             }
                         })
@@ -397,30 +397,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-document.addEventListener('click', function(event) {
+document.addEventListener('click', function (event) {
     const dropdown = document.getElementById('dropdown');
     const optionsMenu = document.getElementById('options-menu');
 
-        if (!dropdown.contains(event.target) && !optionsMenu.contains(event.target)) {
-            // Click is outside of the dropdown and the options menu button
-            dropdown.classList.add('hidden');
-        }
-    });
-
-    function toggleDropdown() {
-        const dropdown = document.getElementById('dropdown');
-        dropdown.classList.toggle('hidden');
+    if (!dropdown.contains(event.target) && !optionsMenu.contains(event.target)) {
+        // Click is outside of the dropdown and the options menu button
+        dropdown.classList.add('hidden');
     }
+});
 
-    function selectOption(option) {
-        document.getElementById('selected-option').textContent = option;
-        const selectedScript = option === 'Doc Dot' ? 'docdot.py' : 'bigdot.py';
-        ipcRenderer.send('switch-script', selectedScript);
-        document.getElementById('dropdown').classList.add('hidden');
-    }
+function toggleDropdown() {
+    const dropdown = document.getElementById('dropdown');
+    dropdown.classList.toggle('hidden');
+}
+
+function selectOption(option) {
+    document.getElementById('selected-option').textContent = option;
+    const selectedScript = option === 'Doc Dot' ? 'docdot.py' : 'bigdot.py';
+    ipcRenderer.send('switch-script', selectedScript);
+    document.getElementById('dropdown').classList.add('hidden');
+}
 
 
 
+// Add event listener to the button
+document.getElementById('toggleDarkMode').addEventListener('click', () => {
+    // Send message to main process to toggle dark mode
+    ipcRenderer.send('toggle-dark-mode');
+});
 
+// Listen for message from main process indicating the new dark mode state
+ipcRenderer.on('dark-mode-toggled', (event, isEnabled) => {
+    // Apply or remove 'dark' class based on the new state
+    document.documentElement.classList.toggle('dark', isEnabled);
+});
+
+
+// JavaScript code
+document.getElementById('toggleDarkMode').addEventListener('click', () => {
+    const iconMoon = document.getElementById('iconMoon');
+    const iconSun = document.getElementById('iconSun');
+    const isDarkMode = document.documentElement.classList.toggle('dark');
+
+    // Toggle between moon and sun icons
+    iconMoon.classList.toggle('hidden', isDarkMode);
+    iconSun.classList.toggle('hidden', !isDarkMode);
+});
 
 
