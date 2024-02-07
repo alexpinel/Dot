@@ -219,7 +219,7 @@ $(document).ready(() => {
                         .then((stats) => {
                             if (stats.isDirectory()) {
                                 li.addClass(
-                                    'folder rounded-lg hover:bg-gray-200 transition align-center'
+                                    'folder rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition align-center'
                                 )
                                 // SVG for arrow icon
                                 arrow.html(
@@ -260,7 +260,7 @@ $(document).ready(() => {
 
                             } else if (stats.isFile()) {
                                 li.addClass(
-                                    'file flex flex-row hover:bg-gray-200 transition '
+                                    'file flex flex-row hover:bg-gray-200 dark:hover:bg-slate-700 transition '
                                 )
 
                                 // SVG for document icon
