@@ -5,10 +5,9 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/hf_transformers";
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { ConversationalRetrievalQAChain } from "langchain/chains";
-
+import { HuggingFaceInferenceEmbeddings } from "langchain/embeddings/hf";
 
 
 
@@ -44,21 +43,53 @@ const llm = new LlamaCpp({modelPath:llamaPath,
     contextSize:8000
  });
 
+ 
 // Embeddings
-const embeddings = new HuggingFaceTransformersEmbeddings({
-    modelName: "Xenova/all-MiniLM-L6-v2",
+
+/*const EmbedPath = path.join(
+    process.resourcesPath,
+    'llm',
+    'mistral-7b-instruct-v0.2.Q4_K_M.gguf'
+);*/
+
+const EmbedPath = path.join(
+    __dirname,
+        '..',
+        'llm',
+        'mpnet'
+    );
+
+const embeddings = new HuggingFaceInferenceEmbeddings({
+    modelName: EmbedPath,
   });
 
 // Vector store
-const texts = ["Cookie is a small white dog with like five teeth."];
-const ids = [{ id: 1 }];
-const vectorStore = await FaissStore.fromTexts(texts, ids, embeddings);
-const retriever = vectorStore.asRetriever();
+
+const vectorStore = await FaissStore.fromTexts(
+    ["Cookie is such a nice green dog", "bob is a nasty cat", "obama was american president"],
+    [{ id: 2 }, { id: 1 }, { id: 3 }],
+    embeddings
+  );
+  
+// Save the vector store to a directory
+const directory = "C:\\Users\\alexp\\Desktop\\Dot-data\\";
+
+
+await vectorStore.save(directory);
+//const directory = "C:\\Users\\alexp\\Desktop\\Dot-data\\Dot-data"; // Assign the path to the directory variable
+
+const VectorStore = await FaissStore.load(
+    directory,
+    embeddings
+);
+
+
+const retriever = VectorStore.asRetriever();
 
 const chain = ConversationalRetrievalQAChain.fromLLM(llm,
     retriever,
     {
-        verbose: true,
+        verbose: false,
         returnSourceDocuments: false,
         questionGeneratorChainOptions: {
             template: `# Instructions
@@ -97,7 +128,7 @@ const chain = ConversationalRetrievalQAChain.fromLLM(llm,
     });
 
 chain.invoke({
-    question: "Write me a song about cookie",
+    question: "Write me a song about bob",
     chat_history: ``,
 }
 ).then((res) => {
