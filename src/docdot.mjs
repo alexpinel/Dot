@@ -1,6 +1,4 @@
 import { LlamaCpp } from "@langchain/community/llms/llama_cpp";
-import { LLMChain } from "langchain/chains";
-import { BufferWindowMemory } from "langchain/memory";
 import { PromptTemplate } from "@langchain/core/prompts";
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,7 +6,7 @@ import { dirname } from 'path';
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { ConversationalRetrievalQAChain } from "langchain/chains";
 import { HuggingFaceInferenceEmbeddings } from "langchain/embeddings/hf";
-
+import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/hf_transformers";
 
 
 // LOCATING THE LLM MODEL, THERE ARE PATHS FOR DEV MODE AND PACKAGED MODE
@@ -40,7 +38,7 @@ const llm = new LlamaCpp({modelPath:llamaPath,
     f16kv:1, 
     maxTokens:2000,
     temperature:0.01,
-    contextSize:8000
+    batchSize:1024
  });
 
  
@@ -49,7 +47,7 @@ const llm = new LlamaCpp({modelPath:llamaPath,
 /*const EmbedPath = path.join(
     process.resourcesPath,
     'llm',
-    'mistral-7b-instruct-v0.2.Q4_K_M.gguf'
+    'mpnet'
 );*/
 
 const EmbedPath = path.join(
@@ -59,34 +57,26 @@ const EmbedPath = path.join(
         'mpnet'
     );
 
-const embeddings = new HuggingFaceInferenceEmbeddings({
-    modelName: EmbedPath,
-  });
-
-// Vector store
-
-const vectorStore = await FaissStore.fromTexts(
-    ["Cookie is such a nice green dog", "bob is a nasty cat", "obama was american president"],
-    [{ id: 2 }, { id: 1 }, { id: 3 }],
-    embeddings
-  );
-  
+const embeddings = new HuggingFaceTransformersEmbeddings({
+    modelName: "Xenova/all-MiniLM-L6-v2",
+    });
+    
 // Save the vector store to a directory
 const directory = "C:\\Users\\alexp\\Desktop\\Dot-data\\";
 
+//await vectorStore.save(directory);
 
-await vectorStore.save(directory);
-//const directory = "C:\\Users\\alexp\\Desktop\\Dot-data\\Dot-data"; // Assign the path to the directory variable
 
+//Load vector store from a specified directory
 const VectorStore = await FaissStore.load(
     directory,
     embeddings
 );
 
+// Equivalent to kwargs in python, 2 indicates the 2 closest documents will be provided
+const retriever = VectorStore.asRetriever(2, { metadataField: "value" });
 
-const retriever = VectorStore.asRetriever();
-
-const chain = ConversationalRetrievalQAChain.fromLLM(llm,
+const chain = ConversationalRetrievalQAChain.fromLLM(llm, 
     retriever,
     {
         verbose: false,
@@ -128,7 +118,7 @@ const chain = ConversationalRetrievalQAChain.fromLLM(llm,
     });
 
 chain.invoke({
-    question: "Write me a song about bob",
+    question: "List me the technical parameters of the leros 1b engine",
     chat_history: ``,
 }
 ).then((res) => {
