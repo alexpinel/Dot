@@ -58,7 +58,7 @@ llm = LlamaCpp(
     f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
     #callback_manager=callback_manager,
     #verbose=True, # Verbose is required to pass to the callback manager,
-    max_tokens=1800,
+    max_tokens=2000,
     temperature= 0.01,
     n_ctx=8000,
 )
