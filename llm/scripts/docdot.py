@@ -115,6 +115,8 @@ def chat(input_text):
         result = chain({'query': user_input})['result']
         return result
 
+
+
 def send_response(response):
     # Convert the response to JSON
     response_json = json.dumps({"result": response})
@@ -142,7 +144,6 @@ if __name__ == "__main__":
         max_chunk_length = 1000
         chunks = [result[i:i + max_chunk_length] for i in range(0, len(result), max_chunk_length)]
 
-        # Send each chunk individually
-        for chunk in chunks:
-            send_response(chunk)
+        # Send the chunks as an array
+        send_response(chunks)
 
