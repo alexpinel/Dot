@@ -51,6 +51,21 @@ conversation = LLMChain(
 )
 
 
+
+
+import sys
+import json
+
+def send_response(response):
+    # Convert the response to JSON
+    response_json = json.dumps({"result": response})
+
+    # Print the JSON to stdout
+    print(response_json)
+
+    # Flush stdout to ensure the message is sent immediately
+    sys.stdout.flush()
+
 if __name__ == "__main__":
     while True:
         user_input = sys.stdin.readline().strip()
@@ -59,12 +74,10 @@ if __name__ == "__main__":
 
         prompt = user_input
         result = conversation({"question": prompt})['text']
-        #print(result["text"])
+        
+        # Split the result into chunks of maximum length (e.g., 1000 characters)
+        max_chunk_length = 1000
+        chunks = [result[i:i + max_chunk_length] for i in range(0, len(result), max_chunk_length)]
 
-        result_json = json.dumps({"result": result})
-
-        # Print the result to stdout
-        print(result_json)
-        # Make sure to flush stdout to ensure the message is sent immediately
-        sys.stdout.flush()
-
+        # Send the chunks as an array
+        send_response(chunks)

@@ -104,13 +104,14 @@ ipcRenderer.on('python-reply', (event, reply) => {
 
     try {
         const resultObject = JSON.parse(reply)
-        const resultMessageMarkdown = resultObject.result
-
-        console.log('Markdown Content:', resultMessageMarkdown)
+        const resultChunks = resultObject.result
 
         hideTypingIndicator() // Remove typing indicator
 
-        // Append the Markdown content to bot-content-container
+        // Join the chunks back together
+        const resultMessageMarkdown = resultChunks.join('')
+
+        // Append the joined Markdown content to bot-content-container
         appendMessage('Bot', resultMessageMarkdown.trim(), true)
 
         chatContainer.scrollTop = chatContainer.scrollHeight
@@ -118,6 +119,7 @@ ipcRenderer.on('python-reply', (event, reply) => {
         console.error('Error parsing JSON:', error)
     }
 })
+
 
 function sendMessage(buttonClicked) {
     const userInput = document.getElementById('user-input').value

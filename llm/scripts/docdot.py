@@ -115,6 +115,16 @@ def chat(input_text):
         result = chain({'query': user_input})['result']
         return result
 
+def send_response(response):
+    # Convert the response to JSON
+    response_json = json.dumps({"result": response})
+
+    # Print the JSON to stdout
+    print(response_json)
+
+    # Flush stdout to ensure the message is sent immediately
+    sys.stdout.flush()
+
 if __name__ == "__main__":
     while True:
         # Read input continuously from stdin
@@ -127,12 +137,12 @@ if __name__ == "__main__":
 
         # Perform your processing on user_input
         result = chat(user_input)
+        
+        # Split the result into chunks of maximum length (e.g., 1000 characters)
+        max_chunk_length = 1000
+        chunks = [result[i:i + max_chunk_length] for i in range(0, len(result), max_chunk_length)]
 
-        # Convert the result to a JSON string
-        result_json = json.dumps({"result": result})
-
-        # Print the result to stdout
-        print(result_json)
-        # Make sure to flush stdout to ensure the message is sent immediately
-        sys.stdout.flush()
+        # Send each chunk individually
+        for chunk in chunks:
+            send_response(chunk)
 
