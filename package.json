@@ -1,7 +1,7 @@
 {
     "name": "dot",
-    "productName": "dot",
-    "version": "1.2.0",
+    "productName": "Dot",
+    "version": "1.0.0",
     "description": "Dot second release",
     "main": "src/index.js",
     "scripts": {
@@ -16,10 +16,10 @@
     },
     "keywords": [],
     "author": {
-        "name": "Bluepoint",
-        "email": "alexpinelneparidze@bluepointai.com"
+        "name": "Alex Pinel",
+        "email": "alexpinel28@gmail.com"
     },
-    "license": "MIT",
+    "license": "",
     "dependencies": {
         "@craco/craco": "^5.9.0",
         "@headlessui/react": "^1.7.17",
@@ -74,8 +74,13 @@
         "webpack-cli": "^5.1.4"
     },
     "build": {
-        "appId": "dot",
+        "appId": "com.alex.dot",
         "productName": "dot",
+        "icon": "./src/Assets/App_Icon.ico",
+        "win": {
+            "target": "nsis-web", 
+            "icon": "./src/Assets/App_Icon.ico" 
+        },
         "mac": {
             "category": "public.app-category.utilities",
             "target": [
@@ -95,7 +100,7 @@
         },
         "afterSign": "./src/notarize.js",
         "extraResources": {
-            "from": "/Users/alexpinel/Desktop/llm",
+            "from": "/Users/alexp/Desktop/llm",
             "to": "llm",
             "filter": [
                 "**/*"

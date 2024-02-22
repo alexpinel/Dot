@@ -9,21 +9,21 @@ const template = [
     // { role: 'appMenu' }
     ...(isMac
         ? [
-            {
-                label: app.name,
-                submenu: [
-                    { role: 'about' },
-                    { type: 'separator' },
-                    { role: 'services' },
-                    { type: 'separator' },
-                    { role: 'hide' },
-                    { role: 'hideOthers' },
-                    { role: 'unhide' },
-                    { type: 'separator' },
-                    { role: 'quit' },
-                ],
-            },
-        ]
+              {
+                  label: app.name,
+                  submenu: [
+                      { role: 'about' },
+                      { type: 'separator' },
+                      { role: 'services' },
+                      { type: 'separator' },
+                      { role: 'hide' },
+                      { role: 'hideOthers' },
+                      { role: 'unhide' },
+                      { type: 'separator' },
+                      { role: 'quit' },
+                  ],
+              },
+          ]
         : []),
     // { role: 'fileMenu' }
     {
@@ -42,23 +42,23 @@ const template = [
             { role: 'paste' },
             ...(isMac
                 ? [
-                    { role: 'pasteAndMatchStyle' },
-                    { role: 'delete' },
-                    { role: 'selectAll' },
-                    { type: 'separator' },
-                    {
-                        label: 'Speech',
-                        submenu: [
-                            { role: 'startSpeaking' },
-                            { role: 'stopSpeaking' },
-                        ],
-                    },
-                ]
+                      { role: 'pasteAndMatchStyle' },
+                      { role: 'delete' },
+                      { role: 'selectAll' },
+                      { type: 'separator' },
+                      {
+                          label: 'Speech',
+                          submenu: [
+                              { role: 'startSpeaking' },
+                              { role: 'stopSpeaking' },
+                          ],
+                      },
+                  ]
                 : [
-                    { role: 'delete' },
-                    { type: 'separator' },
-                    { role: 'selectAll' },
-                ]),
+                      { role: 'delete' },
+                      { type: 'separator' },
+                      { role: 'selectAll' },
+                  ]),
         ],
     },
     // { role: 'viewMenu' }
@@ -85,11 +85,11 @@ const template = [
             { role: 'zoom' },
             ...(isMac
                 ? [
-                    { type: 'separator' },
-                    { role: 'front' },
-                    { type: 'separator' },
-                    { role: 'window' },
-                ]
+                      { type: 'separator' },
+                      { role: 'front' },
+                      { type: 'separator' },
+                      { role: 'window' },
+                  ]
                 : [{ role: 'close' }]),
         ],
     },
@@ -100,7 +100,7 @@ const template = [
                 label: 'Learn More',
                 click: async () => {
                     const { shell } = require('electron')
-                    await shell.openExternal('https://bluepointdotbeta.web.app/index.html')
+                    await shell.openExternal('https://bluepointai.com/')
                 },
             },
         ],
@@ -118,9 +118,9 @@ let pythonProcess // Declare pythonProcess globally
 function findPython() {
     const possibilities = [
         // In packaged app
-        path.join(process.resourcesPath, 'llm', 'python', 'bin', 'python3'),
+        path.join(process.resourcesPath, 'llm', 'python', 'python.exe'),
         // In development
-        path.join(__dirname, '..', 'llm', 'python', 'bin', 'python3'),
+        path.join(__dirname, '..', 'llm', 'python', 'python.exe'),
     ]
     for (const path_to_python of possibilities) {
         if (fs.existsSync(path_to_python)) {
@@ -128,7 +128,7 @@ function findPython() {
         }
     }
     console.log('Could not find python3, checked', possibilities)
-    //app.quit()
+    app.quit()
 }
 
 const pythonPath = findPython()
@@ -150,13 +150,8 @@ ipcMain.on('show-context-menu', (event) => {
 })
 // RUNS DOT THROUGHT  script.py
 
-let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
-/*let currentScript = path.join(
-    process.resourcesPath,
-    'llm',
-    'scripts',
-    'docdot.py'
-) // Default script*/
+//let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
+let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py'); // Default script
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
     // Check if the Python process is already running
@@ -191,55 +186,51 @@ ipcMain.on('switch-script', (event, selectedScript) => {
     // Toggle between 'script.py' and 'normalchat.py'
     console.log('Switching script to:', selectedScript)
 
+    currentScript = currentScript.endsWith('docdot.py') ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py') : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
     /*currentScript = currentScript.endsWith('docdot.py')
-        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
-        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');*/
-    currentScript = currentScript.endsWith('docdot.py')
         ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
-        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');
+        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')*/
 
     // If the Python process is running, kill it and spawn a new one with the updated script
     if (pythonProcess) {
-        pythonProcess.kill();
-        pythonProcess = spawn(pythonPath, [currentScript], { shell: true });
+        pythonProcess.kill()
+        pythonProcess = spawn(pythonPath, [currentScript], { shell: true })
 
         pythonProcess.stdout.on('data', (data) => {
-            const message = data.toString().trim();
-            mainWindow.webContents.send('python-reply', message);
-        });
+            const message = data.toString().trim()
+            mainWindow.webContents.send('python-reply', message)
+        })
 
         pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Script Error: ${data}`);
-        });
+            console.error(`Python Script Error: ${data}`)
+        })
     }
 
     // Optionally, you can inform the renderer process about the script switch
-    mainWindow.webContents.send('script-switched', currentScript);
-});
+    mainWindow.webContents.send('script-switched', currentScript)
+})
 
 //OPEN FOLDER THING!!!!
 
 ipcMain.handle('open-dialog', async (event) => {
     const result = await dialog.showOpenDialog({
-        properties: ['openDirectory'],
-        title: 'Select Directory',
-    })
+        properties: ['openFile', 'openDirectory'], // Include both 'openFile' and 'openDirectory'
+        title: 'Select Directory or Files',
+        filters: [] // Specify an empty filters array to avoid any filtering
+    });
 
     // Check if the user selected a directory
     if (!result.canceled && result.filePaths.length > 0) {
-        const chosenDirectory = result.filePaths[0]
-        console.log('Chosen Directory:', chosenDirectory)
+        const chosenPaths = result.filePaths;
+        console.log('Chosen Paths:', chosenPaths);
     } else {
-        console.log('No directory selected.')
+        console.log('No files or directories selected.');
     }
-    return result
-})
+    return result;
+});
+
 
 // ELECTRON STUFF, CREATE THE WINDOW BLA BLA !!!!
-
-
-// Flag to track whether dark mode is enabled or not
-let isDarkModeEnabled = false;
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -247,7 +238,8 @@ const createWindow = () => {
         height: 700,
         minWidth: 1250,
         minHeight: 700,
-        titleBarStyle: 'hidden',
+        autoHideMenuBar: true, // Hide the menu bar
+        //titleBarStyle: 'hidden',
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -256,14 +248,6 @@ const createWindow = () => {
     })
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'))
-    // Listen for 'toggle-dark-mode' message from renderer process
-    ipcMain.on('toggle-dark-mode', (event) => {
-        // Toggle the dark mode flag
-        isDarkModeEnabled = !isDarkModeEnabled;
-        // Send message back to renderer process with the new state
-        event.sender.send('dark-mode-toggled', isDarkModeEnabled);
-    });
-
     //mainWindow.webContents.openDevTools();
 }
 
@@ -275,7 +259,7 @@ function toggleGalleryView() {
         galleryViewInterval = setInterval(() => {
             const imagePath = getRandomImage()
             mainWindow.webContents.send('update-background', imagePath)
-        }, 60000) // Change image every 20 seconds
+        }, 20000) // Change image every 20 seconds
 
         // Send the first image immediately
         const firstImagePath = getRandomImage()
@@ -337,20 +321,16 @@ const appPath = app.getAppPath()
 ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
         // Construct paths relative to the script's location
+        // const pythonExecutablePath = path.join(__dirname, 'python', 'bin', 'python3');
 
+        const pythonScriptPath = path.join(process.resourcesPath, 'llm', 'scripts', 'embeddings.py');
         /*const pythonScriptPath = path.join(
-            process.resourcesPath,
-            'llm',
-            'scripts',
-            'embeddings.py'
-        )*/
-        const pythonScriptPath = path.join(
             __dirname,
             '..',
             'llm',
             'scripts',
             'embeddings.py'
-        )
+        )*/
 
         // Quote the directory path to handle spaces
         const quotedDirectory = `"${directory}"`

@@ -17,7 +17,7 @@ def embeddings(chosen_directory):
     print("Model Directory:", os.path.abspath(model_directory))
 
     ### LOAD EMBEDDING SETTINGS
-    embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'mps'})
+    embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'cpu'})
 
     text_splitter=RecursiveCharacterTextSplitter(
                                                 chunk_size=8000,
@@ -178,4 +178,3 @@ if __name__ == "__main__":
     print(f"Processing directory: {directory_path}")
     embeddings(directory_path)
     print("LESGOOOOOO")
-

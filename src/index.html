@@ -10,7 +10,6 @@
 
 <body>
     <input id="scriptToggle" style="display: none; width: 0; height: 0;" />
-    <div id="titlebar" class="z-50 border-x border-gray-200 dark:border-slate-800 dark:bg-slate-800 bg-gray-50"></div>
     <div id="backgroundOverlay"></div>
 
     <div class="flex h-screen dark:bg-slate-700">
@@ -20,7 +19,7 @@
             class="flex h-full w-1/5 flex-col justify-between border-x border-gray-200 dark:border-slate-900 dark:bg-slate-800 bg-gray-50">
             <div class="mt-2 flex items-center justify-center">
                 <button id="selectDirectoryButton"
-                    class="mt-6 flex min-h-10 w-11/12 min-w-10 items-center justify-between gap-1.5 rounded-lg dark:bg-slate-700 bg-white px-3 py-1.5 text-gray-900 shadow-md hover:bg-blue-700 dark:text-gray-300 hover:text-white">
+                    class="flex min-h-10 w-11/12 min-w-10 items-center justify-between gap-1.5 rounded-lg dark:bg-slate-700 bg-white px-3 py-1.5 text-gray-900 shadow-md hover:bg-blue-700 dark:text-gray-300 hover:text-white">
                     <span class="text-md font-medium">Upload documents</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="h-6 w-6">
@@ -116,7 +115,7 @@
 
 
             <!-- Dropdown HTML -->
-            <div class="fixed top-3 left-1/2 z-50 transform  mt-5">
+            <div class="fixed top-3 left-1/2 z-50 transform ">
                 <div class="relative inline-block text-left">
 
                     <button type="button" onclick="toggleDropdown()"
@@ -172,7 +171,7 @@
                 </div>
             </div>
 
-            <div id="toggleDarkMode" class="fixed top-3 right-0 z-50 pr-2 mt-2">
+            <div id="toggleDarkMode" class="fixed right-0 z-50 pr-2 -mt-2">                
                 <input type="checkbox" name="light-switch" class="light-switch sr-only" />
                 <label class="relative cursor-pointer p-2" for="light-switch">
                     <svg class="dark:hidden" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
@@ -204,6 +203,40 @@
 
 
             <style>
+                    /* Custom scrollbar styling */
+                    #fileTree::-webkit-scrollbar {
+                    width: 8px; /* Width of the scrollbar */
+                }
+
+                #fileTree::-webkit-scrollbar-track {
+                    background: #f1f1f100; /* Color of the scrollbar track */
+                }
+
+                #fileTree::-webkit-scrollbar-thumb {
+                    background: #888; /* Color of the scrollbar thumb */
+                    border-radius: 4px; /* Roundness of the scrollbar thumb */
+                }
+
+                #fileTree::-webkit-scrollbar-thumb:hover {
+                    background: #555; /* Color of the scrollbar thumb on hover */
+                }
+
+                #chat-container::-webkit-scrollbar {
+                    width: 8px; /* Width of the scrollbar */
+                }
+
+                #chat-container::-webkit-scrollbar-track {
+                    background: #f1f1f100; /* Color of the scrollbar track */
+                }
+
+                #chat-container::-webkit-scrollbar-thumb {
+                    background: #888; /* Color of the scrollbar thumb */
+                    border-radius: 4px; /* Roundness of the scrollbar thumb */
+                }
+
+                #chat-container::-webkit-scrollbar-thumb:hover {
+                    background: #555; /* Color of the scrollbar thumb on hover */
+                }
                 .message {
                     width: 75vw;
                     margin-left: auto;

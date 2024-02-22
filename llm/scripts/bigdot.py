@@ -9,7 +9,7 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
 
 
-n_gpu_layers = 1  # Metal set to 1 is enough.
+n_gpu_layers = -1  # Metal set to 1 is enough.
 n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
 
 
