@@ -1,0 +1,199 @@
+/* markdown-styles.css */
+
+/* ATTENTION, THIS STYLES ARE USED TO CONVERT THE MARKDOWN FORMATTED ANSWERS FROM THE LLM TO HTML FOR PROPER UI DISPLAYING
+
+
+/* Styles specific to Markdown container */
+.bot-content-container {
+  margin-top: 0; /* Reset top margin */
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  /* Add styles for Markdown elements */
+}
+
+/* Headings */
+.bot-content-container h1,
+.bot-content-container h2,
+.bot-content-container h3,
+.bot-content-container h4,
+.bot-content-container h5,
+.bot-content-container h6 {
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+/* Paragraphs */
+.bot-content-container p {
+  margin-bottom: 1em;
+}
+
+/* Force line breaks between paragraphs */
+.bot-content-container p {
+  margin-bottom: 1em;
+  white-space: pre-line;
+}
+
+/* Lists */
+.bot-content-container ul,
+.bot-content-container ol {
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+
+.bot-content-container li {
+  margin-bottom: 0.5em;
+}
+
+/* Links */
+.bot-content-container a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.bot-content-container a:hover {
+  color: #004080;
+}
+
+/* Blockquotes */
+.bot-content-container blockquote {
+  margin: 0 0 1em;
+  padding: 0.5em 1em;
+  border-left: 2px solid #ccc;
+  color: #777;
+}
+
+/* Code blocks */
+.bot-content-container pre {
+  border-radius: 8px;
+  color: #f8f8f8;
+  background-color: #151723;
+  border: 1px solid #000000;
+  padding: 1em;
+  overflow: auto;
+  margin-bottom: 1em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bot-content-container code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+}
+
+/* Horizontal rules */
+.bot-content-container hr {
+  border: 1px solid #ccc;
+  margin: 1em 0;
+}
+
+/* Images */
+.bot-content-container img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1em;
+}
+
+/* Inline styles */
+.bot-content-container em {
+  font-style: italic;
+}
+
+.bot-content-container strong {
+  font-weight: bold;
+}
+
+.bot-content-container del {
+  text-decoration: line-through;
+}
+
+/* Add more styles as needed for other Markdown elements */
+
+/* Lists */
+.bot-content-container ul,
+.bot-content-container ol {
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+
+.bot-content-container li {
+  margin-bottom: 0.5em;
+  list-style-type: disc; /* Style for unordered lists, use 'circle' or 'square' if desired */
+}
+
+.bot-content-container ol {
+  list-style-type: decimal; /* Style for ordered lists */
+}
+
+/* Nested lists */
+.bot-content-container ul ul,
+.bot-content-container ol ul,
+.bot-content-container ul ol,
+.bot-content-container ol ol {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  padding-left: 2em;
+}
+
+/* Links */
+.bot-content-container a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.bot-content-container a:hover {
+  color: #004080;
+}
+
+/* Tables */
+.bot-content-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1em;
+}
+
+.bot-content-container th,
+.bot-content-container td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.bot-content-container th {
+  background-color: #f2f2f2;
+}
+
+/* Task Lists */
+.bot-content-container .task-list-item {
+  list-style-type: none;
+}
+
+.bot-content-container .task-list-item input {
+  margin-right: 5px;
+}
+
+/* Abbreviations */
+.bot-content-container abbr {
+  text-decoration: underline;
+  cursor: help;
+}
+
+/* Footnotes */
+.bot-content-container .footnotes {
+  margin-top: 1em;
+  border-top: 1px solid #ccc;
+  padding-top: 1em;
+}
+
+.bot-content-container .footnote-ref {
+  font-size: 0.8em;
+}
+
+/* Definition Lists */
+.bot-content-container dl {
+  margin-bottom: 1em;
+}
+
+.bot-content-container dt {
+  font-weight: bold;
+}
+

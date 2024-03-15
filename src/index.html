@@ -1,0 +1,447 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="dist/output.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="markdown-styles.css" />
+</head>
+
+<body>
+    <input id="scriptToggle" style="display: none; width: 0; height: 0;" />
+    <div id="titlebar" class="z-50 border-x border-gray-200 dark:border-slate-800 dark:bg-slate-800 bg-gray-50"></div>
+    <div id="backgroundOverlay"></div>
+
+    <div class="flex h-screen dark:bg-slate-700">
+        <!-- Your other content goes here -->
+
+        <div id="menu-side"
+            class="flex h-full w-1/5 flex-col justify-between border-x border-gray-200 dark:border-slate-900 dark:bg-slate-800 bg-gray-50">
+            <div class="mt-2 flex items-center justify-center">
+                <button id="selectDirectoryButton"
+                    class="mt-6 flex min-h-10 w-11/12 min-w-10 items-center justify-between gap-1.5 rounded-lg dark:bg-slate-700 bg-white px-3 py-1.5 text-gray-900 shadow-md hover:bg-blue-700 dark:text-gray-300 hover:text-white">
+                    <span class="text-md font-medium">Upload documents</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="h-6 w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                    </svg>
+                </button>
+            </div>
+
+            <hr class="my-2 h-px border-0 bg-gray-200 dark:bg-gray-700" />
+            <div role="status" id="loadingAnimation"
+                class="-my-2 hidden max-w-md animate-pulse space-y-4 divide-y divide-gray-200 rounded border border-gray-200 p-4 shadow md:p-6 dark:divide-gray-700 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <div class="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <span class="sr-only">Loading...</span>
+            </div>
+
+            <!-- Rest of the menu content... -->
+            <div id="sidebar" class="no-horizontal-scroll">
+                <!-- Sidebar content will be dynamically generated using JavaScript -->
+            </div>
+            <div id="fileTree" class="no-horizontal-scroll overflow-y-auto">
+                <!-- File tree content goes here -->
+            </div>
+            <div id="switches and logo" class="flex grow flex-col items-center justify-end">
+
+
+
+                <!--
+                    <label
+                        class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center"
+                    >
+                        <input type="checkbox" value="" class="peer sr-only" />
+                        <div
+                            class="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-50 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-green-800"
+                        ></div>
+                        <span
+                            class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+                            >Gallery</span
+                        >
+                        <img
+                            src="Assets/icons/art LM.png"
+                            class="mx-1 size-5"
+                        />
+                    </label>
+                -->
+
+                <!-- HTML code -->
+                <img src="Assets/logo2.png" alt="Light Logo" class="w-3/5 dark:hidden" />
+                <img src="Assets/logo-dark.png" alt="Dark Logo" class="w-3/5 dark:block hidden" />
+                <p class="mx-1 mb-1.5 text-center text-xs font-light text-gray-400 p-2 dark:text-gray-300">
+                    Answers may not be accurate, please consider checking
+                    important information.
+                </p>
+            </div>
+        </div>
+
+        <div id="chat-side" class="relative w-4/5 flex-grow">
+
+
+            <!-- Dropdown HTML -->
+            <div class="fixed top-3 left-1/2 z-50 transform  mt-5">
+                <div class="relative inline-block text-left">
+
+                    <button type="button" onclick="toggleDropdown()"
+                        class="inline-flex justify-center w-28 rounded-lg backdrop-blur-xl  bg-white/30 dark:bg-white/0 hover:bg-blue-700 hover:text-white border-gray-200 px-2 py-1.5 text-gray-800"
+                        id="options-menu">
+                        <span class="text-md font-medium dark:text-gray-300" id="selected-option">Doc Dot</span>
+                        <!-- Heroicon name: solid/chevron-down -->
+                        <svg class="w-6 h-6  dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 9-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- The dropdown options are initially hidden -->
+                <div class="origin-top-right absolute mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black dark:bg-slate-800 ring-opacity-5 hidden"
+                    id="dropdown" style="left: calc(50% - 7rem);">
+                    <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                        <button
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100  dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-200 dark:text-gray-300  focus:outline-none"
+                            role="menuitem" onclick="selectOption('Doc Dot')">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-blue-700 dark:text-blue-700" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 8v3c0 .6-.4 1-1 1H5m11 4h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-7a1 1 0 0 0-1 1v1m4 3v10c0 .6-.4 1-1 1H6a1 1 0 0 1-1-1v-7.1c0-.3 0-.5.2-.7l2.5-2.9c.2-.2.5-.3.8-.3H13c.6 0 1 .4 1 1Z" />
+                                </svg>
+                                <div class="ml-0">
+                                    <span class="font-bold ">Doc Dot</span>
+                                    <span class="text-xs text-gray-500 block">Chat and interact with your
+                                        documents</span>
+                                </div>
+                            </div>
+                        </button>
+                        <button
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-200 dark:text-gray-300  focus:outline-none"
+                            role="menuitem" onclick="selectOption('Big Dot')">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-blue-700 dark:text-blue-700" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M16 10.5h0m-4 0h0m-4 0h0M5 5h14c.6 0 1 .4 1 1v9c0 .6-.4 1-1 1h-6.6a1 1 0 0 0-.7.3L8.8 19c-.3.3-.8 0-.8-.4V17c0-.6-.4-1-1-1H5a1 1 0 0 1-1-1V6c0-.6.4-1 1-1Z" />
+                                </svg>
+                                <div class="ml-0">
+                                    <span class="font-bold">Big Dot</span>
+                                    <span class="text-xs text-gray-500 block">Chat freely about anything!</span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="toggleDarkMode" class="fixed top-3 right-0 z-50 pr-2 mt-2">
+                <input type="checkbox" name="light-switch" class="light-switch sr-only" />
+                <label class="relative cursor-pointer p-2" for="light-switch">
+                    <svg class="dark:hidden" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                        <path class="fill-slate-600"
+                            d="M7 0h2v2H7zM12.88 1.637l1.414 1.415-1.415 1.413-1.413-1.414zM14 7h2v2h-2zM12.95 14.433l-1.414-1.413 1.413-1.415 1.415 1.414zM7 14h2v2H7zM2.98 14.364l-1.413-1.415 1.414-1.414 1.414 1.415zM0 7h2v2H0zM3.05 1.706 4.463 3.12 3.05 4.535 1.636 3.12z" />
+                        <path class="fill-slate-700" d="M8 4C5.8 4 4 5.8 4 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Z" />
+                    </svg>
+                    <svg class="hidden dark:block" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                        <path class="fill-slate-400"
+                            d="M6.2 1C3.2 1.8 1 4.6 1 7.9 1 11.8 4.2 15 8.1 15c3.3 0 6-2.2 6.9-5.2C9.7 11.2 4.8 6.3 6.2 1Z" />
+                        <path class="fill-slate-500"
+                            d="M12.5 5a.625.625 0 0 1-.625-.625 1.252 1.252 0 0 0-1.25-1.25.625.625 0 1 1 0-1.25 1.252 1.252 0 0 0 1.25-1.25.625.625 0 1 1 1.25 0c.001.69.56 1.249 1.25 1.25a.625.625 0 1 1 0 1.25c-.69.001-1.249.56-1.25 1.25A.625.625 0 0 1 12.5 5Z" />
+                    </svg>
+                    <span class="sr-only">Switch to light / dark version</span>
+                </label>
+            </div>
+
+            <!-- Content of the 80% width container -->
+            <div id="chat-container"
+                class="flex h-[90vh] flex-grow transform flex-col-reverse overflow-y-auto overflow-x-hidden bg-cover bg-center transition-transform duration-500 ease-in-out">
+
+
+                <!-- Add these classes to your HTML elements -->
+                <div id="bot-message" class="flex w-[vw] flex-col items-center justify-start space-y-2 p-6 text-base">
+                    <!-- ... existing code ... -->
+                </div>
+            </div>
+
+
+
+            <style>
+                .message {
+                    width: 75vw;
+                    margin-left: auto;
+                    margin-right: auto;
+                    overflow: hidden;
+                    /* Ensure overflow is hidden for rounded corners */
+                    animation: fadeIn 0.3s ease-in-out;
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .user-content-container {
+                    display: flex;
+                    align-items: flex-start;
+                }
+
+                .user-bubble {
+                    width: 70vw;
+                    /* Adjust the width of the bot's bubble */
+                    padding: 10px;
+                    background-color: rgba(236, 236, 236, 0.603);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    color: #000;
+                    /* Set the text color to black */
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    /* Shadow effect */
+                }
+
+                .dark .user-bubble {
+                    width: 70vw;
+                    /* Adjust the width of the bot's bubble */
+                    padding: 10px;
+                    background-color: rgba(129, 129, 129, 0.603);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    color: #dae7ff;
+                    /* Set the text color to black */
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    /* Shadow effect */
+                }
+
+                .bot-content-container {
+                    display: flex;
+                    align-items: flex-end;
+                }
+
+                .bot-bubble {
+                    width: 70vw;
+                    /* Adjust the width of the bot's bubble */
+                    padding: 10px;
+                    background-color: rgba(236, 236, 236, 0.603);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    color: #000;
+                    /* Set the text color to black */
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    /* Shadow effect */
+                }
+
+                .dark .bot-bubble {
+                    width: 70vw;
+                    /* Adjust the width of the bot's bubble */
+                    padding: 10px;
+                    background-color: rgba(129, 129, 129, 0.603);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    color: #d9e6ff;
+                    /* Set the text color to black */
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    /* Shadow effect */
+                }
+
+
+                .typing-indicator {
+                    font-style: italic;
+                    color: #6b7280;
+                    /* Adjust color based on your design */
+                }
+
+                .dark .typing-indicator {
+                    font-style: italic;
+                    color: #bfcadf;
+                    /* Adjust color based on your design */
+                }
+
+                .user-icon {
+                    /* Customize user's icon styles */
+                    background-image: url('./Assets/icons/user-icon.png');
+                    background-size: cover;
+                    /* Adjust as needed */
+                    width: 24px;
+                    /* Adjust the width of the icon */
+                    height: 24px;
+                    /* Adjust the height of the icon */
+                    border-radius: 0%;
+                    /* Make it a circle */
+                    margin-right: 12px;
+                    /* Adjust as needed */
+                }
+
+                .bot-icon {
+                    /* Customize bot's icon styles */
+                    background-image: url('./Assets/icons/bot-icon.png');
+                    background-size: cover;
+                    /* Adjust as needed */
+                    width: 20px;
+                    /* Adjust the width of the icon */
+                    height: 20px;
+                    /* Adjust the height of the icon */
+                    border-radius: 0%;
+                    /* Make it a circle */
+                    margin-right: 15px;
+                    /* Adjust as needed */
+                }
+
+                .custom-shadow-md-up {
+                    box-shadow:
+                        0 -10px 15px -3px rgba(0, 0, 0, 0.1),
+                        0 -4px 6px -2px rgba(0, 0, 0, 0.05);
+                }
+
+                .typing-indicator {
+                    position: absolute;
+                    bottom: 0vh;
+                    /* Adjust the value as needed for the desired lift */
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-style: italic;
+                    color: #6b7280;
+                    /* Adjust color based on your design */
+                }
+
+                @keyframes bounce {
+
+                    0%,
+                    20%,
+                    50%,
+                    80%,
+                    100% {
+                        transform: translateY(0);
+                    }
+
+                    40% {
+                        transform: translateY(-5px);
+                    }
+
+                    60% {
+                        transform: translateY(-3px);
+                    }
+                }
+
+                .typing-indicator span {
+                    display: inline-block;
+                    animation: bounce 1s infinite;
+                }
+
+                .typing-indicator span:nth-child(1) {
+                    animation-delay: 0.1s;
+                }
+
+                .typing-indicator span:nth-child(2) {
+                    animation-delay: 0.2s;
+                }
+
+                .typing-indicator span:nth-child(3) {
+                    animation-delay: 0.3s;
+                }
+
+                .rotate-90 {
+                    transform: rotate(90deg);
+                    transform-origin: center;
+                    /* Set the transform origin to the center of the element */
+                    transition: transform 0.3s ease;
+                    /* Adjust the transition duration and easing as needed */
+                }
+
+                .file-name {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+                #titlebar {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 30px;
+                    /* Adjust height as needed */
+                    -webkit-app-region: drag;
+                    /* Allow dragging the window by clicking the title bar */
+                    text-align: center;
+                    line-height: 30px;
+                    user-select: none;
+                }
+
+                /* Add or customize other styles as needed */
+            </style>
+            <div id="user-input-and-button" class="flex flex-shrink-0 items-center justify-center" style="
+                        box-shadow:
+                            0 -4px 6px -1px rgba(0, 0, 0, 0.08),
+                            0 -2px 4px -1px rgba(0, 0, 0, 0.02);
+                    ">
+                <div class="input-container mt-3 w-3/4">
+                    <!-- Adjust the width and margin-top as needed -->
+                    <input type="text" id="user-input" placeholder="Type your message..."
+                        class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-sm focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder-gray-400" />
+                </div>
+                <!-- send button -->
+                <button id="send-button" onclick="sendMessage('')"
+                    class=" group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 bg-white text-black shadow-sm dark:bg-slate-700 transition-all dark:text-gray-300 duration-75 ease-in hover:bg-blue-700 hover:text-white">
+                    <span
+                        class="relative rounded-md px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0">
+                        <svg class="h-5 w-5 transition-all duration-75 ease-in" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 13V1m0 0L1 5m4-4 4 4" />
+                        </svg>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./render.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/marked/marked.min.js"></script>
+    <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
+</body>
+
+</html>
