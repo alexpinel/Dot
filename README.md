@@ -17,7 +17,7 @@ Dot is built with Electron JS, but its main functionalities come from a bundled 
 
 You can either install the packaged app in the [Dot website ](https://dotapp.uk/) or can set up the project for development, to do so follow these steps:
 
-- Clone the repository `$ https://github.com/alexpinel/Dot.git
+- Clone the repository `$ https://github.com/alexpinel/Dot.git`
 - Install Node js and then run `npm install` inside the project repository, you can run `npm install --force` if you face any issues at this stage
 
 Now, it is time to add a full python bundle to the app. The purpose of this is to create a distributable environment with all necessary libraries, if you only plan on using Dot from the console you might not need to follow this particular step but then make sure to replace the python path locations specified in `src/index.js`. Creating the python bundle is covered in detail here: [https://til.simonwillison.net/electron/python-inside-electron](https://til.simonwillison.net/electron/python-inside-electron) , the bundles can also be installed from here: [https://github.com/indygreg/python-build-standalone/releases/tag/20240224](https://github.com/indygreg/python-build-standalone/releases/tag/20240224)
