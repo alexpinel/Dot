@@ -40,5 +40,4 @@ Finally, download the Mistral 7B LLM from the following link and place it inside
 
 That's it! If you follow these steps you should be able to get it all running, please let me know if you are facing any issues :)
 
-<img src="https://github.com/alexpinel/Dot/assets/93524949/03687994-efeb-4c9d-9a4b-859ed139987b)" alt="lock" width="600">
 
