@@ -1,13 +1,16 @@
 # HELLO!
-<div style="text-align: center;">
-  <img src="https://github.com/alexpinel/Dot/assets/93524949/8c9ee23e-c9d2-413e-9c38-ab7a143b8060" alt="dot_desktop" width="600">
-</div>
+
+![ezgif-4-b96c0b5548](https://github.com/alexpinel/Dot/assets/93524949/e5983c61-d59c-45ac-86f6-9d62cffaf37b)
 
 This is Dot, a standalone open source app meant for easy use of local LLMs and RAG in particular to interact with documents and files similarly to Nvidia's Chat with RTX. Dot itself is completely standalone and is packaged with all dependencies including a copy of Mistral 7B, this is to ensure the app is as accessible as possible and no prior knowledge of programming or local LLMs is required to use it. You can install the app (available for Apple Silicon and Windows) here: [Dot website ](https://dotapp.uk/)
 
 ### What does it do?
 
 Dot can be used to load multiple documents into an llm and interact with them in a fully local environment through Retrieval Augmented Generation (RAG), supported documents are: pdf, docx, pptx, xlsx, and markdown. Apart from RAG, users can also switch to Big Dot for any interactions unrelated to their documents similarly to ChatGPT.
+
+<div style="text-align: center;">
+  <img src="https://github.com/alexpinel/Dot/assets/93524949/8c9ee23e-c9d2-413e-9c38-ab7a143b8060" alt="dot_desktop" width="600">
+</div>
 
 ### How does it work?
 
