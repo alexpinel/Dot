@@ -40,4 +40,20 @@ Finally, download the Mistral 7B LLM from the following link and place it inside
 
 That's it! If you follow these steps you should be able to get it all running, please let me know if you are facing any issues :)
 
+### Future features I'd like to add:
+
+- Linux support
+- Ability to choose LLM
+- Image support would be cool
+- Increased awarnes of documents apart from merely their content
+- Loading individual files instead of selecting a folder  (This is really needed, some users get confused by this and I cannot blame them at all)
+- Increased security considerations, after all this is the whole point of using a local LLM
+- Support for more docs
+- idk, will find out along the way
+
+### Want to help?
+
+Please do! I am a busy student working on this as a side project so help is more than welcome!
+
+**Also**, I am hosting the standalone apps in Google Cloud and that has turned out to be faaaar more expensive than I expected, I would really really appreciate any advice on how to properly host the app, as I won't be able to afford the cloud costs
 
