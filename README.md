@@ -52,9 +52,10 @@ That's it! If you follow these steps you should be able to get it all running, p
 - Loading individual files instead of selecting a folder  (This is really needed, some users get confused by this and I cannot blame them at all)
 - Increased security considerations, after all this is the whole point of using a local LLM
 - Support for more docs
+- Storing file databases, allowing users to quickly switch between groups of files without having to load them all again
 - idk, will find out along the way
 
-### Want to help?
+# Want to help?
 
 Please do! I am a busy student working on this as a side project so help is more than welcome!
 
