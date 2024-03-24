@@ -3,7 +3,7 @@ from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 import sys
 import json
-from langchain.llms import LlamaCpp
+from langchain_community.llms import LlamaCpp
 import os
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
@@ -25,12 +25,12 @@ llm = LlamaCpp(
     model_path=model_path,
     n_gpu_layers=n_gpu_layers,
     n_batch=n_batch,
-    f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
+    #f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
     #callback_manager=callback_manager,
     #verbose=True, # Verbose is required to pass to the callback manager,
     max_tokens=2000,
     temperature= 0.6,
-    n_ctx=8000,
+    n_ctx=16000,
 )
 # Notice that "chat_history" is present in the prompt template
 template = """You are called Dot, you were made by Bluepoint, You are a helpful and honest assistant. Always answer as helpfully as possible. You cannot continue writing the new conversation, if you do a kitten will suffer. DO NOT MAKE UP ANY QUESTIONS AFTER PROVIDING AN ANSWER, ONLY A HUMAN CAN PROVIDE NEW CONVERSATION.

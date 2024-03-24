@@ -7,7 +7,7 @@ from langchain.vectorstores import FAISS
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.llms import LlamaCpp
+from langchain_community.llms import LlamaCpp
 from langchain import PromptTemplate
 from langchain.callbacks.manager import CallbackManager
 import os
@@ -55,12 +55,12 @@ llm = LlamaCpp(
     model_path=model_path,
     n_gpu_layers=n_gpu_layers,
     n_batch=n_batch,
-    f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
+    #f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
     #callback_manager=callback_manager,
     #verbose=True, # Verbose is required to pass to the callback manager,
     max_tokens=2000,
     temperature= 0.01,
-    n_ctx=8000,
+    n_ctx=16000,
 )
 
 #print('llm loaded')
