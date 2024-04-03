@@ -59,5 +59,4 @@ That's it! If you follow these steps you should be able to get it all running, p
 
 Please do! I am a busy student working on this as a side project so help is more than welcome!
 
-**Also**, I am hosting the standalone apps in Google Cloud and that has turned out to be faaaar more expensive than I expected, I would really really appreciate any advice on how to properly host the app, as I won't be able to afford the cloud costs
 
