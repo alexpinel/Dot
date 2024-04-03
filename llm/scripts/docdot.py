@@ -7,7 +7,7 @@ from langchain.vectorstores import FAISS
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.llms import LlamaCpp
+from langchain_community.llms import LlamaCpp
 from langchain import PromptTemplate
 from langchain.callbacks.manager import CallbackManager
 import os
@@ -35,9 +35,9 @@ model_directory = os.path.join(current_directory, '..', 'mpnet')
 #print("Model Directory:", os.path.abspath(model_directory))
 
 ### LOAD EMBEDDING SETTINGS
-embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'mps'}) # SET TO 'cpu' for PC
+embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'cpu'})
 vector_store = FAISS.load_local(os.path.join(folder_path, "Dot-data"), embeddings)
-n_gpu_layers = 1  # Metal set to 1 is enough.
+n_gpu_layers = -1  # Metal set to 1 is enough.
 n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
 
 
@@ -49,15 +49,21 @@ relative_model_path = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
 model_path = os.path.join(script_dir, relative_model_path)
 
 
+#callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])         #THIS MAKES THE TEXT STREAM LIKE CHATGPT, OTHERWISE IT JUST POPS OUT
+
 llm = LlamaCpp(
     model_path=model_path,
     n_gpu_layers=n_gpu_layers,
     n_batch=n_batch,
-    f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
+    #f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
+    #callback_manager=callback_manager,
+    #verbose=True, # Verbose is required to pass to the callback manager,
     max_tokens=2000,
     temperature= 0.01,
-    n_ctx=8000,
+    n_ctx=16000,
 )
+
+#print('llm loaded')
 
 DEFAULT_SYSTEM_PROMPT ="""
 You are a good, honest assistant. 
@@ -140,4 +146,3 @@ if __name__ == "__main__":
 
         # Send the chunks as an array
         send_response(chunks)
-

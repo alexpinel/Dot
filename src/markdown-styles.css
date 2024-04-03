@@ -1,8 +1,5 @@
 /* markdown-styles.css */
 
-/* ATTENTION, THIS STYLES ARE USED TO CONVERT THE MARKDOWN FORMATTED ANSWERS FROM THE LLM TO HTML FOR PROPER UI DISPLAYING
-
-
 /* Styles specific to Markdown container */
 .bot-content-container {
   margin-top: 0; /* Reset top margin */
