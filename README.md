@@ -14,7 +14,7 @@ Dot can be used to load multiple documents into an llm and interact with them in
 
 ### How does it work?
 
-Dot is built with Electron JS, but its main functionalities come from a bundled install of Python that contains all libraries and necessary files. A multitude of libraries are used to make everything work, but perhaps the most important to be aware of are: llama-cpp to run the LLM, FAISS to create local vector stores, and Langchain & Huggingface to setup the conversation chains and embedding process.
+Dot is built with Electron JS, but its main functionalities come from a bundled install of Python that contains all libraries and necessary files. A multitude of libraries are used to make everything work, but perhaps the most important to be aware of are: llama.cpp to run the LLM, FAISS to create local vector stores, and Langchain & Huggingface to setup the conversation chains and embedding process.
 
 ### Install
 
@@ -32,7 +32,7 @@ Required python libraries:
 - langchain [link](https://python.langchain.com/docs/get_started/quickstart)
 - FAISS [link](https://python.langchain.com/docs/integrations/vectorstores/faiss)
 - HuggingFace [link](https://python.langchain.com/docs/integrations/platforms/huggingface)
-- llama-cpp [link](https://github.com/abetlen/llama-cpp-python) (Use CUDA implementation if you have an Nvidia GPU!)
+- llama.cpp [link](https://github.com/abetlen/llama-cpp-python) (Use CUDA implementation if you have an Nvidia GPU!)
 - pypdf [link](https://python.langchain.com/docs/modules/data_connection/document_loaders/pdf)
 - docx2txt [link](https://python.langchain.com/docs/integrations/document_loaders/microsoft_word)
 - Unstructured [link](https://github.com/Unstructured-IO/unstructured) (Use `pip install "unstructured[pptx, md, xlsx]` for the file formats)
