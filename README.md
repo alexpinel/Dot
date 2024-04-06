@@ -8,9 +8,10 @@ This is Dot, a standalone open source app meant for easy use of local LLMs and R
 
 Dot can be used to load multiple documents into an llm and interact with them in a fully local environment through Retrieval Augmented Generation (RAG), supported documents are: pdf, docx, pptx, xlsx, and markdown. Apart from RAG, users can also switch to Big Dot for any interactions unrelated to their documents similarly to ChatGPT.
 
-<div style="text-align: center;">
-  <img src="https://github.com/alexpinel/Dot/assets/93524949/8c9ee23e-c9d2-413e-9c38-ab7a143b8060" alt="dot_desktop" width="600">
-</div>
+
+https://github.com/alexpinel/Dot/assets/93524949/807fb58c-40e0-407e-afb3-a3813477ce9e
+
+
 
 ### How does it work?
 
