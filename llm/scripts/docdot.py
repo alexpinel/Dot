@@ -97,6 +97,45 @@ chain = RetrievalQA.from_chain_type(llm=llm,
                                 chain_type_kwargs={'prompt': qa_prompt})
 
 
+def format_response(dictionary):
+    """
+    Formats the response dictionary to:
+    - Print metadata.
+    - Embed an iframe for PDF documents, attempting to open it at a specified page.
+    - Display page_content text for Word, Excel, or PowerPoint documents.
+    Assumes each document in source_documents is an instance of a Document class.
+    """
+    formatted_result = dictionary["result"]
+    source_documents = dictionary["source_documents"]
+    
+    sources = "\n\n---\n\n### Source Documents:\n"
+    for doc in source_documents:
+        # Safely get the 'source' and 'page' from metadata, default if not found
+        source_path = doc.metadata.get("source", "Source path not available.")
+        page_number = doc.metadata.get("page", "Page number not available.")
+        file_extension = source_path.split('.')[-1].lower() if source_path else ""
+        
+        # Metadata information
+        metadata_info = f"**Source**: {source_path}\n**Page**: {page_number}\n"
+
+        if file_extension == 'pdf' and source_path != "Source path not available.":
+            source_path_with_page = f"{source_path}#page={page_number}"
+            iframe_html = f'<iframe src="{source_path_with_page}" style="width:100%; height:300px; border: 1px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: 10px 0;" frameborder="0"></iframe>'
+            sources += f"\n\n{metadata_info}\n{iframe_html}\n\n"
+        elif file_extension in ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']:
+            # For Word, Excel, PowerPoint, display page_content text
+            page_content_text = doc.page_content.replace('\n', ' ') if doc.page_content else "Page content not available."
+            sources += f"\n\n{metadata_info}\n{page_content_text}\n\n"
+        else:
+            # Fallback for other file types or if page_content should be displayed by default
+            page_content_text = doc.page_content.replace('\n', ' ') if doc.page_content else "Page content not available."
+            sources += f"\n\n{metadata_info}\n{page_content_text}\n\n"
+    
+    return formatted_result + sources
+
+
+
+
 def chat(input_text):
     while True:
         user_input=str(input_text)
@@ -106,8 +145,9 @@ def chat(input_text):
             sys.exit()
         if query=='':
             continue
-        result = chain({'query': user_input})['result']
-        return result
+        result = chain({'query': user_input})
+        formatted_response = format_response(result)
+        return formatted_response
 
 
 
