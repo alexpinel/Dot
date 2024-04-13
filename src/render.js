@@ -12,6 +12,7 @@ ipcRenderer.on('context-menu-command', (e, command) => {
 
 //// CHATTY CHAT CHAT STUFF!!!!
 
+
 function appendMessage(sender, message, isMarkdown) {
     const chatContainer = document.getElementById('bot-message')
 
@@ -159,6 +160,11 @@ const $fileTree = $('#fileTree')
 const $loadingSpinner = $('#loadingSpinner')
 
 $(document).ready(() => {
+
+    // Define a path for the file where you will store the last opened directory
+    const { ipcRenderer } = require('electron');
+    const userDataPath = ipcRenderer.sendSync('get-user-data-path'); // You'll need to implement this in your main process
+    const lastOpenedDirPath = path.join(userDataPath, 'lastOpenedDir.txt');
     const $fileTree = $('#fileTree')
 
     function truncateText(textContainer, maxWidth) {
@@ -324,6 +330,21 @@ $(document).ready(() => {
         }
     }
 
+    try {
+        // Check if the lastOpenedDir.txt file exists
+        if (fs.existsSync(lastOpenedDirPath)) {
+            const lastOpenedDir = fs.readFileSync(lastOpenedDirPath, 'utf8');
+
+            // If the directory exists, display its file tree
+            if (fs.existsSync(lastOpenedDir)) {
+                $fileTree.empty();
+                populateTree(lastOpenedDir, $fileTree);
+            }
+        }
+    } catch (err) {
+        console.error('Error loading the last opened directory:', err);
+    }
+
     function selectDirectory() {
         ipcRenderer
             .invoke('open-dialog')
@@ -394,6 +415,21 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.error('Element with ID "scriptToggle" not found.')
     }
+
+    console.log("Renderer Process Loaded");
+    ipcRenderer.send('start-download', 'Initiate Download');
+
+    ipcRenderer.on('download-progress', (event, progress) => {
+        console.log("Download Progress:", progress);
+    });
+
+    ipcRenderer.on('download-complete', () => {
+        console.log("Download Complete");
+    });
+
+    ipcRenderer.on('download-error', (error) => {
+        console.error("Download Error:", error);
+    });
 })
 
 
@@ -447,4 +483,129 @@ document.getElementById('toggleDarkMode').addEventListener('click', () => {
     iconSun.classList.toggle('hidden', !isDarkMode);
 });
 
+
+
+
+
+
+
+let progressMessageExists = false;  // This will track if the progress message is already displayed
+
+
+function appendMessageAuto(sender, message, isMarkdown) {
+    const chatContainer = document.getElementById('bot-message');  // Ensure this is the correct container
+
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+
+    if (sender === 'User') {
+        const userContentContainer = document.createElement('div');
+        userContentContainer.classList.add('user-content-container');
+
+        const userIcon = document.createElement('div');
+        userIcon.classList.add('user-icon');
+        userIcon.style.marginTop = '10px';
+
+        const userBubble = document.createElement('div');
+        userBubble.classList.add('user-bubble');
+        userBubble.innerHTML = `<strong>${message}</strong>`;
+
+        userContentContainer.appendChild(userIcon);
+        userContentContainer.appendChild(userBubble);
+        messageDiv.appendChild(userContentContainer);
+    } else if (sender === 'Bot') {
+        const botIcon = document.createElement('div');
+        botIcon.classList.add('bot-icon');
+        botIcon.style.marginTop = '10px';
+
+        const botContentContainer = document.createElement('div');
+        botContentContainer.classList.add('bot-content-container');
+        botContentContainer.appendChild(botIcon);
+
+        const botBubble = document.createElement('div');
+        botBubble.classList.add('bot-bubble');
+
+        if (isMarkdown) {
+            botBubble.innerHTML = marked(message);
+        } else {
+            // Directly set innerHTML for HTML content
+            botBubble.innerHTML = message;
+        }
+
+        botContentContainer.appendChild(botBubble);
+        messageDiv.appendChild(botContentContainer);
+    }
+
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+
+function showDownloadProgress(progress) {
+    const chatContainer = document.getElementById('chat-container');
+    let progressMessage = chatContainer.querySelector('.download-progress');
+
+    if (!progressMessage) {
+        let progressHTML = `
+        <div class="intro-message">
+            <h1>Hello!</h1>
+            <p>Welcome to Dot. Before you can get started, the Mistral 7B Large Language Model must be installed. This process should only take a few minutes, depending on your connection speed. Please wait while the necessary files are downloaded and set up for your use.</p>
+        </div>
+    
+        <div class="download-progress">
+            <div>Downloading LLM...</div>
+            <div class="progress-bar">
+                <span class="progress-bar-text">0%</span>
+            </div>
+        </div>
+        `;
+        appendMessageAuto('Bot', progressHTML, false);
+    }
+
+    const progressBar = document.querySelector('.progress-bar');
+    const progressBarText = document.querySelector('.progress-bar-text');
+    if (progressBar && progressBarText) {
+        progressBar.style.width = `${progress}%`;
+        progressBarText.innerText = `${progress}%`; // Update text to reflect current progress
+
+        // Check if the progress is 100% and update the text accordingly
+        if (progress >= 100) {
+            progressBarText.innerText = "Complete!";
+            progressBar.style.backgroundColor = "#4CAF50"; // Optional: change color to indicate completion
+        }
+    }
+}
+
+
+function removeDownloadProgress() {
+    const chatContainer = document.getElementById('chat-container');
+    const progressMessage = chatContainer.querySelector('.download-progress');
+
+    if (progressMessage) {
+        // Optionally fade out or just leave the message as-is
+        // const messageDiv = progressMessage.closest('.message');
+        // chatContainer.removeChild(messageDiv);
+        // Or you can leave it to display the complete status
+    }
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+
+
+ipcRenderer.on('download-progress', (event, progress) => {
+    console.log("Download Progress:", progress);
+    showDownloadProgress(progress);
+});
+
+ipcRenderer.on('download-complete', () => {
+    console.log("Download Complete");  // Check if this log appears in the console
+    removeDownloadProgress();
+    appendMessage('Bot', 'Download completed successfully.', false);
+});
+
+ipcRenderer.on('download-error', (event, error) => {
+    console.log("Download Error:", error);
+    removeDownloadProgress();
+    appendMessage('Bot', `Download failed: ${error}`, false);
+});
 

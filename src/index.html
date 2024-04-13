@@ -410,6 +410,59 @@
                     user-select: none;
                 }
 
+
+                /* Base container for the progress bar, giving it a pixelated font and classic layout */
+                /* Base container for the progress bar, maintaining a retro feel with modern aesthetics */
+                .download-progress {
+                    font-family: 'Courier New', Courier, monospace;
+                    /* Retro font */
+                    color: rgb(235, 235, 235);
+                    /* Neon green text */
+                    background: #222222;
+                    /* Dark background */
+                    border: 2px solid rgb(4, 4, 4);
+                    ;
+                    /* Neon green border */
+                    padding: 10px;
+                    margin-bottom: 10px;
+                    box-shadow: 0 0 10px rgb(178, 178, 178);
+                    ;
+                    /* Outer neon glow */
+                    text-shadow: 0 0 5px rgb(178, 178, 178);
+                    border-radius: 10px;
+                    /* Rounded corners */
+                    ;
+                    /* Text glow */
+                }
+
+                /* Progress bar with a gradient fill and inner shadow for depth */
+                .progress-bar {
+                    background: #176add;
+                    /* Gradient fill */
+                    height: 20px;
+                    width: 0%;
+                    /* Initial width */
+                    border: 1px solid #003681;
+                    border-radius: 1px;
+                    /* Light border for contrast */
+                    position: relative;
+                    /* Needed for absolute positioning of text */
+                }
+
+                /* Text within the progress bar showing percentage */
+                .progress-bar-text {
+                    position: absolute;
+                    /* Absolutely positioned */
+                    width: 100%;
+                    text-align: center;
+                    line-height: 20px;
+                    /* Center text vertically */
+                    color: #fff;
+                    /* Subtle text shadow */
+                }
+
+
+
                 /* Add or customize other styles as needed */
             </style>
             <div id="user-input-and-button" class="flex flex-shrink-0 items-center justify-center" style="

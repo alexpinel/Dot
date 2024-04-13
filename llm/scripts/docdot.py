@@ -14,23 +14,24 @@ import os
 
 
 # Specify the desktop path
-desktop_path = os.path.join(os.path.expanduser("~"), "Documents")
+documents_path = os.path.join(os.path.expanduser("~"), "Documents")
 
 # Specify the folder name
-folder_name = "Dot-data"
+folder_name = "Dot-Data"
 
 # Combine the desktop path and folder name
-folder_path = os.path.join(desktop_path, folder_name)
+folder_path = os.path.join(documents_path, folder_name)
 
 # Create the folder if it doesn't exist
 if not os.path.exists(folder_path):
+    print('LLM NOT FOUND!')
     os.makedirs(folder_path)
 
 
 
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
-model_directory = os.path.join(current_directory, '..', 'mpnet')
+model_directory = os.path.join(current_directory, '..', 'baai')
 
 #print("Model Directory:", os.path.abspath(model_directory))
 
@@ -38,7 +39,7 @@ model_directory = os.path.join(current_directory, '..', 'mpnet')
 embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'mps'}) # SET TO 'cpu' for PC
 vector_store = FAISS.load_local(os.path.join(folder_path, "Dot-data"), embeddings)
 n_gpu_layers = 1  # Metal set to 1 is enough.
-n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
+n_batch = 256  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
 
 
 # Find the current script's directory
@@ -46,7 +47,7 @@ script_dir = os.path.dirname(__file__)
 
 # Construct the relative path
 relative_model_path = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
-model_path = os.path.join(script_dir, relative_model_path)
+model_path = os.path.join(folder_path, relative_model_path)
 
 
 llm = LlamaCpp(
@@ -100,15 +101,16 @@ chain = RetrievalQA.from_chain_type(llm=llm,
 def format_response(dictionary):
     """
     Formats the response dictionary to:
-    - Print metadata.
+    - Print metadata for each document.
     - Embed an iframe for PDF documents, attempting to open it at a specified page.
     - Display page_content text for Word, Excel, or PowerPoint documents.
+    - Display the overall result after the document details.
     Assumes each document in source_documents is an instance of a Document class.
     """
-    formatted_result = dictionary["result"]
+    # Correctly define source_documents from the dictionary
     source_documents = dictionary["source_documents"]
     
-    sources = "\n\n---\n\n### Source Documents:\n"
+    sources = "### Source Documents:\n"
     for doc in source_documents:
         # Safely get the 'source' and 'page' from metadata, default if not found
         source_path = doc.metadata.get("source", "Source path not available.")
@@ -131,7 +133,13 @@ def format_response(dictionary):
             page_content_text = doc.page_content.replace('\n', ' ') if doc.page_content else "Page content not available."
             sources += f"\n\n{metadata_info}\n{page_content_text}\n\n"
     
-    return formatted_result + sources
+    # Now appending the formatted result at the end
+    formatted_result = dictionary["result"]
+    complete_response = sources + "\n\n---\n\n### Result:\n" + formatted_result
+    
+    return complete_response
+
+
 
 
 

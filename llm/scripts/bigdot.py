@@ -10,15 +10,26 @@ from langchain.prompts import PromptTemplate
 
 
 n_gpu_layers = 1  # Metal set to 1 is enough.
-n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
+n_batch = 256  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
 
 
-# Find the current script's directory
-script_dir = os.path.dirname(__file__)
+# Specify the desktop path
+documents_path = os.path.join(os.path.expanduser("~"), "Documents")
+
+# Specify the folder name
+folder_name = "Dot-data"
+
+# Combine the desktop path and folder name
+folder_path = os.path.join(documents_path, folder_name)
+
+# Create the folder if it doesn't exist
+if not os.path.exists(folder_path):
+    print('LLM NOT FOUND!')
+    os.makedirs(folder_path)
 
 # Construct the relative path
 relative_model_path = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
-model_path = os.path.join(script_dir, relative_model_path)
+model_path = os.path.join(folder_path, relative_model_path)
 
 
 llm = LlamaCpp(

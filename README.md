@@ -59,5 +59,3 @@ That's it! If you follow these steps you should be able to get it all running, p
 # Want to help?
 
 Please do! I am a busy student working on this as a side project so help is more than welcome!
-
-
