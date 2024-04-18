@@ -1,6 +1,16 @@
-# HELLO!
+<h1 align="center">HELLO!</h1>
+<p align="center">
+  <img src="https://github.com/alexpinel/Dot/assets/93524949/9ab51fa9-3471-427f-b932-c001bac35346" alt="hello">
+</p>
 
-![ezgif-4-b96c0b5548](https://github.com/alexpinel/Dot/assets/93524949/e5983c61-d59c-45ac-86f6-9d62cffaf37b)
+<p align="center">
+  <img src="https://img.shields.io/badge/license-GPL3.0-green.svg" alt="License">
+  <img src="https://img.shields.io/github/v/release/alexpinel/Dot" alt="GitHub release (latest by date)">
+  <img src="https://img.shields.io/github/commits-since/alexpinel/Dot/latest.svg" alt="GitHub commits">
+  <img src="https://img.shields.io/github/stars/alexpinel/Dot.svg?style=social&label=Star" alt="GitHub stars">
+</p>
+
+
 
 This is Dot, a standalone open source app meant for easy use of local LLMs and RAG in particular to interact with documents and files similarly to Nvidia's Chat with RTX. Dot itself is completely standalone and is packaged with all dependencies including a copy of Mistral 7B, this is to ensure the app is as accessible as possible and no prior knowledge of programming or local LLMs is required to use it. You can install the app (available for Apple Silicon and Windows) here: [Dot website ](https://dotapp.uk/)
 
