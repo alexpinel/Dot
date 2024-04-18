@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <strong><a href="https://dotapp.uk/">Visit the Dot Website</a> • <a href="#install">Installation Guide</a> • <a href="#future-features-id-like-to-add">Planned Features</a></strong>
+  <strong><a href="https://dotapp.uk/">Visit the Dot Website</a></strong>
 </p>
 
 ---
