@@ -4,10 +4,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/license-GPL3.0-brightgreen.svg?style=for-the-badge" alt="License">
-  <img src="https://img.shields.io/github/v/release/alexpinel/Dot?style=for-the-badge" alt="GitHub release (latest by date)">
-  <img src="https://img.shields.io/github/commits-since/alexpinel/Dot/latest.svg?style=for-the-badge" alt="GitHub commits">
-  <img src="https://img.shields.io/github/stars/alexpinel/Dot.svg?style=social&label=Star&style=for-the-badge" alt="GitHub stars">
+  <img src="https://img.shields.io/badge/license-GPL3.0-brightgreen.svg?style=flat-square" alt="License">
+  <img src="https://img.shields.io/github/v/release/alexpinel/Dot?style=flat-square" alt="GitHub release (latest by date)">
+  <img src="https://img.shields.io/github/commits-since/alexpinel/Dot/latest.svg?style=flat-square" alt="GitHub commits">
+  <img src="https://img.shields.io/github/stars/alexpinel/Dot.svg?style=social&label=Star&style=flat-square" alt="GitHub stars">
 </p>
 
 <p align="center">
