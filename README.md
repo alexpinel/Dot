@@ -1,4 +1,3 @@
-<h1 align="center">🌟 HELLO! 🌟</h1>
 <p align="center">
   <img src="https://github.com/alexpinel/Dot/assets/93524949/9ab51fa9-3471-427f-b932-c001bac35346" alt="Dot App Banner">
 </p>
