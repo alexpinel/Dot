@@ -8,3 +8,4 @@ src/.env
 dist
 .DS_Store
 mpnet/
+baai/

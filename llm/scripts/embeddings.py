@@ -12,7 +12,7 @@ import os
 def embeddings(chosen_directory):
 
     current_directory = os.path.dirname(os.path.realpath(__file__))
-    model_directory = os.path.join(current_directory, '..', 'mpnet')
+    model_directory = os.path.join(current_directory, '..', 'baai')
 
     print("Model Directory:", os.path.abspath(model_directory))
 
@@ -20,8 +20,8 @@ def embeddings(chosen_directory):
     embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'cpu'})
 
     text_splitter=RecursiveCharacterTextSplitter(
-                                                chunk_size=16000,
-                                                chunk_overlap=8000)
+                                                chunk_size=8000,
+                                                chunk_overlap=4000)
     
 
     victor = FAISS.from_texts(["foo"], embeddings)
@@ -31,7 +31,7 @@ def embeddings(chosen_directory):
     desktop_path = os.path.join(os.path.expanduser("~"), "Documents")
 
     # Specify the folder name
-    folder_name = "Dot-data"
+    folder_name = "Dot-Data"
 
     # Combine the desktop path and folder name
     folder_path = os.path.join(desktop_path, folder_name)
