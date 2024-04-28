@@ -17,7 +17,7 @@ n_batch = 256  # Should be between 1 and n_ctx, consider the amount of RAM of yo
 documents_path = os.path.join(os.path.expanduser("~"), "Documents")
 
 # Specify the folder name
-folder_name = "Dot-data"
+folder_name = "Dot-Data"
 
 # Combine the desktop path and folder name
 folder_path = os.path.join(documents_path, folder_name)
@@ -28,7 +28,7 @@ if not os.path.exists(folder_path):
     os.makedirs(folder_path)
 
 # Construct the relative path
-relative_model_path = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+relative_model_path = "Phi-3-mini-4k-instruct-q4.gguf"
 model_path = os.path.join(folder_path, relative_model_path)
 
 
@@ -39,12 +39,13 @@ llm = LlamaCpp(
     f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
     #callback_manager=callback_manager,
     #verbose=True, # Verbose is required to pass to the callback manager,
-    max_tokens=2000,
-    temperature= 0.6,
-    n_ctx=8000,
+    max_tokens=500,
+    temperature= 0.7,
+    n_ctx=4000,
 )
 # Notice that "chat_history" is present in the prompt template
-template = """You are called Dot, you were made by Bluepoint, You are a helpful and honest assistant. Always answer as helpfully as possible. 
+
+template = """You are called Dot, You are a helpful and honest assistant. Always answer as helpfully as possible. 
 
 Previous conversation:
 {chat_history}
@@ -53,7 +54,8 @@ New conversation: {question}
 Response:"""
 prompt = PromptTemplate.from_template(template)
 # Notice that we need to align the `memory_key`
-memory = ConversationBufferWindowMemory(memory_key="chat_history", k=2)
+
+memory = ConversationBufferWindowMemory(memory_key="chat_history", k=3)
 conversation = LLMChain(
     llm=llm,
     prompt=prompt,

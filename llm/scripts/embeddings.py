@@ -20,8 +20,8 @@ def embeddings(chosen_directory):
     embeddings=HuggingFaceEmbeddings(model_name=model_directory, model_kwargs={'device':'mps'}) # SET TO 'cpu' for PC
 
     text_splitter=RecursiveCharacterTextSplitter(
-                                                chunk_size=8000,
-                                                chunk_overlap=4000)
+                                                chunk_size=4000,
+                                                chunk_overlap=2000)
     
 
     victor = FAISS.from_texts(["foo"], embeddings)

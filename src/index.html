@@ -80,27 +80,6 @@
             </div>
             <div id="switches and logo" class="flex grow flex-col items-center justify-end">
 
-
-
-                <!--
-                    <label
-                        class="relative my-1 me-5 ms-4 inline-flex cursor-pointer items-center"
-                    >
-                        <input type="checkbox" value="" class="peer sr-only" />
-                        <div
-                            class="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-50 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-green-800"
-                        ></div>
-                        <span
-                            class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-                            >Gallery</span
-                        >
-                        <img
-                            src="Assets/icons/art LM.png"
-                            class="mx-1 size-5"
-                        />
-                    </label>
-                -->
-
                 <!-- HTML code -->
                 <img src="Assets/logo2.png" alt="Light Logo" class="w-3/5 dark:hidden" />
                 <img src="Assets/logo-dark.png" alt="Dark Logo" class="w-3/5 dark:block hidden" />
@@ -170,6 +149,9 @@
                     </div>
                 </div>
             </div>
+
+            <button id="settingsButton"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Settings</button>
 
             <div id="toggleDarkMode" class="fixed top-3 right-0 z-50 pr-2 mt-2">
                 <input type="checkbox" name="light-switch" class="light-switch sr-only" />
@@ -461,6 +443,61 @@
                     /* Subtle text shadow */
                 }
 
+                .spinner {
+                    animation: rotate 2s linear infinite;
+                    width: 25px;
+                    height: 25px;
+                }
+
+                .spinner .path {
+                    stroke: #565656;
+                    stroke-linecap: round;
+                    animation: dash 1.5s ease-in-out infinite;
+                }
+
+                @keyframes rotate {
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+
+                @keyframes dash {
+                    0% {
+                        stroke-dasharray: 1, 150;
+                        stroke-dashoffset: 0;
+                    }
+
+                    50% {
+                        stroke-dasharray: 90, 150;
+                        stroke-dashoffset: -35;
+                    }
+
+                    100% {
+                        stroke-dasharray: 90, 150;
+                        stroke-dashoffset: -124;
+                    }
+                }
+
+                @keyframes pulse {
+
+                    0%,
+                    100% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+
+                    50% {
+                        transform: scale(1.05);
+                        opacity: 0.5;
+                    }
+                }
+
+                .mic-active {
+                    animation: pulse 1s infinite;
+                    color: #ef4444;
+                    /* TailwindCSS red-500 */
+                }
+
 
 
                 /* Add or customize other styles as needed */
@@ -470,11 +507,19 @@
                             0 -4px 6px -1px rgba(0, 0, 0, 0.08),
                             0 -2px 4px -1px rgba(0, 0, 0, 0.02);
                     ">
-                <div class="input-container mt-3 w-3/4">
-                    <!-- Adjust the width and margin-top as needed -->
+                <div class="input-container mt-3 w-3/4 relative">
                     <input type="text" id="user-input" placeholder="Type your message..."
-                        class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 shadow-sm focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder-gray-400" />
+                        class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-3 pr-10 text-base text-gray-900 shadow-sm focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder-gray-400" />
+                    <button id="runStreamBtn" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M20 12V13C20 17.4183 16.4183 21 12 21C7.58172 21 4 17.4183 4 13V12M12 17C9.79086 17 8 15.2091 8 13V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V13C16 15.2091 14.2091 17 12 17Z"
+                                stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </button>
                 </div>
+
                 <!-- send button -->
                 <button id="send-button" onclick="sendMessage('')"
                     class=" group relative me-2 ml-1 mt-3 inline-flex h-11 items-end justify-end overflow-hidden rounded-lg border border-blue-700 bg-white text-black shadow-sm dark:bg-slate-700 transition-all dark:text-gray-300 duration-75 ease-in hover:bg-blue-700 hover:text-white">
@@ -487,6 +532,7 @@
                         </svg>
                     </span>
                 </button>
+
             </div>
         </div>
     </div>

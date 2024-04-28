@@ -154,14 +154,9 @@ ipcMain.on('show-context-menu', (event) => {
 })
 // RUNS DOT THROUGHT  script.py
 
-//let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
+let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
 
-let currentScript = path.join(
-    process.resourcesPath,
-    'llm',
-    'scripts',
-    'docdot.py'
-)
+//let currentScript = path.join(process.resourcesPath,'llm','scripts','docdot.py')
 // Default script 
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
@@ -197,12 +192,12 @@ ipcMain.on('switch-script', (event, selectedScript) => {
     // Toggle between 'script.py' and 'normalchat.py'
     console.log('Switching script to:', selectedScript)
 
-    currentScript = currentScript.endsWith('docdot.py')
-        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
-        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
     /*currentScript = currentScript.endsWith('docdot.py')
-    ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
-    : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');*/
+        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
+        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');*/
+    currentScript = currentScript.endsWith('docdot.py')
+        ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
+        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');
 
     // If the Python process is running, kill it and spawn a new one with the updated script
     if (pythonProcess) {
@@ -256,6 +251,8 @@ ipcMain.handle('open-dialog', async (event) => {
 
 // Flag to track whether dark mode is enabled or not
 let isDarkModeEnabled = false;
+const ttsProcessorPath = path.join(__dirname, 'ttsProcessor.mjs');
+
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -282,7 +279,35 @@ const createWindow = () => {
     });
 
     //mainWindow.webContents.openDevTools();
+    //TEXT TO SPEECH 
+
+
+    ipcMain.on('request-tts', (event, message) => {
+        console.log('Attempting to spawn TTS processor...');
+        const ttsProcess = spawn('node', [ttsProcessorPath, message]);
+
+        ttsProcess.stdout.on('data', (data) => {
+            console.log('TTS Process Output:', data.toString());
+            event.reply('tts-response', data.toString());
+        });
+
+        ttsProcess.stderr.on('data', (data) => {
+            console.error(`TTS Process Error: ${data}`);
+        });
+
+        ttsProcess.on('close', (code) => {
+            console.log(`TTS process exited with code ${code}`);
+            if (code === 0) {
+                event.reply('tts-done', 'The TTS process completed successfully.');
+            } else {
+                event.reply('tts-error', `TTS process exited with error code ${code}`);
+            }
+        });
+    });
+
+    //mainWindow.webContents.openDevTools();
 }
+
 
 // GALLERY VIEW!!!!
 
@@ -358,19 +383,19 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
         // Construct paths relative to the script's location
 
-        const pythonScriptPath = path.join(
+        /*const pythonScriptPath = path.join(
             process.resourcesPath,
             'llm',
             'scripts',
             'embeddings.py'
-        )
-        /*const pythonScriptPath = path.join(
+        )*/
+        const pythonScriptPath = path.join(
             __dirname,
             '..',
             'llm',
             'scripts',
             'embeddings.py'
-        )*/
+        )
 
         // Quote the directory path to handle spaces
         const quotedDirectory = `"${directory}"`
@@ -536,5 +561,45 @@ ipcMain.on('start-download', (event, { url, outputPath }) => {
                     event.sender.send('download-error', error.message);
                 }
             });
+    }
+});
+
+
+
+
+
+
+
+// SETTINGS BUTTON
+// THIS WILL OPEN A SETTINGS BUTTON
+let settingsWindow;
+
+ipcMain.on('open-settings-window', () => {
+    if (!settingsWindow) {
+        settingsWindow = new BrowserWindow({
+            width: 300,
+            height: 200,
+            parent: mainWindow,
+            modal: true,
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false, // Important for direct API access
+            }
+        });
+
+        const settingsPath = path.join(__dirname, 'settings.html');
+        settingsWindow.loadFile(settingsPath);
+
+        ipcMain.on('close-settings', () => {
+            if (settingsWindow) {
+                settingsWindow.close();
+            }
+        });
+
+        settingsWindow.on('closed', () => {
+            settingsWindow = null;
+            mainWindow.webContents.send('settings-closed'); // Notify the main window to remove blur
+        });
+
     }
 });

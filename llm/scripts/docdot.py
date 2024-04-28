@@ -46,7 +46,7 @@ n_batch = 256  # Should be between 1 and n_ctx, consider the amount of RAM of yo
 script_dir = os.path.dirname(__file__)
 
 # Construct the relative path
-relative_model_path = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+relative_model_path = "Phi-3-mini-4k-instruct-q4.gguf"
 model_path = os.path.join(folder_path, relative_model_path)
 
 
@@ -57,7 +57,7 @@ llm = LlamaCpp(
     f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls ONLY FOR MAC
     max_tokens=2000,
     temperature= 0.01,
-    n_ctx=8000,
+    n_ctx=4000,
 )
 
 DEFAULT_SYSTEM_PROMPT ="""
