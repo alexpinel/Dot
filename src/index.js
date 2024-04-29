@@ -250,7 +250,6 @@ ipcMain.handle('open-dialog', async (event) => {
 
 
 // Flag to track whether dark mode is enabled or not
-let isDarkModeEnabled = false;
 const ttsProcessorPath = path.join(__dirname, 'ttsProcessor.mjs');
 
 
@@ -270,13 +269,6 @@ const createWindow = () => {
     })
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'))
-    // Listen for 'toggle-dark-mode' message from renderer process
-    ipcMain.on('toggle-dark-mode', (event) => {
-        // Toggle the dark mode flag
-        isDarkModeEnabled = !isDarkModeEnabled;
-        // Send message back to renderer process with the new state
-        event.sender.send('dark-mode-toggled', isDarkModeEnabled);
-    });
 
     //mainWindow.webContents.openDevTools();
     //TEXT TO SPEECH 
@@ -427,7 +419,7 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
     }
 })
 
-// DOWNLOAD MISTRAL AND SUCH!
+// DOWNLOAD LLM AND SUCH!
 
 console.log("IPC Setup Starting");
 ipcMain.on('start-download', (event, data) => {
@@ -574,32 +566,71 @@ ipcMain.on('start-download', (event, { url, outputPath }) => {
 // THIS WILL OPEN A SETTINGS BUTTON
 let settingsWindow;
 
+let isDarkModeEnabled = false; // Maintain dark mode state
+
+ipcMain.on('toggle-dark-mode', (event) => {
+    isDarkModeEnabled = !isDarkModeEnabled;
+    // Update all renderer processes
+    BrowserWindow.getAllWindows().forEach(win => {
+        win.webContents.send('dark-mode-toggled', isDarkModeEnabled);
+    });
+});
+
+// In your main process file (main.js)
+ipcMain.on('request-dark-mode-state', (event) => {
+    event.sender.send('current-dark-mode-state', isDarkModeEnabled);
+});
+
+
+
 ipcMain.on('open-settings-window', () => {
     if (!settingsWindow) {
         settingsWindow = new BrowserWindow({
-            width: 300,
-            height: 200,
+            width: 500,
+            height: 400,
             parent: mainWindow,
             modal: true,
             webPreferences: {
                 nodeIntegration: true,
-                contextIsolation: false, // Important for direct API access
+                contextIsolation: false,
             }
         });
 
         const settingsPath = path.join(__dirname, 'settings.html');
         settingsWindow.loadFile(settingsPath);
 
-        ipcMain.on('close-settings', () => {
-            if (settingsWindow) {
-                settingsWindow.close();
-            }
-        });
-
         settingsWindow.on('closed', () => {
             settingsWindow = null;
-            mainWindow.webContents.send('settings-closed'); // Notify the main window to remove blur
+            mainWindow.webContents.send('settings-closed');
         });
-
     }
 });
+
+ipcMain.on('close-settings', () => {
+    if (settingsWindow) {
+        settingsWindow.close();
+    }
+});
+
+
+//AUTO TTS
+//This will make TTS activate for EACH message automatically
+let autoTtsEnabled = false; // Default state
+
+// index.js in your main process
+ipcMain.on('set-auto-tts', (event, isEnabled) => {
+    console.log("Setting auto TTS to", isEnabled); // Confirm this logs correctly
+    autoTtsEnabled = isEnabled;
+
+    // Update all renderer processes
+    BrowserWindow.getAllWindows().forEach(win => {
+        win.webContents.send('update-auto-tts', autoTtsEnabled);
+    });
+});
+
+ipcMain.on('request-auto-tts-state', (event) => {
+    console.log("Sending auto TTS state:", autoTtsEnabled); // Confirm state before sending
+    event.sender.send('get-auto-tts-state', autoTtsEnabled);
+});
+
+

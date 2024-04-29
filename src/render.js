@@ -10,6 +10,10 @@ ipcRenderer.on('context-menu-command', (e, command) => {
     // ...
 })
 
+
+let autoTtsEnabled = false; // Default value to ensure it's always defined
+
+
 //// CHATTY CHAT CHAT STUFF!!!!
 function appendMessage(sender, message, isMarkdown) {
     const chatContainer = document.getElementById('bot-message')
@@ -106,16 +110,32 @@ function appendMessage(sender, message, isMarkdown) {
             showErrorIcon();  // Function to change the icon or display an error message
         }
 
+        console.log("Auto TTS Enabled:", autoTtsEnabled); // Log when checking autoTTS
+        if (autoTtsEnabled) {
+            console.log("Attempting to click TTS button for automatic TTS");
+            ttsButton.click();
+        }
+
+
         botContentContainer.appendChild(botBubble);
         botContentContainer.appendChild(ttsButton);
         messageDiv.appendChild(botContentContainer);
     }
+    // Automatically trigger TTS if autoTTS is enabled
+
 
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-
+ipcRenderer.on('update-auto-tts', (event, isEnabled) => {
+    console.log("Received updated auto TTS state:", isEnabled); // Check the incoming state
+    autoTtsEnabled = isEnabled;
+});
+ipcRenderer.on('get-auto-tts-state', (event, isEnabled) => {
+    console.log("Received auto TTS state:", isEnabled);
+    document.getElementById('auto-tts-toggle').checked = isEnabled;
+});
 
 function sendMessageToMainForTTS(message, onComplete, onError) {
     console.log('TTS Requested for:', message);
@@ -602,28 +622,7 @@ function selectOption(option) {
     document.getElementById('dropdown').classList.add('hidden')
 }
 
-// Add event listener to the button
-document.getElementById('toggleDarkMode').addEventListener('click', () => {
-    // Send message to main process to toggle dark mode
-    ipcRenderer.send('toggle-dark-mode')
-})
 
-// Listen for message from main process indicating the new dark mode state
-ipcRenderer.on('dark-mode-toggled', (event, isEnabled) => {
-    // Apply or remove 'dark' class based on the new state
-    document.documentElement.classList.toggle('dark', isEnabled)
-})
-
-// JavaScript code
-document.getElementById('toggleDarkMode').addEventListener('click', () => {
-    const iconMoon = document.getElementById('iconMoon')
-    const iconSun = document.getElementById('iconSun')
-    const isDarkMode = document.documentElement.classList.toggle('dark')
-
-    // Toggle between moon and sun icons
-    iconMoon.classList.toggle('hidden', isDarkMode)
-    iconSun.classList.toggle('hidden', !isDarkMode)
-})
 
 let progressMessageExists = false // This will track if the progress message is already displayed
 
@@ -761,4 +760,18 @@ ipcRenderer.on('settings-closed', () => {
 // This listens for the 'settings-closed' event
 ipcRenderer.on('settings-closed', () => {
     document.body.classList.remove('blur-sm'); // Assuming 'blur-sm' is the blur class
+});
+
+// In both settings.js and index.js
+ipcRenderer.on('dark-mode-toggled', (event, isEnabled) => {
+    document.documentElement.classList.toggle('dark', isEnabled);
+});
+
+// Add this in both settings.js and index.js
+document.addEventListener('DOMContentLoaded', () => {
+    ipcRenderer.send('request-dark-mode-state'); // Ask main process for current dark mode state
+});
+
+ipcRenderer.on('current-dark-mode-state', (event, isEnabled) => {
+    document.documentElement.classList.toggle('dark', isEnabled);
 });
