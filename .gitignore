@@ -9,3 +9,5 @@ dist
 .DS_Store
 mpnet/
 baai/
+vits-piper-en_US-glados
+whisper.cpp

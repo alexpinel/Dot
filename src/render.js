@@ -11,6 +11,29 @@ ipcRenderer.on('context-menu-command', (e, command) => {
 })
 
 
+function formatLaTeX(inputString) {
+    // This regular expression finds all LaTeX expressions within brackets
+    const regex = /\[([^\]]+)\]/g;
+    return inputString.replace(regex, (match, equation) => {
+        // Replace brackets with MathJax delimiters for display math
+        return `$$ ${equation.trim()} $$`;
+    });
+}
+
+
+
+// Ensure MathJax is loaded and ready before calling any functions
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.MathJax) {
+        MathJax.startup.promise.then(() => {
+            console.log("MathJax is fully loaded and ready!");
+        }).catch((err) => console.error("Error loading MathJax:", err));
+    } else {
+        console.error("MathJax not found!");
+    }
+});
+
+
 let autoTtsEnabled = false; // Default value to ensure it's always defined
 
 
@@ -48,9 +71,17 @@ function appendMessage(sender, message, isMarkdown) {
         const botBubble = document.createElement('div')
         botBubble.classList.add('bot-bubble')
         if (isMarkdown) {
-            botBubble.innerHTML = marked(message)
+            botBubble.innerHTML = marked(message);
+            // Check if MathJax is loaded and then typeset
+            if (window.MathJax) {
+                MathJax.typesetPromise([botBubble]).then(() => {
+                    console.log("MathJax has finished processing!");
+                }).catch((err) => console.error('MathJax processing error:', err));
+            } else {
+                console.log("MathJax is not available to process the content.");
+            }
         } else {
-            botBubble.innerText = message
+            botBubble.innerText = message;
         }
 
         const ttsButton = document.createElement('button')
@@ -100,7 +131,7 @@ function appendMessage(sender, message, isMarkdown) {
 
         function resetSpeakerIcon() {
             // Reset the speaker icon
-            speakerIcon.innerHTML = `<path ...></path>`;
+            speakerIcon.innerHTML = `<path d="M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M16 8.99998C16.5 9.49998 17 10.5 17 12C17 13.5 16.5 14.5 16 15M3 10.5V13.5C3 14.6046 3.5 15.5 5.5 16C7.5 16.5 9 21 12 21C14 21 14 3 12 3C9 3 7.5 7.5 5.5 8C3.5 8.5 3 9.39543 3 10.5Z" fill="none" stroke="#424242" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;;
             // Additional UI reset logic if necessary
         }
 
@@ -148,20 +179,21 @@ function sendMessageToMainForTTS(message, onComplete, onError) {
         ttsMessage = message.substring(startIndex).trim();
     }
 
-    // Send the processed message to the TTS engine
-    ipcRenderer.send('request-tts', ttsMessage);
-
-    // Handle successful completion of the TTS process
-    ipcRenderer.once('tts-done', () => {
-        console.log('TTS completed successfully.');
-        onComplete();  // Reset the icon or perform other UI updates
-    });
-
-    // Handle errors from the TTS process
-    ipcRenderer.once('tts-error', (event, error) => {
-        console.error('TTS encountered an error:', error);
-        onError(error);  // Perform error handling UI updates
-    });
+    // Send the processed message to the TTS engine in the main process
+    ipcRenderer.invoke('run-tts', ttsMessage)
+        .then(filePath => {
+            console.log('TTS audio file generated:', filePath);
+            // Play the audio file using the main process
+            return ipcRenderer.invoke('play-audio', filePath);
+        })
+        .then(() => {
+            console.log('TTS playback successful.');
+            onComplete();  // Reset the icon or perform other UI updates
+        })
+        .catch(error => {
+            console.error('Error during TTS generation or playback:', error);
+            onError(error);  // Perform error handling UI updates
+        });
 }
 
 
@@ -223,63 +255,58 @@ ipcRenderer.on('python-reply', (event, reply) => {
 
 
 
+
 //WHISPER
+//This logic loads in whisper.cpp to enable live transcription of messages
+//whisper.cpp is loaded in the llm folder, from which the stream executable is accessed
 
 const { spawn } = require('child_process');
 
 let isTranscribing = false;
 let streamProcess = null;
 
-
 document.getElementById('runStreamBtn').addEventListener('click', () => {
     const micIcon = document.getElementById('mic-icon');
     if (!isTranscribing) {
         isTranscribing = true;
         runStreamModel();
-        micIcon.classList.add('mic-active'); // Add the active class with stronger animation and color
+        micIcon.classList.add('mic-active');
     } else {
+        if (streamProcess !== null) {
+            streamProcess.kill('SIGINT'); // Send an interrupt signal to terminate the process
+            streamProcess = null; // Reset the streamProcess variable
+        }
         isTranscribing = false;
-        micIcon.classList.remove('mic-active'); // Remove the active class to stop animation
+        micIcon.classList.remove('mic-active');
     }
 });
 
 
+
+//WHISPER CPP
+
 function runStreamModel() {
-    const modelPath = path.join(__dirname, '..', 'llm', 'whisper.cpp', 'models', 'ggml-model-whisper-base.bin')
-    const args = [
-        '-m', modelPath,
-        '-t', '8',
-        '--step', '500',
-        '--length', '5000'
-    ];
+    ipcRenderer.send('run-stream-model');
 
-    const streamPath = path.join(__dirname, '..', 'llm', 'whisper.cpp', 'stream')
-    const streamProcess = spawn(streamPath, args, { cwd: __dirname });
-
-    streamProcess.stdout.on('data', (data) => {
-        if (isTranscribing) {
-            let output = data.toString();
-            console.log(output); // log for debugging
-
-            // Remove ANSI escape sequences and control characters
-            output = output.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/g, '').trim();
-
-            if (output !== '' && output !== '[BLANK_AUDIO]') {
-                document.getElementById('user-input').value = output; // Update input field with transcribed text
-            }
+    ipcRenderer.on('stream-data', (event, data) => {
+        console.log(data);
+        data = data.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/g, '').trim();
+        if (data !== '' && data !== '[BLANK_AUDIO]') {
+            document.getElementById('user-input').value = data;
         }
     });
 
-    streamProcess.stderr.on('data', (data) => {
+    ipcRenderer.on('stream-error', (event, data) => {
         console.error(`stderr: ${data}`);
     });
 
-    streamProcess.on('close', (code) => {
+    ipcRenderer.on('stream-close', (event, code) => {
         console.log(`child process exited with code ${code}`);
-        isTranscribing = false;
-        document.getElementById('mic-icon').classList.remove('mic-active'); // Ensure animation is turned off when process ends
+        childProcesses.delete(streamProcess);  // Remove process from tracking set
+        document.getElementById('mic-icon').classList.remove('mic-active');
     });
 }
+
 
 //SENDING MESSAGES
 
@@ -293,6 +320,7 @@ function sendMessage(buttonClicked) {
         document.getElementById('user-input').value = ''; // Clear input after sending
         isTranscribing = false; // Stop transcribing after sending the message
         document.getElementById('mic-icon').classList.remove('mic-active'); // Turn off animation immediately after sending
+        streamProcess.kill('SIGINT'); // Send an interrupt signal to terminate the process
     }
 }
 
@@ -682,7 +710,7 @@ function showDownloadProgress(progress) {
         let progressHTML = `
         <div class="intro-message">
             <h1>Hello!</h1>
-            <p>Welcome to Dot. Before you can get started, the Mistral 7B Large Language Model must be installed. This process should only take a few minutes, depending on your connection speed. Please wait while the necessary files are downloaded and set up for your use.</p>
+            <p>Welcome to Dot. Before you can get started, the Phi-3 Large Language Model must be installed. This process should only take a few minutes, depending on your connection speed. Please wait while the necessary files are downloaded and set up for your use.</p>
         </div>
     
         <div class="download-progress">

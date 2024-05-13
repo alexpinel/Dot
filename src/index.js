@@ -1,8 +1,13 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
+const { exec } = require('child_process');
 const fs = require('fs')
 const fetch = require('node-fetch'); // Using CommonJS
+const userDataPath = app.getPath('userData');
+const configPath = path.join(userDataPath, 'config.json');
+const { Worker } = require('worker_threads');
+
 
 const isMac = process.platform === 'darwin'
 let galleryViewInterval // Declare galleryViewInterval globally
@@ -156,7 +161,7 @@ ipcMain.on('show-context-menu', (event) => {
 
 let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
 
-//let currentScript = path.join(process.resourcesPath,'llm','scripts','docdot.py')
+//let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
 // Default script 
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
@@ -167,7 +172,7 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
     } else {
         // If the Python process is not running, spawn a new one with the default script
         console.log(`Current working directory: ${process.cwd()}`)
-        pythonProcess = spawn(pythonPath, [currentScript], { shell: true })
+        pythonProcess = spawn(pythonPath, [currentScript, `"${configPath}"`], { shell: true })
 
         pythonProcess.stdout.on('data', (data) => {
             const message = data.toString().trim()
@@ -192,17 +197,17 @@ ipcMain.on('switch-script', (event, selectedScript) => {
     // Toggle between 'script.py' and 'normalchat.py'
     console.log('Switching script to:', selectedScript)
 
-    /*currentScript = currentScript.endsWith('docdot.py')
-        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
-        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');*/
     currentScript = currentScript.endsWith('docdot.py')
+        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
+        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
+    /*currentScript = currentScript.endsWith('docdot.py')
         ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
-        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');
+        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');*/
 
     // If the Python process is running, kill it and spawn a new one with the updated script
     if (pythonProcess) {
         pythonProcess.kill();
-        pythonProcess = spawn(pythonPath, [currentScript], { shell: true });
+        pythonProcess = spawn(pythonPath, [currentScript, `"${configPath}"`], { shell: true });
 
         pythonProcess.stdout.on('data', (data) => {
             const message = data.toString().trim();
@@ -221,7 +226,6 @@ ipcMain.on('switch-script', (event, selectedScript) => {
 //OPEN FOLDER THING!!!!
 
 // Define a path for the file where you will store the last opened directory
-const userDataPath = app.getPath('userData');
 const lastOpenedDirPath = path.join(userDataPath, 'lastOpenedDir.txt');
 
 ipcMain.on('get-user-data-path', (event) => {
@@ -273,28 +277,35 @@ const createWindow = () => {
     //mainWindow.webContents.openDevTools();
     //TEXT TO SPEECH 
 
+    // Setup TTS Worker
+    let ttsWorker = new Worker(path.join(__dirname, 'ttsProcessor.js'));
 
+    ttsWorker.on('message', (data) => {
+        console.log('Received from worker:', data);
+        mainWindow.webContents.send('tts-response', data);
+        ttsWorker.terminate().then(() => console.log('Worker terminated successfully.'));
+
+    });
+
+    ttsWorker.on('error', (error) => {
+        console.error('Error from TTS worker:', error);
+        mainWindow.webContents.send('tts-error', error.message);
+        ttsWorker.terminate().then(() => console.log('Worker terminated due to error.'));
+
+    });
+
+    ttsWorker.on('exit', (code) => {
+        console.log(`Worker exited with code ${code}`);
+        if (code !== 0) {
+            console.log('Unexpected exit, attempting to restart worker...');
+            ttsWorker = new Worker(path.join(__dirname, 'ttsProcessor.js'));
+        }
+    });
+
+    // Handle TTS requests
     ipcMain.on('request-tts', (event, message) => {
-        console.log('Attempting to spawn TTS processor...');
-        const ttsProcess = spawn('node', [ttsProcessorPath, message]);
-
-        ttsProcess.stdout.on('data', (data) => {
-            console.log('TTS Process Output:', data.toString());
-            event.reply('tts-response', data.toString());
-        });
-
-        ttsProcess.stderr.on('data', (data) => {
-            console.error(`TTS Process Error: ${data}`);
-        });
-
-        ttsProcess.on('close', (code) => {
-            console.log(`TTS process exited with code ${code}`);
-            if (code === 0) {
-                event.reply('tts-done', 'The TTS process completed successfully.');
-            } else {
-                event.reply('tts-error', `TTS process exited with error code ${code}`);
-            }
-        });
+        console.log('Attempting to send message to TTS processor...');
+        ttsWorker.postMessage({ cmd: 'run-tts', message });
     });
 
     //mainWindow.webContents.openDevTools();
@@ -362,12 +373,18 @@ ipcMain.on('update-background', (event, imagePath) => {
 })
 
 app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') {
-        // Do not quit the app when all windows are closed on platforms other than macOS
-        // app.quit();
-    }
-})
+    childProcesses.forEach(process => {
+        if (!process.killed) {
+            process.kill();  // Forcefully terminate each child process
+            console.log('Child process killed');
+        }
+    });
+    childProcesses.clear();  // Clear the set after killing all processes
 
+    if (process.platform !== 'darwin') {
+        app.quit();  // Optionally quit the app on non-macOS platforms
+    }
+});
 
 const appPath = app.getAppPath()
 
@@ -375,26 +392,26 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
         // Construct paths relative to the script's location
 
-        /*const pythonScriptPath = path.join(
+        const pythonScriptPath = path.join(
             process.resourcesPath,
             'llm',
             'scripts',
             'embeddings.py'
-        )*/
-        const pythonScriptPath = path.join(
+        )
+        /*const pythonScriptPath = path.join(
             __dirname,
             '..',
             'llm',
             'scripts',
             'embeddings.py'
-        )
+        )*/
 
         // Quote the directory path to handle spaces
         const quotedDirectory = `"${directory}"`
         // Spawn the Python process
         const pythonProcess = spawn(
             pythonPath,
-            [pythonScriptPath, quotedDirectory],
+            [pythonScriptPath, quotedDirectory, `"${configPath}"`],
             { shell: true }
         )
 
@@ -510,10 +527,10 @@ async function ensureAndDownloadDependencies(event) {
         fs.mkdirSync(dotDataDir, { recursive: true });
     }
 
-    const filePath = path.join(dotDataDir, 'mistral-7b-instruct-v0.2.Q4_K_M.gguf');
+    const filePath = path.join(dotDataDir, 'Phi-3-mini-4k-instruct-q4.gguf');
     if (!checkFileExists(filePath)) {
         try {
-            await downloadFile('https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf?download=true', filePath, event);
+            await downloadFile('https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf?download=true', filePath, event);
             console.log('Download completed');
         } catch (error) {
             console.error('Download failed:', error);
@@ -538,6 +555,8 @@ app.on('ready', () => {
                         mainWindow.webContents.send('download-error', error.message);
                     }
                 });
+            ttsWorker = setupTtsWorker();
+            initializeHandlers();
         });
     } else {
         console.error('Failed to create main window');
@@ -586,8 +605,8 @@ ipcMain.on('request-dark-mode-state', (event) => {
 ipcMain.on('open-settings-window', () => {
     if (!settingsWindow) {
         settingsWindow = new BrowserWindow({
-            width: 500,
-            height: 400,
+            width: 600,
+            height: 500,
             parent: mainWindow,
             modal: true,
             webPreferences: {
@@ -634,3 +653,154 @@ ipcMain.on('request-auto-tts-state', (event) => {
 });
 
 
+
+
+
+
+//CONFIG FOR USER SETTINGS
+//THIS FILE WILL STORE USER SETTINGS FOR THE LLM. THESE SETTINGS WILL BE READ BY PYTHON.
+
+
+// Check if config exists, if not, create it
+if (!fs.existsSync(configPath)) {
+    const defaultConfig = {
+        n_ctx: "default1",
+        n_batch: 100,
+        max_tokens: false,
+        big_dot_temperature: false,
+        big_dot_promt: "hi"
+    };
+    fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), 'utf-8');
+}
+
+
+// Listener to get the current configuration
+ipcMain.handle('getConfig', async () => {
+    if (fs.existsSync(configPath)) {
+        return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    }
+    return null;
+});
+
+// Listener to save the configuration
+ipcMain.handle('setConfig', async (event, newConfig) => {
+    fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2), 'utf-8');
+});
+
+
+
+ipcMain.handle('open-file-dialog', async (event) => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'GGUF Files', extensions: ['gguf'] }]
+    });
+    if (canceled) {
+        return { filePaths: [] };
+    } else {
+        return { filePaths };
+    }
+});
+
+
+
+
+
+
+
+// WHISPER CPP
+
+
+ipcMain.on('run-stream-model', (event, arg) => {
+    const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin')
+    //const modelPath = path.join(process.resourcesPath, 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin')
+    const args = [
+        '-m', modelPath,
+        '-t', '8',
+        '--step', '500',
+        '--length', '5000'
+    ];
+
+    const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
+    //const streamPath = path.join(process.resourcesPath, 'llm', 'whisper', 'stream');
+
+    // Use resourcesPath for cwd as well
+    const streamProcess = spawn(streamPath, args, { shell: true });
+
+    streamProcess.stdout.on('data', (data) => {
+        event.sender.send('stream-data', data.toString());
+    });
+
+    streamProcess.stderr.on('data', (data) => {
+        event.sender.send('stream-error', data.toString());
+    });
+
+    streamProcess.on('close', (code) => {
+        event.sender.send('stream-close', code);
+        childProcesses.delete(streamProcess);  // Remove process from tracking set
+        console.log(`Stream process closed with code ${code}`);
+    });
+});
+
+
+
+
+
+let ttsWorker; // Declare the worker globally or in a scope accessible by the IPC handlers
+
+// Function to ensure worker is initialized
+function initializeTtsWorker() {
+    if (!ttsWorker || ttsWorker.isTerminated) {
+        ttsWorker = new Worker(path.join(__dirname, 'ttsProcessor.js'));
+        ttsWorker.on('error', error => {
+            console.error('Worker Error:', error);
+            ttsWorker = null; // Reset on error so we can try to recreate later
+        });
+        ttsWorker.on('exit', code => {
+            console.log(`Worker exited with code ${code}`);
+            ttsWorker = null; // Ensure we recreate the worker if it exits
+        });
+    }
+}
+
+ipcMain.handle('run-tts', async (event, message) => {
+    console.log("Received 'run-tts' with message:", message);
+
+    initializeTtsWorker(); // Ensure worker is ready
+
+    if (!ttsWorker) {
+        console.error("TTS worker is not initialized.");
+        throw new Error("TTS worker is not initialized"); // This error will be sent back to the renderer
+    }
+
+    return new Promise((resolve, reject) => {
+        ttsWorker.once('message', (response) => {
+            if (response.filePath) {
+                console.log("Audio file path:", response.filePath);
+                resolve(response.filePath); // Automatically sends this back to the renderer
+            } else {
+                console.error("Failed to process TTS:", response.error);
+                reject(new Error("Failed to process TTS")); // This error will be sent back to the renderer
+            }
+        });
+
+        ttsWorker.postMessage({ cmd: 'run-tts', message });
+    });
+});
+
+
+ipcMain.handle('play-audio', async (event, filePath) => {
+    const { exec } = require('child_process');
+
+    return new Promise((resolve, reject) => {
+        exec(`afplay "${filePath}"`, (err) => {
+            if (err) {
+                console.error('Error during audio playback:', err);
+                reject(new Error('Audio playback failed'));
+            } else {
+                console.log('Audio playback successful.');
+                ttsWorker.terminate().then(() => console.log('Worker terminated.'));
+                resolve('Playback success');
+            }
+        });
+    });
+});
