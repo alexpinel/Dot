@@ -15,6 +15,8 @@
 
 ---
 
+# README NOT UP TO DATE, WILL UPDATE SOON!
+
 ## 🚀 About Dot
 
 Dot is a standalone, open-source application designed for seamless interaction with documents and files using local LLMs and Retrieval Augmented Generation (RAG). It is inspired by solutions like Nvidia's Chat with RTX, providing a user-friendly interface for those without a programming background. Pre-packaged with Mistral 7B, Dot ensures accessibility and simplicity right out of the box.
