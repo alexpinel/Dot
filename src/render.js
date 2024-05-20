@@ -260,8 +260,6 @@ ipcRenderer.on('python-reply', (event, reply) => {
 //This logic loads in whisper.cpp to enable live transcription of messages
 //whisper.cpp is loaded in the llm folder, from which the stream executable is accessed
 
-const { spawn } = require('child_process');
-
 let isTranscribing = false;
 let streamProcess = null;
 
@@ -273,17 +271,12 @@ document.getElementById('runStreamBtn').addEventListener('click', () => {
         micIcon.classList.add('mic-active');
     } else {
         if (streamProcess !== null) {
-            streamProcess.kill('SIGINT'); // Send an interrupt signal to terminate the process
-            streamProcess = null; // Reset the streamProcess variable
+            ipcRenderer.send('kill-stream-process');
         }
         isTranscribing = false;
         micIcon.classList.remove('mic-active');
     }
 });
-
-
-
-//WHISPER CPP
 
 function runStreamModel() {
     ipcRenderer.send('run-stream-model');
@@ -302,13 +295,15 @@ function runStreamModel() {
 
     ipcRenderer.on('stream-close', (event, code) => {
         console.log(`child process exited with code ${code}`);
-        childProcesses.delete(streamProcess);  // Remove process from tracking set
+        streamProcess = null;
+        document.getElementById('mic-icon').classList.remove('mic-active');
+    });
+
+    ipcRenderer.on('stream-terminated', () => {
+        isTranscribing = false;
         document.getElementById('mic-icon').classList.remove('mic-active');
     });
 }
-
-
-//SENDING MESSAGES
 
 function sendMessage(buttonClicked) {
     const userInput = document.getElementById('user-input').value;
@@ -318,9 +313,12 @@ function sendMessage(buttonClicked) {
         showTypingIndicator();
         ipcRenderer.send('run-python-script', { userInput, buttonClicked });
         document.getElementById('user-input').value = ''; // Clear input after sending
+        if (streamProcess !== null) {
+            ipcRenderer.send('kill-stream-process');
+        }
         isTranscribing = false; // Stop transcribing after sending the message
         document.getElementById('mic-icon').classList.remove('mic-active'); // Turn off animation immediately after sending
-        streamProcess.kill('SIGINT'); // Send an interrupt signal to terminate the process
+        ipcRenderer.send('kill-stream-process');
     }
 }
 
@@ -330,11 +328,15 @@ input.addEventListener('keyup', function (event) {
     if (event.keyCode === 13) {
         event.preventDefault();
         document.getElementById('send-button').click();
+
     }
 });
 
+document.getElementById('mic-icon').addEventListener('click', () => {
+    ipcRenderer.send('kill-stream-process');
+});
 
-//WHISPER
+
 
 
 // SIDEBAR AND FILE TREE!!!!
@@ -802,4 +804,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 ipcRenderer.on('current-dark-mode-state', (event, isEnabled) => {
     document.documentElement.classList.toggle('dark', isEnabled);
+});
+
+
+
+
+
+
+
+//KILL TTS WHEN:
+
+// Add event listener for microphone icon
+document.getElementById('mic-icon').addEventListener('click', () => {
+    ipcRenderer.send('kill-tts-process');
+});
+
+// Assuming the TTS spinner is a button with class 'tts-button'
+document.querySelectorAll('.tts-button').forEach(button => {
+    button.addEventListener('click', () => {
+        ipcRenderer.send('kill-tts-process');
+    });
 });

@@ -1,6 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron')
 const path = require('path')
-const { spawn } = require('child_process')
+const { spawn, fork } = require('child_process')
 const { exec } = require('child_process');
 const fs = require('fs')
 const fetch = require('node-fetch'); // Using CommonJS
@@ -10,7 +10,11 @@ const { Worker } = require('worker_threads');
 
 
 const isMac = process.platform === 'darwin'
+
 let galleryViewInterval // Declare galleryViewInterval globally
+let ttsProcess; // Declare ttsProcess globally
+
+
 const template = [
     // { role: 'appMenu' }
     ...(isMac
@@ -159,9 +163,9 @@ ipcMain.on('show-context-menu', (event) => {
 })
 // RUNS DOT THROUGHT  script.py
 
-let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
+//let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
+let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
 
-//let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
 // Default script 
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
@@ -254,7 +258,6 @@ ipcMain.handle('open-dialog', async (event) => {
 
 
 // Flag to track whether dark mode is enabled or not
-const ttsProcessorPath = path.join(__dirname, 'ttsProcessor.mjs');
 
 
 const createWindow = () => {
@@ -276,37 +279,73 @@ const createWindow = () => {
 
     //mainWindow.webContents.openDevTools();
     //TEXT TO SPEECH 
+    // Setup TTS child process
 
-    // Setup TTS Worker
-    let ttsWorker = new Worker(path.join(__dirname, 'ttsProcessor.js'));
+    //let ttsProcessorPath;  // Use let instead of const
 
-    ttsWorker.on('message', (data) => {
-        console.log('Received from worker:', data);
-        mainWindow.webContents.send('tts-response', data);
-        ttsWorker.terminate().then(() => console.log('Worker terminated successfully.'));
 
+    function createTtsProcess() {
+        let ttsProcessorPath = path.join(process.resourcesPath, 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+        //let ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+        return fork(ttsProcessorPath);
+    }
+
+    ipcMain.handle('run-tts', async (event, message) => {
+        return new Promise((resolve, reject) => {
+            const ttsProcess = createTtsProcess();
+            const userDataPath = app.getPath('userData');
+
+            ttsProcess.on('message', (response) => {
+                if (response.filePath) {
+                    resolve(response.filePath);
+                } else {
+                    reject(new Error(response.error));
+                }
+            });
+
+            ttsProcess.on('error', (error) => {
+                console.error('Error from TTS process:', error);
+                reject(new Error('TTS process error'));
+            });
+
+            ttsProcess.on('exit', (code) => {
+                console.log(`TTS process exited with code ${code}`);
+                if (code !== 0) {
+                    reject(new Error('TTS process exited unexpectedly'));
+                }
+            });
+
+            ttsProcess.send({ cmd: 'run-tts', message, userDataPath });
+
+            // Timeout to handle cases where the process might not respond
+            setTimeout(() => {
+                ttsProcess.kill();
+                reject(new Error('TTS process did not respond in time'));
+            }, 40000); // Adjust timeout duration as needed
+        }).finally(() => {
+            if (ttsProcess) {
+                ttsProcess.kill();
+            }
+        });
     });
 
-    ttsWorker.on('error', (error) => {
-        console.error('Error from TTS worker:', error);
-        mainWindow.webContents.send('tts-error', error.message);
-        ttsWorker.terminate().then(() => console.log('Worker terminated due to error.'));
-
+    ipcMain.handle('play-audio', async (event, filePath) => {
+        const { exec } = require('child_process');
+        return new Promise((resolve, reject) => {
+            exec(`afplay "${filePath}"`, (err) => {
+                if (err) {
+                    console.error('Error during audio playback:', err);
+                    reject(new Error('Audio playback failed'));
+                } else {
+                    //ttsProcess.kill(); // Kill the process instead of terminate
+                    console.log('Audio playback successful.');
+                    resolve('Playback success');
+                }
+            });
+        });
     });
 
-    ttsWorker.on('exit', (code) => {
-        console.log(`Worker exited with code ${code}`);
-        if (code !== 0) {
-            console.log('Unexpected exit, attempting to restart worker...');
-            ttsWorker = new Worker(path.join(__dirname, 'ttsProcessor.js'));
-        }
-    });
 
-    // Handle TTS requests
-    ipcMain.on('request-tts', (event, message) => {
-        console.log('Attempting to send message to TTS processor...');
-        ttsWorker.postMessage({ cmd: 'run-tts', message });
-    });
 
     //mainWindow.webContents.openDevTools();
 }
@@ -381,12 +420,17 @@ app.on('window-all-closed', function () {
     });
     childProcesses.clear();  // Clear the set after killing all processes
 
+    if (ttsProcess) {
+        ttsProcess.kill();
+    }
+
     if (process.platform !== 'darwin') {
         app.quit();  // Optionally quit the app on non-macOS platforms
     }
 });
 
 const appPath = app.getAppPath()
+
 
 ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
@@ -437,6 +481,7 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
 })
 
 // DOWNLOAD LLM AND SUCH!
+
 
 console.log("IPC Setup Starting");
 ipcMain.on('start-download', (event, data) => {
@@ -530,7 +575,7 @@ async function ensureAndDownloadDependencies(event) {
     const filePath = path.join(dotDataDir, 'Phi-3-mini-4k-instruct-q4.gguf');
     if (!checkFileExists(filePath)) {
         try {
-            await downloadFile('https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf?download=true', filePath, event);
+            await downloadFile('https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf?download=true', filePath, event); console.log('Download completed');
             console.log('Download completed');
         } catch (error) {
             console.error('Download failed:', error);
@@ -657,6 +702,8 @@ ipcMain.on('request-auto-tts-state', (event) => {
 
 
 
+
+
 //CONFIG FOR USER SETTINGS
 //THIS FILE WILL STORE USER SETTINGS FOR THE LLM. THESE SETTINGS WILL BE READ BY PYTHON.
 
@@ -664,11 +711,12 @@ ipcMain.on('request-auto-tts-state', (event) => {
 // Check if config exists, if not, create it
 if (!fs.existsSync(configPath)) {
     const defaultConfig = {
-        n_ctx: "default1",
-        n_batch: 100,
-        max_tokens: false,
-        big_dot_temperature: false,
-        big_dot_promt: "hi"
+        n_ctx: 4000,
+        n_gpu_layers: -1,
+        n_batch: 256,
+        max_tokens: 500,
+        big_dot_temperature: 0.7,
+        big_dot_promt: "You are called Dot, You are a helpful and honest assistant."
     };
     fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), 'utf-8');
 }
@@ -710,9 +758,11 @@ ipcMain.handle('open-file-dialog', async (event) => {
 // WHISPER CPP
 
 
-ipcMain.on('run-stream-model', (event, arg) => {
-    const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin')
-    //const modelPath = path.join(process.resourcesPath, 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin')
+let streamProcess = null;
+
+ipcMain.on('run-stream-model', (event) => {
+    //const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
+    const modelPath = path.join(process.resourcesPath, 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
     const args = [
         '-m', modelPath,
         '-t', '8',
@@ -720,11 +770,10 @@ ipcMain.on('run-stream-model', (event, arg) => {
         '--length', '5000'
     ];
 
-    const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
-    //const streamPath = path.join(process.resourcesPath, 'llm', 'whisper', 'stream');
+    //const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
+    const streamPath = path.join(process.resourcesPath, 'llm', 'whisper', 'stream');
 
-    // Use resourcesPath for cwd as well
-    const streamProcess = spawn(streamPath, args, { shell: true });
+    streamProcess = spawn(streamPath, args, { shell: true });
 
     streamProcess.stdout.on('data', (data) => {
         event.sender.send('stream-data', data.toString());
@@ -736,71 +785,16 @@ ipcMain.on('run-stream-model', (event, arg) => {
 
     streamProcess.on('close', (code) => {
         event.sender.send('stream-close', code);
-        childProcesses.delete(streamProcess);  // Remove process from tracking set
+        streamProcess = null; // Reset the streamProcess variable
         console.log(`Stream process closed with code ${code}`);
     });
 });
 
-
-
-
-
-let ttsWorker; // Declare the worker globally or in a scope accessible by the IPC handlers
-
-// Function to ensure worker is initialized
-function initializeTtsWorker() {
-    if (!ttsWorker || ttsWorker.isTerminated) {
-        ttsWorker = new Worker(path.join(__dirname, 'ttsProcessor.js'));
-        ttsWorker.on('error', error => {
-            console.error('Worker Error:', error);
-            ttsWorker = null; // Reset on error so we can try to recreate later
-        });
-        ttsWorker.on('exit', code => {
-            console.log(`Worker exited with code ${code}`);
-            ttsWorker = null; // Ensure we recreate the worker if it exits
-        });
+ipcMain.on('kill-stream-process', (event) => {
+    if (streamProcess) {
+        streamProcess.kill('SIGINT'); // Send an interrupt signal to terminate the process
+        streamProcess = null; // Reset the streamProcess variable
+        event.sender.send('stream-terminated'); // Notify renderer process
     }
-}
-
-ipcMain.handle('run-tts', async (event, message) => {
-    console.log("Received 'run-tts' with message:", message);
-
-    initializeTtsWorker(); // Ensure worker is ready
-
-    if (!ttsWorker) {
-        console.error("TTS worker is not initialized.");
-        throw new Error("TTS worker is not initialized"); // This error will be sent back to the renderer
-    }
-
-    return new Promise((resolve, reject) => {
-        ttsWorker.once('message', (response) => {
-            if (response.filePath) {
-                console.log("Audio file path:", response.filePath);
-                resolve(response.filePath); // Automatically sends this back to the renderer
-            } else {
-                console.error("Failed to process TTS:", response.error);
-                reject(new Error("Failed to process TTS")); // This error will be sent back to the renderer
-            }
-        });
-
-        ttsWorker.postMessage({ cmd: 'run-tts', message });
-    });
 });
 
-
-ipcMain.handle('play-audio', async (event, filePath) => {
-    const { exec } = require('child_process');
-
-    return new Promise((resolve, reject) => {
-        exec(`afplay "${filePath}"`, (err) => {
-            if (err) {
-                console.error('Error during audio playback:', err);
-                reject(new Error('Audio playback failed'));
-            } else {
-                console.log('Audio playback successful.');
-                ttsWorker.terminate().then(() => console.log('Worker terminated.'));
-                resolve('Playback success');
-            }
-        });
-    });
-});
