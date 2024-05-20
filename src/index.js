@@ -1,11 +1,20 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron')
 const path = require('path')
-const { spawn } = require('child_process')
+const { spawn, fork } = require('child_process')
+const { exec } = require('child_process');
 const fs = require('fs')
 const fetch = require('node-fetch'); // Using CommonJS
+const userDataPath = app.getPath('userData');
+const configPath = path.join(userDataPath, 'config.json');
+const { Worker } = require('worker_threads');
+
 
 const isMac = process.platform === 'darwin'
+
 let galleryViewInterval // Declare galleryViewInterval globally
+let ttsProcess; // Declare ttsProcess globally
+
+
 const template = [
     // { role: 'appMenu' }
     ...(isMac
@@ -155,13 +164,8 @@ ipcMain.on('show-context-menu', (event) => {
 // RUNS DOT THROUGHT  script.py
 
 //let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
+let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
 
-let currentScript = path.join(
-    process.resourcesPath,
-    'llm',
-    'scripts',
-    'docdot.py'
-)
 // Default script 
 
 ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
@@ -172,7 +176,7 @@ ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
     } else {
         // If the Python process is not running, spawn a new one with the default script
         console.log(`Current working directory: ${process.cwd()}`)
-        pythonProcess = spawn(pythonPath, [currentScript], { shell: true })
+        pythonProcess = spawn(pythonPath, [currentScript, `"${configPath}"`], { shell: true })
 
         pythonProcess.stdout.on('data', (data) => {
             const message = data.toString().trim()
@@ -201,13 +205,13 @@ ipcMain.on('switch-script', (event, selectedScript) => {
         ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
         : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
     /*currentScript = currentScript.endsWith('docdot.py')
-    ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
-    : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');*/
+        ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
+        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');*/
 
     // If the Python process is running, kill it and spawn a new one with the updated script
     if (pythonProcess) {
         pythonProcess.kill();
-        pythonProcess = spawn(pythonPath, [currentScript], { shell: true });
+        pythonProcess = spawn(pythonPath, [currentScript, `"${configPath}"`], { shell: true });
 
         pythonProcess.stdout.on('data', (data) => {
             const message = data.toString().trim();
@@ -226,7 +230,6 @@ ipcMain.on('switch-script', (event, selectedScript) => {
 //OPEN FOLDER THING!!!!
 
 // Define a path for the file where you will store the last opened directory
-const userDataPath = app.getPath('userData');
 const lastOpenedDirPath = path.join(userDataPath, 'lastOpenedDir.txt');
 
 ipcMain.on('get-user-data-path', (event) => {
@@ -255,7 +258,7 @@ ipcMain.handle('open-dialog', async (event) => {
 
 
 // Flag to track whether dark mode is enabled or not
-let isDarkModeEnabled = false;
+
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -273,16 +276,80 @@ const createWindow = () => {
     })
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'))
-    // Listen for 'toggle-dark-mode' message from renderer process
-    ipcMain.on('toggle-dark-mode', (event) => {
-        // Toggle the dark mode flag
-        isDarkModeEnabled = !isDarkModeEnabled;
-        // Send message back to renderer process with the new state
-        event.sender.send('dark-mode-toggled', isDarkModeEnabled);
+
+    //mainWindow.webContents.openDevTools();
+    //TEXT TO SPEECH 
+    // Setup TTS child process
+
+    //let ttsProcessorPath;  // Use let instead of const
+
+
+    function createTtsProcess() {
+        let ttsProcessorPath = path.join(process.resourcesPath, 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+        //let ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+        return fork(ttsProcessorPath);
+    }
+
+    ipcMain.handle('run-tts', async (event, message) => {
+        return new Promise((resolve, reject) => {
+            const ttsProcess = createTtsProcess();
+            const userDataPath = app.getPath('userData');
+
+            ttsProcess.on('message', (response) => {
+                if (response.filePath) {
+                    resolve(response.filePath);
+                } else {
+                    reject(new Error(response.error));
+                }
+            });
+
+            ttsProcess.on('error', (error) => {
+                console.error('Error from TTS process:', error);
+                reject(new Error('TTS process error'));
+            });
+
+            ttsProcess.on('exit', (code) => {
+                console.log(`TTS process exited with code ${code}`);
+                if (code !== 0) {
+                    reject(new Error('TTS process exited unexpectedly'));
+                }
+            });
+
+            ttsProcess.send({ cmd: 'run-tts', message, userDataPath });
+
+            // Timeout to handle cases where the process might not respond
+            setTimeout(() => {
+                ttsProcess.kill();
+                reject(new Error('TTS process did not respond in time'));
+            }, 40000); // Adjust timeout duration as needed
+        }).finally(() => {
+            if (ttsProcess) {
+                ttsProcess.kill();
+            }
+        });
     });
+
+    ipcMain.handle('play-audio', async (event, filePath) => {
+        const { exec } = require('child_process');
+        return new Promise((resolve, reject) => {
+            exec(`afplay "${filePath}"`, (err) => {
+                if (err) {
+                    console.error('Error during audio playback:', err);
+                    reject(new Error('Audio playback failed'));
+                } else {
+                    //ttsProcess.kill(); // Kill the process instead of terminate
+                    console.log('Audio playback successful.');
+                    resolve('Playback success');
+                }
+            });
+        });
+    });
+
+
 
     //mainWindow.webContents.openDevTools();
 }
+
 
 // GALLERY VIEW!!!!
 
@@ -345,14 +412,25 @@ ipcMain.on('update-background', (event, imagePath) => {
 })
 
 app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') {
-        // Do not quit the app when all windows are closed on platforms other than macOS
-        // app.quit();
-    }
-})
+    childProcesses.forEach(process => {
+        if (!process.killed) {
+            process.kill();  // Forcefully terminate each child process
+            console.log('Child process killed');
+        }
+    });
+    childProcesses.clear();  // Clear the set after killing all processes
 
+    if (ttsProcess) {
+        ttsProcess.kill();
+    }
+
+    if (process.platform !== 'darwin') {
+        app.quit();  // Optionally quit the app on non-macOS platforms
+    }
+});
 
 const appPath = app.getAppPath()
+
 
 ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
@@ -377,7 +455,7 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
         // Spawn the Python process
         const pythonProcess = spawn(
             pythonPath,
-            [pythonScriptPath, quotedDirectory],
+            [pythonScriptPath, quotedDirectory, `"${configPath}"`],
             { shell: true }
         )
 
@@ -402,7 +480,8 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
     }
 })
 
-// DOWNLOAD MISTRAL AND SUCH!
+// DOWNLOAD LLM AND SUCH!
+
 
 console.log("IPC Setup Starting");
 ipcMain.on('start-download', (event, data) => {
@@ -493,10 +572,10 @@ async function ensureAndDownloadDependencies(event) {
         fs.mkdirSync(dotDataDir, { recursive: true });
     }
 
-    const filePath = path.join(dotDataDir, 'mistral-7b-instruct-v0.2.Q4_K_M.gguf');
+    const filePath = path.join(dotDataDir, 'Phi-3-mini-4k-instruct-q4.gguf');
     if (!checkFileExists(filePath)) {
         try {
-            await downloadFile('https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf?download=true', filePath, event);
+            await downloadFile('https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf?download=true', filePath, event); console.log('Download completed');
             console.log('Download completed');
         } catch (error) {
             console.error('Download failed:', error);
@@ -521,6 +600,8 @@ app.on('ready', () => {
                         mainWindow.webContents.send('download-error', error.message);
                     }
                 });
+            ttsWorker = setupTtsWorker();
+            initializeHandlers();
         });
     } else {
         console.error('Failed to create main window');
@@ -538,3 +619,182 @@ ipcMain.on('start-download', (event, { url, outputPath }) => {
             });
     }
 });
+
+
+
+
+
+
+
+// SETTINGS BUTTON
+// THIS WILL OPEN A SETTINGS BUTTON
+let settingsWindow;
+
+let isDarkModeEnabled = false; // Maintain dark mode state
+
+ipcMain.on('toggle-dark-mode', (event) => {
+    isDarkModeEnabled = !isDarkModeEnabled;
+    // Update all renderer processes
+    BrowserWindow.getAllWindows().forEach(win => {
+        win.webContents.send('dark-mode-toggled', isDarkModeEnabled);
+    });
+});
+
+// In your main process file (main.js)
+ipcMain.on('request-dark-mode-state', (event) => {
+    event.sender.send('current-dark-mode-state', isDarkModeEnabled);
+});
+
+
+
+ipcMain.on('open-settings-window', () => {
+    if (!settingsWindow) {
+        settingsWindow = new BrowserWindow({
+            width: 600,
+            height: 500,
+            parent: mainWindow,
+            modal: true,
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false,
+            }
+        });
+
+        const settingsPath = path.join(__dirname, 'settings.html');
+        settingsWindow.loadFile(settingsPath);
+
+        settingsWindow.on('closed', () => {
+            settingsWindow = null;
+            mainWindow.webContents.send('settings-closed');
+        });
+    }
+});
+
+ipcMain.on('close-settings', () => {
+    if (settingsWindow) {
+        settingsWindow.close();
+    }
+});
+
+
+//AUTO TTS
+//This will make TTS activate for EACH message automatically
+let autoTtsEnabled = false; // Default state
+
+// index.js in your main process
+ipcMain.on('set-auto-tts', (event, isEnabled) => {
+    console.log("Setting auto TTS to", isEnabled); // Confirm this logs correctly
+    autoTtsEnabled = isEnabled;
+
+    // Update all renderer processes
+    BrowserWindow.getAllWindows().forEach(win => {
+        win.webContents.send('update-auto-tts', autoTtsEnabled);
+    });
+});
+
+ipcMain.on('request-auto-tts-state', (event) => {
+    console.log("Sending auto TTS state:", autoTtsEnabled); // Confirm state before sending
+    event.sender.send('get-auto-tts-state', autoTtsEnabled);
+});
+
+
+
+
+
+
+
+
+//CONFIG FOR USER SETTINGS
+//THIS FILE WILL STORE USER SETTINGS FOR THE LLM. THESE SETTINGS WILL BE READ BY PYTHON.
+
+
+// Check if config exists, if not, create it
+if (!fs.existsSync(configPath)) {
+    const defaultConfig = {
+        n_ctx: 4000,
+        n_gpu_layers: -1,
+        n_batch: 256,
+        max_tokens: 500,
+        big_dot_temperature: 0.7,
+        big_dot_promt: "You are called Dot, You are a helpful and honest assistant."
+    };
+    fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), 'utf-8');
+}
+
+
+// Listener to get the current configuration
+ipcMain.handle('getConfig', async () => {
+    if (fs.existsSync(configPath)) {
+        return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    }
+    return null;
+});
+
+// Listener to save the configuration
+ipcMain.handle('setConfig', async (event, newConfig) => {
+    fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2), 'utf-8');
+});
+
+
+
+ipcMain.handle('open-file-dialog', async (event) => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'GGUF Files', extensions: ['gguf'] }]
+    });
+    if (canceled) {
+        return { filePaths: [] };
+    } else {
+        return { filePaths };
+    }
+});
+
+
+
+
+
+
+
+// WHISPER CPP
+
+
+let streamProcess = null;
+
+ipcMain.on('run-stream-model', (event) => {
+    //const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
+    const modelPath = path.join(process.resourcesPath, 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
+    const args = [
+        '-m', modelPath,
+        '-t', '8',
+        '--step', '500',
+        '--length', '5000'
+    ];
+
+    //const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
+    const streamPath = path.join(process.resourcesPath, 'llm', 'whisper', 'stream');
+
+    streamProcess = spawn(streamPath, args, { shell: true });
+
+    streamProcess.stdout.on('data', (data) => {
+        event.sender.send('stream-data', data.toString());
+    });
+
+    streamProcess.stderr.on('data', (data) => {
+        event.sender.send('stream-error', data.toString());
+    });
+
+    streamProcess.on('close', (code) => {
+        event.sender.send('stream-close', code);
+        streamProcess = null; // Reset the streamProcess variable
+        console.log(`Stream process closed with code ${code}`);
+    });
+});
+
+ipcMain.on('kill-stream-process', (event) => {
+    if (streamProcess) {
+        streamProcess.kill('SIGINT'); // Send an interrupt signal to terminate the process
+        streamProcess = null; // Reset the streamProcess variable
+        event.sender.send('stream-terminated'); // Notify renderer process
+    }
+});
+
