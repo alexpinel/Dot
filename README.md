@@ -15,7 +15,7 @@
 
 ---
 
-# TTS and Voice input only supported for MacOS, support for Windows coming very soon!
+## Important note: Voice input is only supported for MacOS, Windows support will be added soon!
 
 ## 🚀 About Dot
 
