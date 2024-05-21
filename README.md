@@ -69,7 +69,7 @@ That's it! If you follow these steps you should be able to get it all running, p
 ## 🌟 Future Features I'd Like to Add
 
 - Linux support
-- Choice of LLM
+- Choice of LLM - Done!
 - Image file support
 - Enhanced document awareness beyond content
 - Simplified file loading (select individual files, not just folders)
