@@ -81,9 +81,15 @@ That's it! If you follow these steps you should be able to get it all running, p
 
 Contributions are highly encouraged! As a student managing this project on the side, any help is greatly appreciated. Whether it's coding, documentation, or feature suggestions, please feel free to get involved!
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=alexpinel/dot&type=Date)](https://star-history.com/#alexpinel/dot&Date)
+
 ---
 
 <div align="center">
   <strong><a href="#top">Back to top</a></strong>
 </div>
+
+
 
