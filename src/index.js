@@ -163,8 +163,8 @@ ipcMain.on('show-context-menu', (event) => {
 })
 // RUNS DOT THROUGHT  script.py
 
-//let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
-let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
+let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
+//let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
 
 // Default script 
 
@@ -201,12 +201,12 @@ ipcMain.on('switch-script', (event, selectedScript) => {
     // Toggle between 'script.py' and 'normalchat.py'
     console.log('Switching script to:', selectedScript)
 
-    currentScript = currentScript.endsWith('docdot.py')
-        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
-        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
     /*currentScript = currentScript.endsWith('docdot.py')
+        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
+        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');*/
+    currentScript = currentScript.endsWith('docdot.py')
         ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
-        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');*/
+        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');
 
     // If the Python process is running, kill it and spawn a new one with the updated script
     if (pythonProcess) {
@@ -285,8 +285,8 @@ const createWindow = () => {
 
 
     function createTtsProcess() {
-        let ttsProcessorPath = path.join(process.resourcesPath, 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
-        //let ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+        //let ttsProcessorPath = path.join(process.resourcesPath, 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+        let ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
         return fork(ttsProcessorPath);
     }
 
@@ -436,19 +436,19 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
         // Construct paths relative to the script's location
 
-        const pythonScriptPath = path.join(
+        /*const pythonScriptPath = path.join(
             process.resourcesPath,
             'llm',
             'scripts',
             'embeddings.py'
-        )
-        /*const pythonScriptPath = path.join(
+        )*/
+        const pythonScriptPath = path.join(
             __dirname,
             '..',
             'llm',
             'scripts',
             'embeddings.py'
-        )*/
+        )
 
         // Quote the directory path to handle spaces
         const quotedDirectory = `"${directory}"`
@@ -761,8 +761,8 @@ ipcMain.handle('open-file-dialog', async (event) => {
 let streamProcess = null;
 
 ipcMain.on('run-stream-model', (event) => {
-    //const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
-    const modelPath = path.join(process.resourcesPath, 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
+    const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
+    //const modelPath = path.join(process.resourcesPath, 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
     const args = [
         '-m', modelPath,
         '-t', '8',
@@ -770,8 +770,8 @@ ipcMain.on('run-stream-model', (event) => {
         '--length', '5000'
     ];
 
-    //const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
-    const streamPath = path.join(process.resourcesPath, 'llm', 'whisper', 'stream');
+    const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
+    //const streamPath = path.join(process.resourcesPath, 'llm', 'whisper', 'stream');
 
     streamProcess = spawn(streamPath, args, { shell: true });
 
