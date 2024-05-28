@@ -11,3 +11,9 @@ mpnet/
 baai/
 whisper
 espeak-ng-data
+
+## LINUX IGNORE
+env/
+__pycache__/
+*.log
+*.out
