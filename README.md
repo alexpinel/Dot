@@ -63,6 +63,16 @@ Now python should be setup and running! However, there is still a few more steps
 
 Finally, download the Mistral 7B LLM from the following link and place it inside the `llm/scripts` directory alongside the python scripts used by Dot: [TheBloke/Mistral-7B-Instruct-v0.2-GGUF](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/blob/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf)
 
+## Linux Installation
+```bash
+$ chmod +x setup_python.sh
+$ ./setup_python.sh
+```
+The above command will check if python is installed on your system and start the setup.
+Once the setup is done, configure all the models by specifying their features in the config file located at `llm/config.ini`
+
+Finally, run `npm start`
+
 That's it! If you follow these steps you should be able to get it all running, please let me know if you are facing any issues :)
 
 
