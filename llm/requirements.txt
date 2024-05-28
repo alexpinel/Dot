@@ -1,0 +1,8 @@
+torch
+langchain-community
+faiss-cpu
+huggingface_hub
+llama-cpp-python -C cmake.args="-DLLAMA_BLAS=ON;-DLLAMA_BLAS_VENDOR=OpenBLAS;-DLLAMA_CUDA=ON"
+pypdf
+unstructured
+docx2txt

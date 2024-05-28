@@ -10,6 +10,7 @@ const { Worker } = require('worker_threads');
 
 
 const isMac = process.platform === 'darwin'
+const isLinux = process.platform === 'linux'
 
 let galleryViewInterval // Declare galleryViewInterval globally
 let ttsProcess; // Declare ttsProcess globally
@@ -34,11 +35,26 @@ const template = [
                 ],
             },
         ]
-        : []),
+        : isLinux ? [
+            {
+                label: app.name,
+                submenu: [
+                    { role: 'about' },
+                    { type: 'separator' },
+                    { role: 'services' },
+                    { type: 'separator' },
+                    { role: 'hide' },
+                    { role: 'hideOthers' },
+                    { role: 'unhide' },
+                    { type: 'separator' },
+                    { role: 'quit' },
+                ],
+            },
+        ] : []),
     // { role: 'fileMenu' }
     {
         label: 'File',
-        submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
+        submenu: [isMac ? { role: 'close' } : isLinux ? { role: 'close' } : { role: 'quit' }],
     },
     // { role: 'editMenu' }
     {
@@ -64,7 +80,19 @@ const template = [
                         ],
                     },
                 ]
-                : [
+                : isLinux ? [
+                    { role: 'pasteAndMatchStyle' },
+                    { role: 'delete' },
+                    { role: 'selectAll' },
+                    { type: 'separator' },
+                    {
+                        label: 'Speech',
+                        submenu: [
+                            { role: 'startSpeaking' },
+                            { role: 'stopSpeaking' },
+                        ],
+                    },
+                ] : [
                     { role: 'delete' },
                     { type: 'separator' },
                     { role: 'selectAll' },
@@ -100,7 +128,12 @@ const template = [
                     { type: 'separator' },
                     { role: 'window' },
                 ]
-                : [{ role: 'close' }]),
+                : isLinux ? [
+                    { type: 'separator' },
+                    { role: 'front' },
+                    { type: 'separator' },
+                    { role: 'window' },
+                ] : [{ role: 'close' }]),
         ],
     },
     {
@@ -128,11 +161,15 @@ let pythonProcess // Declare pythonProcess globally
 function findPython() {
     const possibilities = [
         // In packaged app
-        path.join(process.resourcesPath, 'llm', 'python', 'bin', 'python3'),
+        isMac ? path.join(process.resourcesPath, 'llm', 'python', 'bin', 'python3')
+            : isLinux ? path.join(process.resourcesPath, 'llm', 'env', 'bin', 'python3')
+                : path.join(process.resourcesPath, 'llm', 'python', 'bin', 'python3'),
         //WINDOWS: path.join(process.resourcesPath, 'llm', 'python', 'python.exe'),
 
         // In development
-        path.join(__dirname, '..', 'llm', 'python', 'bin', 'python3'),
+        isMac ? path.join(__dirname, '..', 'llm', 'python', 'bin', 'python3')
+            : isLinux ? path.join(__dirname, '..', 'llm', 'env', 'bin', 'python3')
+                : path.join(__dirname, '..', 'llm', 'python', 'bin', 'python3'),
         //WINDOWS: path.join(process.__dirname, 'llm', 'python', 'python.exe'),
     ]
     for (const path_to_python of possibilities) {
