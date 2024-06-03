@@ -539,21 +539,21 @@ async function ensureAndDownloadDependencies(event) {
 }
 
 
-app.on('ready', async () => {
-    mainWindow = createWindow(); // This should now correctly create and return the window
-
+app.on('ready', () => {
+    const mainWindow = createWindow(); // This should now correctly create and return the window
+    
     if (mainWindow) {
-        mainWindow.on('ready-to-show', async () => {
-            try {
-                await ensureAndDownloadDependencies(mainWindow.webContents);
-                ttsWorker = setupTtsWorker();
-                initializeHandlers();
-                await switchScript(currentScript); // Ensure the module is loaded
-            } catch (error) {
-                if (mainWindow && !mainWindow.isDestroyed()) {
-                    mainWindow.webContents.send('download-error', error.message);
-                }
-            }
+        mainWindow.on('ready-to-show', () => {
+            ensureAndDownloadDependencies(mainWindow.webContents)
+                .catch(error => {
+                    if (mainWindow && !mainWindow.isDestroyed()) {
+                        mainWindow.webContents.send('download-error', error.message);
+                    }
+                });
+            ttsWorker = setupTtsWorker();
+            initializeHandlers();
+            activeChatModule =  loadScriptModule(currentScript);
+            mainWindow.webContents.send('script-switched', currentScript);
         });
     } else {
         console.error('Failed to create main window');
