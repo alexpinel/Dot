@@ -307,7 +307,7 @@ function sendMessage(buttonClicked) {
     const userInput = document.getElementById('user-input').value;
 
     if (userInput.trim() !== '') {
-        appendMessage('User', userInput);
+        //appendMessage('User', userInput);
         showTypingIndicator();
         ipcRenderer.send('run-python-script', { userInput, buttonClicked });
         //document.getElementById('user-input').value = ''; // Clear input after sending
@@ -321,8 +321,79 @@ function sendMessage(buttonClicked) {
 }
 
 // ENTER == SEND
-let accumulatedTokens = ''; // Variable to store accumulated tokens
 
+var input = document.getElementById('user-input');
+input.addEventListener('keyup', function (event) {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById('send-button').click();
+
+    }
+});
+
+let accumulatedTokens = '';
+let iframes = ''; // Variable to store iframe tokens
+let iframesInserted = false; // Variable to track if iframes have been inserted
+
+// Function to append tokens to the last message
+function appendTokenToLastMessage() {
+    const chatContainer = document.getElementById('bot-message');
+    const lastMessage = chatContainer.lastElementChild;
+    if (lastMessage && lastMessage.classList.contains('message')) {
+        const botBubble = lastMessage.querySelector('.bot-bubble');
+        let textContainer = lastMessage.querySelector('.text-container'); // A container for text content
+
+        if (!textContainer) {
+            // Create a container for text content if it doesn't exist
+            textContainer = document.createElement('div');
+            textContainer.classList.add('text-container');
+            botBubble.appendChild(textContainer);
+        }
+
+        if (botBubble) {
+            // Separate iframes from other tokens
+            let newContent = '';
+            const tokens = accumulatedTokens.split('</iframe>'); // Split tokens by iframe end tag
+
+            tokens.forEach(token => {
+                if (token.includes('<iframe')) {
+                    if (!iframesInserted) {
+                        iframes += token + '</iframe>'; // Include the iframe end tag
+                    }
+                } else {
+                    newContent += token;
+                }
+            });
+
+            // Append iframes only once
+            if (!iframesInserted && iframes) {
+                botBubble.insertAdjacentHTML('afterbegin', iframes); // Insert iframes at the beginning
+                iframesInserted = true; // Mark iframes as inserted
+            }
+
+            // Append new content to the text container
+            textContainer.innerHTML = marked(newContent);
+
+            // Check if MathJax is loaded and then typeset
+            if (window.MathJax) {
+                MathJax.typesetPromise([textContainer]).then(() => {
+                    console.log("MathJax has finished processing!");
+                }).catch((err) => console.error('MathJax processing error:', err));
+            } else {
+                console.log("MathJax is not available to process the content.");
+            }
+        }
+    }
+}
+
+// Event listener to handle tokens received from the main process
+ipcRenderer.on('chat-token', (event, token) => {
+    console.log('Received token:', token);
+    accumulatedTokens += token; // Append the new token to the accumulated tokens
+    appendTokenToLastMessage();
+});
+
+// Initial setup for appending messages
 document.getElementById('send-button').addEventListener('click', async () => {
     const userInput = document.getElementById('user-input').value;
     console.log('Send button clicked, user input:', userInput);
@@ -332,6 +403,8 @@ document.getElementById('send-button').addEventListener('click', async () => {
         try {
             appendMessage('Bot', '', true); // Create a new message div for the bot response
             accumulatedTokens = ''; // Reset accumulated tokens
+            iframesInserted = false; // Reset iframes inserted flag
+            iframes = ''; // Reset iframes content
             await ipcRenderer.invoke('run-chat', userInput);
             console.log('IPC call made: run-chat');
         } catch (error) {
@@ -342,34 +415,14 @@ document.getElementById('send-button').addEventListener('click', async () => {
         }
     }
 });
-// Handle tokens received from the main process
-ipcRenderer.on('chat-token', (event, token) => {
-    console.log('Received token:', token);
-    accumulatedTokens += token; // Append the new token to the accumulated tokens
-    appendTokenToLastMessage();
-});
 
-function appendTokenToLastMessage() {
-    const chatContainer = document.getElementById('bot-message');
-    const lastMessage = chatContainer.lastElementChild;
-    if (lastMessage && lastMessage.classList.contains('message')) {
-        const botBubble = lastMessage.querySelector('.bot-bubble');
-        if (botBubble) {
-            // Process the accumulated tokens for markdown and MathJax
-            botBubble.innerHTML = marked(accumulatedTokens);
-            // Check if MathJax is loaded and then typeset
-            if (window.MathJax) {
-                MathJax.typesetPromise([botBubble]).then(() => {
-                    console.log("MathJax has finished processing!");
-                }).catch((err) => console.error('MathJax processing error:', err));
-            } else {
-                console.log("MathJax is not available to process the content.");
-            }
-        }
-    }
-}
+
+// Handle tokens received from the main process
+
+
+
 //document.getElementById('mic-icon').addEventListener('click', () => {
-    //ipcRenderer.send('kill-stream-process');
+//ipcRenderer.send('kill-stream-process');
 //});
 
 

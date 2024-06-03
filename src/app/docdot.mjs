@@ -2,6 +2,7 @@ import { LlamaCpp } from "@langchain/community/llms/llama_cpp";
 import { PromptTemplate } from "@langchain/core/prompts";
 import path from "path";
 import { homedir } from "os";
+import os from 'os';
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/hf_transformers";
 import fs from "fs";
@@ -80,7 +81,8 @@ async function runChat(input, sendToken, configPath) {
   });
 
   // Load vector store from a specified directory
-  const directory = "C:\\Users\\alexp\\Desktop\\Dot-data\\";
+  const directory = path.join(os.homedir(), "Documents", "Dot-Data");
+
   const VectorStore = await FaissStore.load(directory, embeddings);
 
   // Equivalent to kwargs in python, 2 indicates the 2 closest documents will be provided
@@ -110,7 +112,7 @@ async function runChat(input, sendToken, configPath) {
   ragChainWithSource = ragChainWithSource.assign({ answer: ragChainFromDocs });
 
   // Define stop conditions
-  const stopConditions = ["[/INST]", "<|eot_id|>", "[response]"];
+  const stopConditions = ["[/INST]", "<|eot_id|>", "[response]", "<|end|>", "<|assistant|> "];
 
   // Generate the response
   let stream;
@@ -147,7 +149,7 @@ async function runChat(input, sendToken, configPath) {
         if (key === 'context') {
           processTokens = true;
           // Send "Source" token before processing context
-          sendToken("**Source:**");
+          sendToken("Source:");
         }
 
         if (processTokens) {

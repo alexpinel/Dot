@@ -214,8 +214,8 @@ const createWindow = () => {
         height: 700,
         minWidth: 1250,
         minHeight: 700,
-        autoHideMenuBar: true, // FOR WINDOWS
-        //titleBarStyle: 'hidden', // REMOVE FOR WINDOWS
+        //autoHideMenuBar: true, // FOR WINDOWS
+        titleBarStyle: 'hidden', // REMOVE FOR WINDOWS
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -381,55 +381,21 @@ app.on('window-all-closed', function () {
 
 const appPath = app.getAppPath()
 
-
 ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
-        // Construct paths relative to the script's location
+        //const configPath = path.resolve(__dirname, '..', 'llm', 'scripts', 'config.json'); // Adjust the config path as necessary
 
-        /*const pythonScriptPath = path.join(
-            process.resourcesPath,
-            'llm',
-            'scripts',
-            'embeddings.py'
-        )*/
-        const pythonScriptPath = path.join(
-            __dirname,
-            '..',
-            'llm',
-            'scripts',
-            'embeddings.py'
-        )
+        // Dynamically import the ES module
+        const { processDirectory } = await import('./app/embeddings.mjs');
 
-        // Quote the directory path to handle spaces
-        const quotedDirectory = `"${directory}"`
-        // Spawn the Python process
-        const pythonProcess = spawn(
-            pythonPath,
-            [pythonScriptPath, quotedDirectory, `"${configPath}"`],
-            { shell: true }
-        )
+        // Call the processDirectory function from embeddings.mjs
+        await processDirectory(directory, configPath);
 
-        // Handle the output and errors if needed
-        pythonProcess.stdout.on('data', (data) => {
-            console.log(`stdout: ${data}`)
-        })
-
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`stderr: ${data}`)
-        })
-
-        // Wait for the Python process to exit
-        await new Promise((resolve) => {
-            pythonProcess.on('close', (code) => {
-                console.log(`child process exited with code ${code}`)
-                resolve()
-            })
-        })
+        console.log('Processing complete.');
     } catch (err) {
-        console.error(err)
+        console.error(err);
     }
-})
-
+});
 // DOWNLOAD LLM AND SUCH!
 
 
@@ -541,7 +507,7 @@ async function ensureAndDownloadDependencies(event) {
 
 app.on('ready', () => {
     const mainWindow = createWindow(); // This should now correctly create and return the window
-    
+
     if (mainWindow) {
         mainWindow.on('ready-to-show', () => {
             ensureAndDownloadDependencies(mainWindow.webContents)
@@ -552,7 +518,7 @@ app.on('ready', () => {
                 });
             ttsWorker = setupTtsWorker();
             initializeHandlers();
-            activeChatModule =  loadScriptModule(currentScript);
+            activeChatModule = loadScriptModule(currentScript);
             mainWindow.webContents.send('script-switched', currentScript);
         });
     } else {
@@ -605,7 +571,7 @@ ipcMain.on('open-settings-window', () => {
             width: 600,
             height: 500,
             parent: mainWindow,
-            titleBarStyle: 'hidden',            
+            titleBarStyle: 'hidden',
             modal: true,
             webPreferences: {
                 nodeIntegration: true,
