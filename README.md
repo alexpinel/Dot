@@ -15,11 +15,17 @@
 
 ---
 
+# TTS and Voice input only supported for MacOS, support for Windows coming very soon!
+
 ## 🚀 About Dot
 
-Dot is a standalone, open-source application designed for seamless interaction with documents and files using local LLMs and Retrieval Augmented Generation (RAG). It is inspired by solutions like Nvidia's Chat with RTX, providing a user-friendly interface for those without a programming background. Pre-packaged with Mistral 7B, Dot ensures accessibility and simplicity right out of the box.
+Dot is a standalone, open-source application designed for seamless interaction with documents and files using local LLMs and Retrieval Augmented Generation (RAG). It is inspired by solutions like Nvidia's Chat with RTX, providing a user-friendly interface for those without a programming background. Using the Phi-3 LLM by default, Dot ensures accessibility and simplicity right out of the box.
 
-https://github.com/alexpinel/Dot/assets/93524949/242ef635-b9f5-4263-8f9e-07bc040e3113
+
+
+https://github.com/alexpinel/Dot/assets/93524949/28b26128-7bdc-4bf7-99f3-d09bd8431875
+
+
 
 
 ### 📜 What does it do?
@@ -63,7 +69,7 @@ That's it! If you follow these steps you should be able to get it all running, p
 ## 🌟 Future Features I'd Like to Add
 
 - Linux support
-- Choice of LLM
+- Choice of LLM - Done!
 - Image file support
 - Enhanced document awareness beyond content
 - Simplified file loading (select individual files, not just folders)

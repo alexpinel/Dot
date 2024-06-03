@@ -39,39 +39,40 @@ let autoTtsEnabled = false; // Default value to ensure it's always defined
 
 //// CHATTY CHAT CHAT STUFF!!!!
 function appendMessage(sender, message, isMarkdown) {
-    const chatContainer = document.getElementById('bot-message')
-    const messageDiv = document.createElement('div')
-    messageDiv.classList.add('message')
-    // Optionally set z-index here if necessary
+    console.log('Appending message from', sender);
+    const chatContainer = document.getElementById('bot-message');
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
     messageDiv.style.position = 'relative';
 
     if (sender === 'User') {
-        const userContentContainer = document.createElement('div')
-        userContentContainer.classList.add('user-content-container')
-        const userIcon = document.createElement('div')
-        userIcon.classList.add('user-icon')
-        userIcon.style.marginTop = '10px'
+        const userContentContainer = document.createElement('div');
+        userContentContainer.classList.add('user-content-container');
 
-        const userBubble = document.createElement('div')
-        userBubble.classList.add('user-bubble')
-        userBubble.innerHTML = `<strong>${message}</strong>`
+        const userIcon = document.createElement('div');
+        userIcon.classList.add('user-icon');
+        userIcon.style.marginTop = '10px';
 
-        userContentContainer.appendChild(userIcon)
-        userContentContainer.appendChild(userBubble)
-        messageDiv.appendChild(userContentContainer)
+        const userBubble = document.createElement('div');
+        userBubble.classList.add('user-bubble');
+        userBubble.innerHTML = `<strong>${message}</strong>`;
+
+        userContentContainer.appendChild(userIcon);
+        userContentContainer.appendChild(userBubble);
+        messageDiv.appendChild(userContentContainer);
     } else if (sender === 'Bot') {
-        const botIcon = document.createElement('div')
-        botIcon.classList.add('bot-icon')
-        botIcon.style.marginTop = '10px'
+        const botIcon = document.createElement('div');
+        botIcon.classList.add('bot-icon');
+        botIcon.style.marginTop = '10px';
 
-        const botContentContainer = document.createElement('div')
-        botContentContainer.classList.add('bot-content-container')
-        botContentContainer.appendChild(botIcon)
+        const botContentContainer = document.createElement('div');
+        botContentContainer.classList.add('bot-content-container');
+        botContentContainer.appendChild(botIcon);
 
-        const botBubble = document.createElement('div')
-        botBubble.classList.add('bot-bubble')
+        const botBubble = document.createElement('div');
+        botBubble.classList.add('bot-bubble');
         if (isMarkdown) {
-            botBubble.innerHTML = marked(message);
+            botBubble.innerHTML = marked.parse(message);
             // Check if MathJax is loaded and then typeset
             if (window.MathJax) {
                 MathJax.typesetPromise([botBubble]).then(() => {
@@ -84,15 +85,12 @@ function appendMessage(sender, message, isMarkdown) {
             botBubble.innerText = message;
         }
 
-        const ttsButton = document.createElement('button')
-        ttsButton.classList.add('tts-button')
+        const ttsButton = document.createElement('button');
+        ttsButton.classList.add('tts-button');
         ttsButton.style.position = 'relative';
         ttsButton.style.zIndex = '1000'; // Set sufficiently high within context
 
-        const speakerIcon = document.createElementNS(
-            'http://www.w3.org/2000/svg',
-            'svg'
-        );
+        const speakerIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         speakerIcon.setAttribute('class', 'tts-icon');
         speakerIcon.setAttribute('viewBox', '0 0 24 24');
         speakerIcon.style.width = '16px';
@@ -102,7 +100,7 @@ function appendMessage(sender, message, isMarkdown) {
         speakerIcon.style.strokeLinecap = 'round';
         speakerIcon.style.strokeLinejoin = 'round';
         speakerIcon.style.marginLeft = '-18px';
-        speakerIcon.style.marginTop = '-10px';    // Moves the icon 3 pixels up
+        speakerIcon.style.marginTop = '-10px'; // Moves the icon 3 pixels up
         speakerIcon.innerHTML = `<path d="M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M16 8.99998C16.5 9.49998 17 10.5 17 12C17 13.5 16.5 14.5 16 15M3 10.5V13.5C3 14.6046 3.5 15.5 5.5 16C7.5 16.5 9 21 12 21C14 21 14 3 12 3C9 3 7.5 7.5 5.5 8C3.5 8.5 3 9.39543 3 10.5Z" fill="none" stroke="#424242" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;
 
         ttsButton.appendChild(speakerIcon);
@@ -131,14 +129,14 @@ function appendMessage(sender, message, isMarkdown) {
 
         function resetSpeakerIcon() {
             // Reset the speaker icon
-            speakerIcon.innerHTML = `<path d="M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M16 8.99998C16.5 9.49998 17 10.5 17 12C17 13.5 16.5 14.5 16 15M3 10.5V13.5C3 14.6046 3.5 15.5 5.5 16C7.5 16.5 9 21 12 21C14 21 14 3 12 3C9 3 7.5 7.5 5.5 8C3.5 8.5 3 9.39543 3 10.5Z" fill="none" stroke="#424242" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;;
+            speakerIcon.innerHTML = `<path d="M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M16 8.99998C16.5 9.49998 17 10.5 17 12C17 13.5 16.5 14.5 16 15M3 10.5V13.5C3 14.6046 3.5 15.5 5.5 16C7.5 16.5 9 21 12 21C14 21 14 3 12 3C9 3 7.5 7.5 5.5 8C3.5 8.5 3 9.39543 3 10.5Z" fill="none" stroke="#424242" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;
             // Additional UI reset logic if necessary
         }
 
         function handleTtsError(error) {
             // Update the UI to reflect the error state
             console.error('Error during TTS:', error);
-            showErrorIcon();  // Function to change the icon or display an error message
+            showErrorIcon(); // Function to change the icon or display an error message
         }
 
         console.log("Auto TTS Enabled:", autoTtsEnabled); // Log when checking autoTTS
@@ -147,16 +145,14 @@ function appendMessage(sender, message, isMarkdown) {
             ttsButton.click();
         }
 
-
         botContentContainer.appendChild(botBubble);
         botContentContainer.appendChild(ttsButton);
         messageDiv.appendChild(botContentContainer);
     }
-    // Automatically trigger TTS if autoTTS is enabled
-
 
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
+    return messageDiv; // Return the message div for further manipulation
 }
 
 ipcRenderer.on('update-auto-tts', (event, isEnabled) => {
@@ -263,6 +259,7 @@ ipcRenderer.on('python-reply', (event, reply) => {
 let isTranscribing = false;
 let streamProcess = null;
 
+/*
 document.getElementById('runStreamBtn').addEventListener('click', () => {
     const micIcon = document.getElementById('mic-icon');
     if (!isTranscribing) {
@@ -304,6 +301,7 @@ function runStreamModel() {
         document.getElementById('mic-icon').classList.remove('mic-active');
     });
 }
+*/
 
 function sendMessage(buttonClicked) {
     const userInput = document.getElementById('user-input').value;
@@ -312,29 +310,67 @@ function sendMessage(buttonClicked) {
         appendMessage('User', userInput);
         showTypingIndicator();
         ipcRenderer.send('run-python-script', { userInput, buttonClicked });
-        document.getElementById('user-input').value = ''; // Clear input after sending
-        if (streamProcess !== null) {
-            ipcRenderer.send('kill-stream-process');
-        }
-        isTranscribing = false; // Stop transcribing after sending the message
-        document.getElementById('mic-icon').classList.remove('mic-active'); // Turn off animation immediately after sending
-        ipcRenderer.send('kill-stream-process');
+        //document.getElementById('user-input').value = ''; // Clear input after sending
+        //if (streamProcess !== null) {
+        //    ipcRenderer.send('kill-stream-process');
+        //}
+        //isTranscribing = false; // Stop transcribing after sending the message
+        //document.getElementById('mic-icon').classList.remove('mic-active'); // Turn off animation immediately after sending
+        //ipcRenderer.send('kill-stream-process');
     }
 }
 
 // ENTER == SEND
-var input = document.getElementById('user-input');
-input.addEventListener('keyup', function (event) {
-    if (event.keyCode === 13) {
-        event.preventDefault();
-        document.getElementById('send-button').click();
+let accumulatedTokens = ''; // Variable to store accumulated tokens
 
+document.getElementById('send-button').addEventListener('click', async () => {
+    const userInput = document.getElementById('user-input').value;
+    console.log('Send button clicked, user input:', userInput);
+    if (userInput.trim() !== '') {
+        appendMessage('User', userInput);
+        showTypingIndicator();
+        try {
+            appendMessage('Bot', '', true); // Create a new message div for the bot response
+            accumulatedTokens = ''; // Reset accumulated tokens
+            await ipcRenderer.invoke('run-chat', userInput);
+            console.log('IPC call made: run-chat');
+        } catch (error) {
+            console.error('Error initiating chat1:', error);
+            appendMessage('Bot', 'There was an error processing your request.', false);
+        } finally {
+            hideTypingIndicator();
+        }
     }
 });
-
-document.getElementById('mic-icon').addEventListener('click', () => {
-    ipcRenderer.send('kill-stream-process');
+// Handle tokens received from the main process
+ipcRenderer.on('chat-token', (event, token) => {
+    console.log('Received token:', token);
+    accumulatedTokens += token; // Append the new token to the accumulated tokens
+    appendTokenToLastMessage();
 });
+
+function appendTokenToLastMessage() {
+    const chatContainer = document.getElementById('bot-message');
+    const lastMessage = chatContainer.lastElementChild;
+    if (lastMessage && lastMessage.classList.contains('message')) {
+        const botBubble = lastMessage.querySelector('.bot-bubble');
+        if (botBubble) {
+            // Process the accumulated tokens for markdown and MathJax
+            botBubble.innerHTML = marked(accumulatedTokens);
+            // Check if MathJax is loaded and then typeset
+            if (window.MathJax) {
+                MathJax.typesetPromise([botBubble]).then(() => {
+                    console.log("MathJax has finished processing!");
+                }).catch((err) => console.error('MathJax processing error:', err));
+            } else {
+                console.log("MathJax is not available to process the content.");
+            }
+        }
+    }
+}
+//document.getElementById('mic-icon').addEventListener('click', () => {
+    //ipcRenderer.send('kill-stream-process');
+//});
 
 
 
@@ -518,8 +554,8 @@ $(document).ready(() => {
             $loadingSpinner.hide()
             //RESETTING SCRIPT
             const selectedScript = scriptToggle.checked
-                ? 'bigdot.py'
-                : 'docdot.py'
+                ? 'bigdot.mjs'
+                : 'docdot.mjs'
             ipcRenderer.send('switch-script', selectedScript)
             ipcRenderer.send('switch-script', selectedScript)
         }
@@ -595,18 +631,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const scriptToggle = document.getElementById('scriptToggle')
 
     if (scriptToggle) {
-        console.log('scriptToggle found:', scriptToggle)
-
         scriptToggle.addEventListener('change', function () {
-            console.log('Script toggle changed')
+            const selectedScript = scriptToggle.checked ? 'bigdot.mjs' : 'docdot.mjs';
+            ipcRenderer.send('switch-script', selectedScript);
+        });
 
-            const selectedScript = scriptToggle.checked
-                ? 'bigdot.py'
-                : 'docdot.py'
-            console.log('Selected script:', selectedScript)
-
-            ipcRenderer.send('switch-script', selectedScript)
-        })
     } else {
         console.error('Element with ID "scriptToggle" not found.')
     }
@@ -647,7 +676,7 @@ function toggleDropdown() {
 
 function selectOption(option) {
     document.getElementById('selected-option').textContent = option
-    const selectedScript = option === 'Doc Dot' ? 'docdot.py' : 'bigdot.py'
+    const selectedScript = option === 'Doc Dot' ? 'docdot.mjs' : 'bigdot.mjs'
     ipcRenderer.send('switch-script', selectedScript)
     document.getElementById('dropdown').classList.add('hidden')
 }
@@ -811,7 +840,7 @@ ipcRenderer.on('current-dark-mode-state', (event, isEnabled) => {
 
 
 
-
+/*
 //KILL TTS WHEN:
 
 // Add event listener for microphone icon
@@ -825,3 +854,5 @@ document.querySelectorAll('.tts-button').forEach(button => {
         ipcRenderer.send('kill-tts-process');
     });
 });
+
+*/

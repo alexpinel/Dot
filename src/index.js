@@ -13,6 +13,7 @@ const isMac = process.platform === 'darwin'
 
 let galleryViewInterval // Declare galleryViewInterval globally
 let ttsProcess; // Declare ttsProcess globally
+const childProcesses = new Set(); // Declare childProcesses as a Set
 
 
 const template = [
@@ -121,111 +122,58 @@ const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
 
 let mainWindow
-let pythonProcess // Declare pythonProcess globally
 
-// FIND PYTHON VENV, WORKS IN DEVELOPMENT MODE AND **SHOULD** WORK IN PACKAGED APP
+let currentScript = 'docdot.mjs'; // Default script
+let activeChatModule; // To hold the currently active chat module
 
-function findPython() {
-    const possibilities = [
-        // In packaged app
-        path.join(process.resourcesPath, 'llm', 'python', 'bin', 'python3'),
-        //WINDOWS: path.join(process.resourcesPath, 'llm', 'python', 'python.exe'),
 
-        // In development
-        path.join(__dirname, '..', 'llm', 'python', 'bin', 'python3'),
-        //WINDOWS: path.join(process.__dirname, 'llm', 'python', 'python.exe'),
-    ]
-    for (const path_to_python of possibilities) {
-        if (fs.existsSync(path_to_python)) {
-            return path_to_python
+
+const loadScriptModule = async (scriptName) => {
+    try {
+        const modulePath = path.join(__dirname, 'app', scriptName);
+        const module = await import(`file://${modulePath}`);
+        if (!module.default) {
+            throw new Error(`No default export found in ${scriptName}`);
         }
+        return module.default;
+    } catch (error) {
+        console.error(`Error loading module ${scriptName}:`, error);
+        throw error;
     }
-    console.log('Could not find python3, checked', possibilities)
-    //app.quit()
-}
+};
 
-const pythonPath = findPython()
-console.log('Python Path:', pythonPath)
-// main
-ipcMain.on('show-context-menu', (event) => {
-    const template = [
-        {
-            label: 'Menu Item 1',
-            click: () => {
-                event.sender.send('context-menu-command', 'menu-item-1')
-            },
-        },
-        { type: 'separator' },
-        { label: 'Menu Item 2', type: 'checkbox', checked: true },
-    ]
-    const menu = Menu.buildFromTemplate(template)
-    menu.popup({ window: BrowserWindow.fromWebContents(event.sender) })
-})
-// RUNS DOT THROUGHT  script.py
-
-//let currentScript = path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py')
-let currentScript = path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py')
-
-// Default script 
-
-ipcMain.on('run-python-script', (event, { userInput, buttonClicked }) => {
-    // Check if the Python process is already running
-    if (pythonProcess) {
-        // Send the new input to the existing process
-        pythonProcess.stdin.write(`${userInput} ${buttonClicked}\n`)
-    } else {
-        // If the Python process is not running, spawn a new one with the default script
-        console.log(`Current working directory: ${process.cwd()}`)
-        pythonProcess = spawn(pythonPath, [currentScript, `"${configPath}"`], { shell: true })
-
-        pythonProcess.stdout.on('data', (data) => {
-            const message = data.toString().trim()
-            mainWindow.webContents.send('python-reply', message)
-            console.log(`stdout: ${data}`)
-        })
-
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Script Error: ${data}`)
-            console.error(`stderr: ${data}`)
-        })
-
-        // Send the initial input to the new process
-        pythonProcess.stdin.write(`${userInput} ${buttonClicked}\n`)
+ipcMain.on('switch-script', async (event, selectedScript) => {
+    console.log('Switching script to:', selectedScript);
+    currentScript = selectedScript; // Set the selected script
+    try {
+        activeChatModule = await loadScriptModule(currentScript);
+        console.log(`Switched to ${currentScript} module`);
+        mainWindow.webContents.send('script-switched', currentScript);
+    } catch (error) {
+        console.error(`Error switching to script ${currentScript}:`, error);
     }
-})
-
-//BIG DOT TOGGLE!!!!
-
-// Switch between the two scripts
-ipcMain.on('switch-script', (event, selectedScript) => {
-    // Toggle between 'script.py' and 'normalchat.py'
-    console.log('Switching script to:', selectedScript)
-
-    currentScript = currentScript.endsWith('docdot.py')
-        ? path.join(process.resourcesPath, 'llm', 'scripts', 'bigdot.py')
-        : path.join(process.resourcesPath, 'llm', 'scripts', 'docdot.py');
-    /*currentScript = currentScript.endsWith('docdot.py')
-        ? path.join(__dirname, '..', 'llm', 'scripts', 'bigdot.py')
-        : path.join(__dirname, '..', 'llm', 'scripts', 'docdot.py');*/
-
-    // If the Python process is running, kill it and spawn a new one with the updated script
-    if (pythonProcess) {
-        pythonProcess.kill();
-        pythonProcess = spawn(pythonPath, [currentScript, `"${configPath}"`], { shell: true });
-
-        pythonProcess.stdout.on('data', (data) => {
-            const message = data.toString().trim();
-            mainWindow.webContents.send('python-reply', message);
-        });
-
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Script Error: ${data}`);
-        });
-    }
-
-    // Optionally, you can inform the renderer process about the script switch
-    mainWindow.webContents.send('script-switched', currentScript);
 });
+
+ipcMain.handle('run-chat', async (event, userInput) => {
+    console.log(`IPC call received to run ${currentScript}`);
+    try {
+        const sendToken = (token) => {
+            console.log('Sending token:', token);
+            event.sender.send('chat-token', token);
+        };
+        if (activeChatModule) {
+            const response = await activeChatModule(userInput, sendToken, configPath);
+            console.log('Final response:', response);
+            return response;
+        } else {
+            throw new Error(`Module ${currentScript} is not loaded.`);
+        }
+    } catch (error) {
+        console.error(`Error running ${currentScript}:`, error);
+        throw error;
+    }
+});
+
 
 //OPEN FOLDER THING!!!!
 
@@ -266,8 +214,8 @@ const createWindow = () => {
         height: 700,
         minWidth: 1250,
         minHeight: 700,
-        //autoHideMenuBar: true, // FOR WINDOWS
-        titleBarStyle: 'hidden', // REMOVE FOR WINDOWS
+        autoHideMenuBar: true, // FOR WINDOWS
+        //titleBarStyle: 'hidden', // REMOVE FOR WINDOWS
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -285,8 +233,8 @@ const createWindow = () => {
 
 
     function createTtsProcess() {
-        let ttsProcessorPath = path.join(process.resourcesPath, 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
-        //let ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+        //let ttsProcessorPath = path.join(process.resourcesPath, 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+        let ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
         return fork(ttsProcessorPath);
     }
 
@@ -294,6 +242,8 @@ const createWindow = () => {
         return new Promise((resolve, reject) => {
             const ttsProcess = createTtsProcess();
             const userDataPath = app.getPath('userData');
+            childProcesses.add(ttsProcess);
+
 
             ttsProcess.on('message', (response) => {
                 if (response.filePath) {
@@ -321,7 +271,7 @@ const createWindow = () => {
             setTimeout(() => {
                 ttsProcess.kill();
                 reject(new Error('TTS process did not respond in time'));
-            }, 40000); // Adjust timeout duration as needed
+            }, 100000); // Adjust timeout duration as needed
         }).finally(() => {
             if (ttsProcess) {
                 ttsProcess.kill();
@@ -436,19 +386,19 @@ ipcMain.handle('execute-python-script', async (event, directory) => {
     try {
         // Construct paths relative to the script's location
 
-        const pythonScriptPath = path.join(
+        /*const pythonScriptPath = path.join(
             process.resourcesPath,
             'llm',
             'scripts',
             'embeddings.py'
-        )
-        /*const pythonScriptPath = path.join(
+        )*/
+        const pythonScriptPath = path.join(
             __dirname,
             '..',
             'llm',
             'scripts',
             'embeddings.py'
-        )*/
+        )
 
         // Quote the directory path to handle spaces
         const quotedDirectory = `"${directory}"`
@@ -589,19 +539,21 @@ async function ensureAndDownloadDependencies(event) {
 }
 
 
-app.on('ready', () => {
-    const mainWindow = createWindow(); // This should now correctly create and return the window
+app.on('ready', async () => {
+    mainWindow = createWindow(); // This should now correctly create and return the window
 
     if (mainWindow) {
-        mainWindow.on('ready-to-show', () => {
-            ensureAndDownloadDependencies(mainWindow.webContents)
-                .catch(error => {
-                    if (mainWindow && !mainWindow.isDestroyed()) {
-                        mainWindow.webContents.send('download-error', error.message);
-                    }
-                });
-            ttsWorker = setupTtsWorker();
-            initializeHandlers();
+        mainWindow.on('ready-to-show', async () => {
+            try {
+                await ensureAndDownloadDependencies(mainWindow.webContents);
+                ttsWorker = setupTtsWorker();
+                initializeHandlers();
+                await switchScript(currentScript); // Ensure the module is loaded
+            } catch (error) {
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send('download-error', error.message);
+                }
+            }
         });
     } else {
         console.error('Failed to create main window');
@@ -653,6 +605,7 @@ ipcMain.on('open-settings-window', () => {
             width: 600,
             height: 500,
             parent: mainWindow,
+            titleBarStyle: 'hidden',            
             modal: true,
             webPreferences: {
                 nodeIntegration: true,
@@ -761,8 +714,8 @@ ipcMain.handle('open-file-dialog', async (event) => {
 let streamProcess = null;
 
 ipcMain.on('run-stream-model', (event) => {
-    //const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
-    const modelPath = path.join(process.resourcesPath, 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
+    const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
+    //const modelPath = path.join(process.resourcesPath, 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
     const args = [
         '-m', modelPath,
         '-t', '8',
@@ -770,8 +723,8 @@ ipcMain.on('run-stream-model', (event) => {
         '--length', '5000'
     ];
 
-    //const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
-    const streamPath = path.join(process.resourcesPath, 'llm', 'whisper', 'stream');
+    const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
+    //const streamPath = path.join(process.resourcesPath, 'llm', 'whisper', 'stream');
 
     streamProcess = spawn(streamPath, args, { shell: true });
 
