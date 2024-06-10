@@ -36,8 +36,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 let autoTtsEnabled = false; // Default value to ensure it's always defined
 
-
-//// CHATTY CHAT CHAT STUFF!!!!
 function appendMessage(sender, message, isMarkdown) {
     console.log('Appending message from', sender);
     const chatContainer = document.getElementById('bot-message');
@@ -73,7 +71,6 @@ function appendMessage(sender, message, isMarkdown) {
         botBubble.classList.add('bot-bubble');
         if (isMarkdown) {
             botBubble.innerHTML = marked.parse(message);
-            // Check if MathJax is loaded and then typeset
             if (window.MathJax) {
                 MathJax.typesetPromise([botBubble]).then(() => {
                     console.log("MathJax has finished processing!");
@@ -88,7 +85,7 @@ function appendMessage(sender, message, isMarkdown) {
         const ttsButton = document.createElement('button');
         ttsButton.classList.add('tts-button');
         ttsButton.style.position = 'relative';
-        ttsButton.style.zIndex = '1000'; // Set sufficiently high within context
+        ttsButton.style.zIndex = '1000';
 
         const speakerIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         speakerIcon.setAttribute('class', 'tts-icon');
@@ -100,10 +97,21 @@ function appendMessage(sender, message, isMarkdown) {
         speakerIcon.style.strokeLinecap = 'round';
         speakerIcon.style.strokeLinejoin = 'round';
         speakerIcon.style.marginLeft = '-18px';
-        speakerIcon.style.marginTop = '-10px'; // Moves the icon 3 pixels up
+        speakerIcon.style.marginTop = '-10px';
         speakerIcon.innerHTML = `<path d="M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M16 8.99998C16.5 9.49998 17 10.5 17 12C17 13.5 16.5 14.5 16 15M3 10.5V13.5C3 14.6046 3.5 15.5 5.5 16C7.5 16.5 9 21 12 21C14 21 14 3 12 3C9 3 7.5 7.5 5.5 8C3.5 8.5 3 9.39543 3 10.5Z" fill="none" stroke="#424242" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;
 
         ttsButton.appendChild(speakerIcon);
+
+        ttsButton.onclick = (() => {
+            const capturedMessage = message; // Capture the correct message
+            return () => {
+                // Extract the actual message content
+                const botMessage = botBubble.querySelector('.text-container')?.innerText || '';
+                console.log("TTS button clicked, message:", botMessage);
+                showSpinner(speakerIcon);
+                sendMessageToMainForTTS(botMessage, resetSpeakerIcon, handleTtsError);
+            };
+        })();
 
         function showSpinner() {
             // Change to spinner
@@ -119,13 +127,6 @@ function appendMessage(sender, message, isMarkdown) {
             speakerIcon.style.height = '16px';
         };
 
-        ttsButton.onclick = () => {
-            // Change to spinner or other "processing" indicator
-            showSpinner();
-
-            // Start the TTS request
-            sendMessageToMainForTTS(message, resetSpeakerIcon, handleTtsError);
-        };
 
         function resetSpeakerIcon() {
             // Reset the speaker icon
@@ -139,7 +140,7 @@ function appendMessage(sender, message, isMarkdown) {
             showErrorIcon(); // Function to change the icon or display an error message
         }
 
-        console.log("Auto TTS Enabled:", autoTtsEnabled); // Log when checking autoTTS
+        console.log("Auto TTS Enabled:", autoTtsEnabled);
         if (autoTtsEnabled) {
             console.log("Attempting to click TTS button for automatic TTS");
             ttsButton.click();
@@ -152,8 +153,10 @@ function appendMessage(sender, message, isMarkdown) {
 
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
-    return messageDiv; // Return the message div for further manipulation
+    return messageDiv;
 }
+
+
 
 ipcRenderer.on('update-auto-tts', (event, isEnabled) => {
     console.log("Received updated auto TTS state:", isEnabled); // Check the incoming state
@@ -175,6 +178,8 @@ function sendMessageToMainForTTS(message, onComplete, onError) {
         ttsMessage = message.substring(startIndex).trim();
     }
 
+    console.log('Processed TTS message:', ttsMessage); // Log the processed message
+
     // Send the processed message to the TTS engine in the main process
     ipcRenderer.invoke('run-tts', ttsMessage)
         .then(filePath => {
@@ -191,6 +196,8 @@ function sendMessageToMainForTTS(message, onComplete, onError) {
             onError(error);  // Perform error handling UI updates
         });
 }
+
+
 
 
 function showTypingIndicator() {
@@ -374,6 +381,9 @@ function appendTokenToLastMessage() {
             // Append new content to the text container
             textContainer.innerHTML = marked(newContent);
 
+            // Log the content of the textContainer
+            console.log("Updated botBubble content:", textContainer.innerHTML);
+
             // Check if MathJax is loaded and then typeset
             if (window.MathJax) {
                 MathJax.typesetPromise([textContainer]).then(() => {
@@ -385,6 +395,7 @@ function appendTokenToLastMessage() {
         }
     }
 }
+
 
 // Event listener to handle tokens received from the main process
 ipcRenderer.on('chat-token', (event, token) => {
