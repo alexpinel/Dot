@@ -7,6 +7,7 @@ const fetch = require('node-fetch'); // Using CommonJS
 const userDataPath = app.getPath('userData');
 const configPath = path.join(userDataPath, 'config.json');
 const { Worker } = require('worker_threads');
+const cliProgress = require('cli-progress');
 
 
 const isMac = process.platform === 'darwin'
@@ -184,24 +185,37 @@ ipcMain.on('get-user-data-path', (event) => {
     event.returnValue = app.getPath('userData');
 });
 
+
 ipcMain.handle('open-dialog', async (event) => {
-    const result = await dialog.showOpenDialog({
+    const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory'],
-        title: 'Select Directory',
     });
 
-    if (!result.canceled && result.filePaths.length > 0) {
-        const chosenDirectory = result.filePaths[0];
-        console.log('Chosen Directory:', chosenDirectory);
+    if (!result.canceled) {
+        const selectedPath = result.filePaths[0];
+        mainWindow.webContents.send('directory-selected', selectedPath);
 
-        // Save the chosen directory to the file
-        fs.writeFileSync(lastOpenedDirPath, chosenDirectory, 'utf8');
-    } else {
-        console.log('No directory selected.');
+        const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+        progressBar.start(100, 0);
+
+        const updateProgress = (progress) => {
+            progressBar.update(progress);
+            mainWindow.webContents.send('update-progress', progress);
+        };
+
+        try {
+            // Dynamically import processDirectory from the embeddings.mjs file
+            const { processDirectory } = await import('./app/embeddings.mjs');
+            await processDirectory(selectedPath, updateProgress);
+            progressBar.stop();
+            mainWindow.webContents.send('loading-complete');
+        } catch (error) {
+            console.error('Error processing directory:', error);
+            progressBar.stop();
+            mainWindow.webContents.send('loading-error', error.message);
+        }
     }
-    return result;
 });
-
 // ELECTRON STUFF, CREATE THE WINDOW BLA BLA !!!!
 
 

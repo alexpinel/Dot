@@ -3,10 +3,10 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { PDFLoader } from "langchain/document_loaders/fs/pdf";
-import { DocxLoader } from "langchain/document_loaders/fs/docx";
-import { PPTXLoader } from "langchain/document_loaders/fs/pptx";
-import { NotionLoader } from "langchain/document_loaders/fs/notion";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { DocxLoader } from "@langchain/community/document_loaders/fs/docx";
+import { PPTXLoader } from "@langchain/community/document_loaders/fs/pptx";
+import { NotionLoader } from "@langchain/community/document_loaders/fs/notion";
 import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/hf_transformers";
 import fs from 'fs/promises';
@@ -29,12 +29,8 @@ const embeddings = new HuggingFaceTransformersEmbeddings({
   modelName: "Xenova/all-MiniLM-L6-v2",
 });
 
-const textSplitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 4000,
-  chunkOverlap: 2000,
-});
-
-export const processDirectory = async (directory, configPath) => {
+export const processDirectory = async (directory, updateProgress) => {
+  const configPath = path.join(__dirname, 'config.json');
   const config = await readConfig(configPath);
   const chunkSize = config.chunk_length || 4000;
   const chunkOverlap = config.chunk_overlap || 2000;
@@ -44,11 +40,6 @@ export const processDirectory = async (directory, configPath) => {
     chunkOverlap,
   });
 
-  const embeddings = new HuggingFaceTransformersEmbeddings({
-    modelName: "Xenova/all-MiniLM-L6-v2",
-  });
-
-
   const desktopPath = path.join(os.homedir(), "Documents", "Dot-Data");
 
   try {
@@ -57,8 +48,6 @@ export const processDirectory = async (directory, configPath) => {
     console.error(`Error creating directory: ${error.message}`);
   }
 
-
-  // Save the vector store to a directory
   const loader = new DirectoryLoader(
     directory,
     {
@@ -69,20 +58,33 @@ export const processDirectory = async (directory, configPath) => {
     },
     { recursive: true }
   );
+
   const docs = await loader.load();
-
-
-
   const Documentato = await textSplitter.splitDocuments(docs);
 
-  const Vittorio = await FaissStore.fromDocuments(
-    Documentato,
-    embeddings,
-  ); console.log({ Documentato });
+  const batchSize = 10;
+  let batch = [];
+  let Vittorio;
 
+  for (let i = 0; i < Documentato.length; i++) {
+    batch.push(Documentato[i]);
 
-  // Merging vector stores
+    if (batch.length === batchSize || i === Documentato.length - 1) {
+      const tempStore = await FaissStore.fromDocuments(batch, embeddings);
 
-  // Save the merged vector store
+      if (Vittorio) {
+        Vittorio.mergeFrom(tempStore);
+      } else {
+        Vittorio = tempStore;
+      }
+
+      batch = [];
+    }
+
+    const progress = ((i + 1) / Documentato.length) * 100;
+    updateProgress(progress);
+  }
+
   await Vittorio.save(desktopPath);
+  console.log({ Documentato });
 };

@@ -33,8 +33,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-
 let autoTtsEnabled = false; // Default value to ensure it's always defined
+const TOKEN_STREAM_TIMEOUT = 1000; // Duration in milliseconds to wait for more tokens before considering the message complete
+let tokenStreamTimeoutId = null;
+let messageStreamingComplete = false;
+let accumulatedTokens = '';
+let iframes = ''; // Variable to store iframe tokens
+let iframesInserted = false; // Variable to track if iframes have been inserted
 
 function appendMessage(sender, message, isMarkdown) {
     console.log('Appending message from', sender);
@@ -109,7 +114,7 @@ function appendMessage(sender, message, isMarkdown) {
                 const botMessage = botBubble.querySelector('.text-container')?.innerText || '';
                 console.log("TTS button clicked, message:", botMessage);
                 showSpinner(speakerIcon);
-                sendMessageToMainForTTS(botMessage, resetSpeakerIcon, handleTtsError);
+                sendMessageToMainForTTS(botMessage, () => resetSpeakerIcon(speakerIcon), handleTtsError);
             };
         })();
 
@@ -118,32 +123,34 @@ function appendMessage(sender, message, isMarkdown) {
             speakerIcon.innerHTML = `<svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>`;
             speakerIcon.style.width = '16px'; // Adjust size for spinner if needed
             speakerIcon.style.height = '16px';
-        };
-        // Call the sendMessage function with a callback to reset the icon
-        function showErrorIcon() {
+        }
+
+        function resetSpeakerIcon() {
             // Reset back to speaker icon
             speakerIcon.innerHTML = `<path d="M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M16 8.99998C16.5 9.49998 17 10.5 17 12C17 13.5 16.5 14.5 16 15M3 10.5V13.5C3 14.6046 3.5 15.5 5.5 16C7.5 16.5 9 21 12 21C14 21 14 3 12 3C9 3 7.5 7.5 5.5 8C3.5 8.5 3 9.39543 3 10.5Z" fill="none" stroke="#424242" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;
             speakerIcon.style.width = '16px'; // Reset size for speaker icon
             speakerIcon.style.height = '16px';
-        };
-
-
-        function resetSpeakerIcon() {
-            // Reset the speaker icon
-            speakerIcon.innerHTML = `<path d="M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M16 8.99998C16.5 9.49998 17 10.5 17 12C17 13.5 16.5 14.5 16 15M3 10.5V13.5C3 14.6046 3.5 15.5 5.5 16C7.5 16.5 9 21 12 21C14 21 14 3 12 3C9 3 7.5 7.5 5.5 8C3.5 8.5 3 9.39543 3 10.5Z" fill="none" stroke="#424242" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;
-            // Additional UI reset logic if necessary
         }
 
         function handleTtsError(error) {
             // Update the UI to reflect the error state
             console.error('Error during TTS:', error);
-            showErrorIcon(); // Function to change the icon or display an error message
+            resetSpeakerIcon(); // Function to change the icon or display an error message
         }
 
         console.log("Auto TTS Enabled:", autoTtsEnabled);
         if (autoTtsEnabled) {
             console.log("Attempting to click TTS button for automatic TTS");
-            ttsButton.click();
+            // Handle auto TTS processing only when the message is complete
+            if (messageStreamingComplete) {
+                ttsButton.click();
+            } else {
+                tokenStreamTimeoutId = setTimeout(() => {
+                    messageStreamingComplete = true;
+                    console.log('Message streaming complete for auto TTS.');
+                    ttsButton.click();
+                }, TOKEN_STREAM_TIMEOUT);
+            }
         }
 
         botContentContainer.appendChild(botBubble);
@@ -156,6 +163,56 @@ function appendMessage(sender, message, isMarkdown) {
     return messageDiv;
 }
 
+// Event listener to handle tokens received from the main process
+ipcRenderer.on('chat-token', (event, token) => {
+    console.log('Received token:', token);
+    accumulatedTokens += token; // Append the new token to the accumulated tokens
+    appendTokenToLastMessage();
+
+    // Clear any existing timeout
+    if (tokenStreamTimeoutId) {
+        clearTimeout(tokenStreamTimeoutId);
+    }
+
+    // Set a new timeout
+    tokenStreamTimeoutId = setTimeout(() => {
+        messageStreamingComplete = true;
+        console.log('Message streaming complete.');
+        if (autoTtsEnabled) {
+            const lastMessage = document.querySelector('.bot-bubble .text-container')?.innerText || '';
+            console.log('Auto TTS processing last message:', lastMessage);
+            sendMessageToMainForTTS(lastMessage, () => resetSpeakerIcon(speakerIcon), handleTtsError);
+        }
+    }, TOKEN_STREAM_TIMEOUT);
+});
+
+function sendMessageToMainForTTS(message, onComplete, onError) {
+    console.log('TTS Requested for:', message);
+
+    const resultKeyword = "Result:";
+    let ttsMessage = message;
+    if (message.includes(resultKeyword)) {
+        const startIndex = message.indexOf(resultKeyword) + resultKeyword.length;
+        ttsMessage = message.substring(startIndex).trim();
+    }
+
+    console.log('Processed TTS message:', ttsMessage);
+
+    ipcRenderer.invoke('run-tts', ttsMessage)
+        .then(filePath => {
+            console.log('TTS audio file generated:', filePath);
+            return ipcRenderer.invoke('play-audio', filePath);
+        })
+        .then(() => {
+            console.log('TTS playback successful.');
+            onComplete();
+        })
+        .catch(error => {
+            console.error('Error during TTS generation or playback:', error);
+            onError(error);
+        });
+}
+
 
 
 ipcRenderer.on('update-auto-tts', (event, isEnabled) => {
@@ -166,36 +223,6 @@ ipcRenderer.on('get-auto-tts-state', (event, isEnabled) => {
     console.log("Received auto TTS state:", isEnabled);
     document.getElementById('auto-tts-toggle').checked = isEnabled;
 });
-
-function sendMessageToMainForTTS(message, onComplete, onError) {
-    console.log('TTS Requested for:', message);
-
-    // Check if the message contains "Result:" and extract the relevant part
-    const resultKeyword = "Result:";
-    let ttsMessage = message;
-    if (message.includes(resultKeyword)) {
-        const startIndex = message.indexOf(resultKeyword) + resultKeyword.length;
-        ttsMessage = message.substring(startIndex).trim();
-    }
-
-    console.log('Processed TTS message:', ttsMessage); // Log the processed message
-
-    // Send the processed message to the TTS engine in the main process
-    ipcRenderer.invoke('run-tts', ttsMessage)
-        .then(filePath => {
-            console.log('TTS audio file generated:', filePath);
-            // Play the audio file using the main process
-            return ipcRenderer.invoke('play-audio', filePath);
-        })
-        .then(() => {
-            console.log('TTS playback successful.');
-            onComplete();  // Reset the icon or perform other UI updates
-        })
-        .catch(error => {
-            console.error('Error during TTS generation or playback:', error);
-            onError(error);  // Perform error handling UI updates
-        });
-}
 
 
 
@@ -266,7 +293,7 @@ ipcRenderer.on('python-reply', (event, reply) => {
 let isTranscribing = false;
 let streamProcess = null;
 
-/*
+
 document.getElementById('runStreamBtn').addEventListener('click', () => {
     const micIcon = document.getElementById('mic-icon');
     if (!isTranscribing) {
@@ -308,25 +335,25 @@ function runStreamModel() {
         document.getElementById('mic-icon').classList.remove('mic-active');
     });
 }
-*/
 
+/*
 function sendMessage(buttonClicked) {
     const userInput = document.getElementById('user-input').value;
 
     if (userInput.trim() !== '') {
-        //appendMessage('User', userInput);
+        appendMessage('User', userInput);
         showTypingIndicator();
         ipcRenderer.send('run-python-script', { userInput, buttonClicked });
-        //document.getElementById('user-input').value = ''; // Clear input after sending
-        //if (streamProcess !== null) {
-        //    ipcRenderer.send('kill-stream-process');
-        //}
-        //isTranscribing = false; // Stop transcribing after sending the message
-        //document.getElementById('mic-icon').classList.remove('mic-active'); // Turn off animation immediately after sending
-        //ipcRenderer.send('kill-stream-process');
+        document.getElementById('user-input').value = ''; // Clear input after sending
+        if (streamProcess !== null) {
+            ipcRenderer.send('kill-stream-process');
+        }
+        isTranscribing = false; // Stop transcribing after sending the message
+        document.getElementById('mic-icon').classList.remove('mic-active'); // Turn off animation immediately after sending
+        ipcRenderer.send('kill-stream-process');
     }
 }
-
+*/
 // ENTER == SEND
 
 var input = document.getElementById('user-input');
@@ -338,9 +365,7 @@ input.addEventListener('keyup', function (event) {
     }
 });
 
-let accumulatedTokens = '';
-let iframes = ''; // Variable to store iframe tokens
-let iframesInserted = false; // Variable to track if iframes have been inserted
+
 
 // Function to append tokens to the last message
 function appendTokenToLastMessage() {
@@ -396,13 +421,6 @@ function appendTokenToLastMessage() {
     }
 }
 
-
-// Event listener to handle tokens received from the main process
-ipcRenderer.on('chat-token', (event, token) => {
-    console.log('Received token:', token);
-    accumulatedTokens += token; // Append the new token to the accumulated tokens
-    appendTokenToLastMessage();
-});
 
 // Initial setup for appending messages
 document.getElementById('send-button').addEventListener('click', async () => {
@@ -640,43 +658,44 @@ $(document).ready(() => {
         console.error('Error loading the last opened directory:', err)
     }
 
-    function selectDirectory() {
-        ipcRenderer
-            .invoke('open-dialog')
-            .then((result) => {
-                if (!result.canceled && result.filePaths.length > 0) {
-                    const selectedDirectory = result.filePaths[0]
-
-                    document.getElementById('fileTree').innerHTML = ''
-                    // Show the loading animation after the directory has been selected
-
-                    document.getElementById('loadingAnimation').style.display =
-                        'block'
-
-                    // Now call the function to process the directory
-                    executePythonScript(selectedDirectory)
-                        .then(() => {
-                            // Hide the loading animation after the folder is loaded and displayed
-                            document.getElementById(
-                                'loadingAnimation'
-                            ).style.display = 'none'
-                        })
-                        .catch((err) => {
-                            // Hide the loading animation also in case of error
-                            document.getElementById(
-                                'loadingAnimation'
-                            ).style.display = 'none'
-                            console.error(err)
-                        })
-                }
-            })
-            .catch((err) => {
-                console.error(err)
-            })
-    }
 
     $('#selectDirectoryButton').click(selectDirectory)
 })
+
+document.getElementById('selectDirectoryButton').addEventListener('click', async () => {
+    await ipcRenderer.invoke('open-dialog');
+});
+
+ipcRenderer.on('directory-selected', (event, path) => {
+    console.log(`Selected directory: ${path}`);
+    document.getElementById('fileTree').classList.add('hidden');
+    document.getElementById('loadingAnimation').classList.remove('hidden');
+});
+
+ipcRenderer.on('update-progress', (event, progress) => {
+    const percentageText = document.querySelector('.percentage-text');
+    percentageText.innerText = `${progress.toFixed(2)}%`;
+    const spinner = document.querySelector('.spinner .path');
+    const radius = 45;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (progress / 100) * circumference;
+    spinner.style.strokeDasharray = `${circumference} ${circumference}`;
+    spinner.style.strokeDashoffset = offset;
+});
+
+ipcRenderer.on('loading-complete', () => {
+    document.getElementById('loadingAnimation').classList.add('hidden');
+    document.getElementById('fileTree').classList.remove('hidden');
+    // Show a success message or perform additional actions
+});
+
+ipcRenderer.on('loading-error', (event, message) => {
+    document.getElementById('loadingAnimation').classList.add('hidden');
+    document.getElementById('fileTree').classList.remove('hidden');
+    // Show an error message
+    console.error('Loading error:', message);
+});
+
 
 // GALLERY VIEW!!!!
 ipcRenderer.on('update-background', (event, imagePath) => {
