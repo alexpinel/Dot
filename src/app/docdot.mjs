@@ -25,6 +25,8 @@ async function readConfig(configPath) {
     config.max_tokens = Number(config.max_tokens);
     config.big_dot_temperature = Number(config.big_dot_temperature);
     config.n_ctx = Number(config.n_ctx);
+    config.sources = Number(config.sources);
+
 
     return config;
   } catch (error) {
@@ -59,6 +61,7 @@ async function runChat(input, sendToken, configPath) {
   );
   const maxTokens = config.max_tokens || 500;
   const contextSize = config.n_ctx || 4000;
+  const sources = config.sources || 1;
 
   // Handle model path with possible null value in config
   if ("ggufFilePath" in config && config["ggufFilePath"] === null) {
@@ -86,7 +89,7 @@ async function runChat(input, sendToken, configPath) {
   const VectorStore = await FaissStore.load(directory, embeddings);
 
   // Equivalent to kwargs in python, 2 indicates the 2 closest documents will be provided
-  const retriever = VectorStore.asRetriever(1, {});
+  const retriever = VectorStore.asRetriever(sources, {});
 
   const prompt = PromptTemplate.fromTemplate(`
   You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Keep the answer concise.

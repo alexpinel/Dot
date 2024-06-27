@@ -186,6 +186,7 @@ ipcMain.on('get-user-data-path', (event) => {
 });
 
 
+
 ipcMain.handle('open-dialog', async (event) => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory'],
@@ -193,29 +194,34 @@ ipcMain.handle('open-dialog', async (event) => {
 
     if (!result.canceled) {
         const selectedPath = result.filePaths[0];
+        fs.writeFileSync(lastOpenedDirPath, selectedPath, 'utf-8'); // Save the selected path to lastOpenedDir.txt
         mainWindow.webContents.send('directory-selected', selectedPath);
-
-        const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-        progressBar.start(100, 0);
-
-        const updateProgress = (progress) => {
-            progressBar.update(progress);
-            mainWindow.webContents.send('update-progress', progress);
-        };
-
-        try {
-            // Dynamically import processDirectory from the embeddings.mjs file
-            const { processDirectory } = await import('./app/embeddings.mjs');
-            await processDirectory(selectedPath, updateProgress);
-            progressBar.stop();
-            mainWindow.webContents.send('loading-complete');
-        } catch (error) {
-            console.error('Error processing directory:', error);
-            progressBar.stop();
-            mainWindow.webContents.send('loading-error', error.message);
-        }
+        await processSelectedDirectory(selectedPath, mainWindow.webContents);
     }
 });
+
+async function processSelectedDirectory(selectedPath, webContents) {
+    const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+    progressBar.start(100, 0);
+
+    const updateProgress = (progress) => {
+        progressBar.update(progress);
+        webContents.send('update-progress', progress);
+    };
+
+    try {
+        const { processDirectory } = await import('./app/embeddings.mjs');
+        await processDirectory(selectedPath, updateProgress);
+        progressBar.stop();
+        webContents.send('loading-complete', selectedPath); // Ensure selectedPath is passed here
+    } catch (error) {
+        console.error('Error processing directory:', error);
+        progressBar.stop();
+        webContents.send('loading-error', error.message);
+    }
+}
+
+
 // ELECTRON STUFF, CREATE THE WINDOW BLA BLA !!!!
 
 
@@ -238,6 +244,7 @@ const createWindow = () => {
     })
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'))
+
 
     //mainWindow.webContents.openDevTools();
     //TEXT TO SPEECH 
@@ -310,6 +317,7 @@ const createWindow = () => {
     });
 
 
+    return mainWindow; // Ensure to return the created mainWindow
 
     //mainWindow.webContents.openDevTools();
 }
@@ -519,40 +527,61 @@ async function ensureAndDownloadDependencies(event) {
 }
 
 
+
+
+
 app.on('ready', () => {
-    const mainWindow = createWindow(); // This should now correctly create and return the window
+    mainWindow = createWindow(); // This should now correctly create and return the window
 
-    if (mainWindow) {
-        mainWindow.on('ready-to-show', () => {
-            ensureAndDownloadDependencies(mainWindow.webContents)
-                .catch(error => {
-                    if (mainWindow && !mainWindow.isDestroyed()) {
-                        mainWindow.webContents.send('download-error', error.message);
-                    }
-                });
-            ttsWorker = setupTtsWorker();
-            initializeHandlers();
-            activeChatModule = loadScriptModule(currentScript);
+    mainWindow.once('ready-to-show', async () => {
+        try {
+            activeChatModule = await loadScriptModule(currentScript); // Load docdot.mjs on startup
+            console.log(`Loaded ${currentScript} module on startup`);
             mainWindow.webContents.send('script-switched', currentScript);
-        });
-    } else {
-        console.error('Failed to create main window');
-    }
-});
+        } catch (error) {
+            console.error(`Error loading initial script ${currentScript}:`, error);
+        }
 
-// IPC event handler
-ipcMain.on('start-download', (event, { url, outputPath }) => {
-    if (event.sender && !event.sender.isDestroyed()) {
-        ensureAndDownloadDependencies(event)
+        ensureAndDownloadDependencies(mainWindow.webContents)
             .catch(error => {
-                if (event.sender && !event.sender.isDestroyed()) {
-                    event.sender.send('download-error', error.message);
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send('download-error', error.message);
                 }
             });
-    }
+        ttsWorker = setupTtsWorker();
+        initializeHandlers();
+    });
+
+    // IPC event handler
+    ipcMain.on('start-download', (event, { url, outputPath }) => {
+        if (event.sender && !event.sender.isDestroyed()) {
+            ensureAndDownloadDependencies(event)
+                .catch(error => {
+                    if (event.sender && !event.sender.isDestroyed()) {
+                        event.sender.send('download-error', error.message);
+                    }
+                });
+        }
+    });
 });
 
+app.on('window-all-closed', function () {
+    childProcesses.forEach(process => {
+        if (!process.killed) {
+            process.kill();  // Forcefully terminate each child process
+            console.log('Child process killed');
+        }
+    });
+    childProcesses.clear();  // Clear the set after killing all processes
 
+    if (ttsProcess) {
+        ttsProcess.kill();
+    }
+
+    if (process.platform !== 'darwin') {
+        app.quit();  // Optionally quit the app on non-macOS platforms
+    }
+});
 
 
 
@@ -647,7 +676,8 @@ if (!fs.existsSync(configPath)) {
         n_ctx: 4000,
         n_gpu_layers: -1,
         n_batch: 256,
-        max_tokens: 500,
+        max_tokens: 128,
+        sources: 1,
         big_dot_temperature: 0.7,
         big_dot_promt: "You are called Dot, You are a helpful and honest assistant."
     };

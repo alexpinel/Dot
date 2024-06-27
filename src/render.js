@@ -458,7 +458,6 @@ document.getElementById('send-button').addEventListener('click', async () => {
 
 
 // SIDEBAR AND FILE TREE!!!!
-
 const { dialog } = require('electron')
 const fs = require('fs')
 const path = require('path')
@@ -468,208 +467,144 @@ const defaultDirectory = './src/mystuff'
 const $fileTree = $('#fileTree')
 const $loadingSpinner = $('#loadingSpinner')
 
-$(document).ready(() => {
-    // Define a path for the file where you will store the last opened directory
-    const { ipcRenderer } = require('electron')
-    const userDataPath = ipcRenderer.sendSync('get-user-data-path') // You'll need to implement this in your main process
-    const lastOpenedDirPath = path.join(userDataPath, 'lastOpenedDir.txt')
-    const $fileTree = $('#fileTree')
 
-    function truncateText(textContainer, maxWidth) {
-        const text = textContainer.text()
-        const originalText = textContainer.data('original-text')
 
-        if (!originalText) {
-            textContainer.data('original-text', text)
-        }
-
-        const isTruncated = textContainer[0].scrollWidth > maxWidth
-
-        if (isTruncated) {
-            const truncatedText = originalText.slice(0, -1)
-            textContainer.text(truncatedText)
-        } else {
-            textContainer.text(originalText)
-        }
-
-        return isTruncated
+// Define populateTree function in the global scope
+function populateTree(rootPath, parentElement) {
+    if (!rootPath || typeof rootPath !== 'string') {
+        console.error('Invalid rootPath:', rootPath);
+        return;
     }
 
-    function populateTree(rootPath, parentElement) {
-        fs.promises
-            .readdir(rootPath)
-            .then((files) => {
-                const ul = $('<ul>').css('list-style-type', 'none')
+    console.log('Populating tree for path:', rootPath); // Log the rootPath
 
-                files.forEach((file) => {
-                    // Skip .DS_Store files
-                    if (file === '.DS_Store') {
-                        return
-                    }
-                    const fullPath = path.join(rootPath, file)
-                    const li = $('<li>')
-                        .addClass('folder flex flex-col mb-2')
-                        .css({
-                            'list-style-type': 'none',
-                            'padding-left': '20px',
-                        })
-                    const shit = $('<div>').addClass(
-                        'folder flex flex-row items-center'
-                    ) // Changed from div to li
-                    const icon = $('<div>') // Container for the icon
-                    const arrow = $('<div>') // Container for the arrow
-                    const textContainer = $('<div>').addClass(
-                        'text-container mx-1 text-gray-500 file-name'
-                    ) // Container for text
+    fs.promises.readdir(rootPath).then((files) => {
+        const ul = $('<ul>').css('list-style-type', 'none');
 
-                    // Append li to shit
-                    li.append(shit)
-                    // Append items to li
-                    shit.append(arrow, icon, textContainer)
-                    // Append li to ul
-                    ul.append(li)
+        files.forEach((file) => {
+            if (file === '.DS_Store') return;
 
-                    fs.promises
-                        .stat(fullPath)
-                        .then((stats) => {
-                            if (stats.isDirectory()) {
-                                li.addClass(
-                                    'folder rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition align-center'
-                                )
-                                // SVG for arrow icon
-                                arrow
-                                    .html(
-                                        `<svg class="w-3 h-3 text-black dark:text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"/>
-                                    </svg>`
-                                    )
-                                    .addClass(
-                                        'inline-block transition mr-1 rotate-0'
-                                    ) // Added rotate-0 class
-                                    .click(() => {
-                                        if (!subUl.children().length) {
-                                            populateTree(fullPath, subUl)
-                                        }
-                                        subUl.slideToggle()
+            const fullPath = path.join(rootPath, file);
+            const li = $('<li>').addClass('folder flex flex-col mb-2').css({
+                'list-style-type': 'none',
+                'padding-left': '20px',
+            });
+            const div = $('<div>').addClass('folder flex flex-row items-center');
+            const icon = $('<div>');
+            const arrow = $('<div>');
+            const textContainer = $('<div>').addClass(
+                'text-container mx-1 text-gray-500 file-name'
+            );
 
-                                        // Toggle the rotate class
-                                        arrow.toggleClass('rotate-90')
-                                    })
+            li.append(div);
+            div.append(arrow, icon, textContainer);
+            ul.append(li);
 
-                                // Create a nested ul for subdirectories
-                                const subUl = $('<ul>')
-                                    .css({
-                                        'list-style-type': 'none',
-                                        'padding-left': '20px',
-                                    })
-                                    .hide()
-                                li.append(subUl) // Append nested ul to li
-
-                                // Text
-                                // Text for folders
-                                textContainer.text(file)
-                                const isTruncated = truncateText(
-                                    textContainer,
-                                    textContainer.width()
-                                )
-                                if (isTruncated) {
-                                    textContainer.attr('title', file)
-                                } else {
-                                    textContainer.removeAttr('title')
-                                }
-                            } else if (stats.isFile()) {
-                                li.addClass(
-                                    'file flex flex-row hover:bg-gray-200 dark:hover:bg-slate-700 transition '
-                                )
-
-                                // SVG for document icon
-                                icon.html(
-                                    `<svg class="w-3 h-3 text-gray-800 dark:text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">
-                                    <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M6 1v4a1 1 0 0 1-1 1H1m14-4v16a.97.97 0 0 1-.933 1H1.933A.97.97 0 0 1 1 18V5.828a2 2 0 0 1 .586-1.414l2.828-2.828A2 2 0 0 1 5.828 1h8.239A.97.97 0 0 1 15 2Z"/>
-                                  </svg>`
-                                ).addClass('icon  inline-block ml-1')
-
-                                // Text for files
-                                // Text for folders
-                                textContainer.text(file)
-                                const isTruncated = truncateText(
-                                    textContainer,
-                                    textContainer.width()
-                                )
-                                if (isTruncated) {
-                                    textContainer.attr('title', file)
-                                } else {
-                                    textContainer.removeAttr('title')
-                                }
+            fs.promises.stat(fullPath).then((stats) => {
+                if (stats.isDirectory()) {
+                    li.addClass(
+                        'folder rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition align-center'
+                    );
+                    arrow.html(
+                        `<svg class="w-3 h-3 text-black dark:text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"/>
+                        </svg>`
+                    )
+                        .addClass('inline-block transition mr-1 rotate-0')
+                        .click(() => {
+                            if (!subUl.children().length) {
+                                populateTree(fullPath, subUl);
                             }
-                        })
-                        .catch((err) => {
-                            console.error(err)
-                        })
-                })
+                            subUl.slideToggle();
+                            arrow.toggleClass('rotate-90');
+                        });
 
-                parentElement.append(ul)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
+                    const subUl = $('<ul>').css({
+                        'list-style-type': 'none',
+                        'padding-left': '20px',
+                    }).hide();
+                    li.append(subUl);
+                    textContainer.text(file);
+                } else if (stats.isFile()) {
+                    li.addClass(
+                        'file flex flex-row hover:bg-gray-200 dark:hover:bg-slate-700 transition'
+                    );
+                    icon.html(
+                        `<svg class="w-3 h-3 text-gray-800 dark:text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">
+                            <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M6 1v4a1 1 0 0 1-1 1H1m14-4v16a.97.97 0 0 1-.933 1H1.933A.97.97 0 0 1 1 18V5.828a2 2 0 0 1 .586-1.414l2.828-2.828A2 2 0 0 1 5.828 1h8.239A.97.97 0 0 1 15 2Z"/>
+                        </svg>`
+                    ).addClass('icon inline-block ml-1');
+                    textContainer.text(file);
+                }
+            }).catch((err) => console.error(err));
+        });
+
+        parentElement.append(ul);
+    }).catch((err) => console.error(err));
+}
+
+$(document).ready(() => {
+    const { ipcRenderer } = require('electron');
+    const userDataPath = ipcRenderer.sendSync('get-user-data-path');
+    const lastOpenedDirPath = path.join(userDataPath, 'lastOpenedDir.txt');
+    const $fileTree = $('#fileTree');
+
+    function truncateText(textContainer, maxWidth) {
+        const text = textContainer.text();
+        const originalText = textContainer.data('original-text');
+
+        if (!originalText) {
+            textContainer.data('original-text', text);
+        }
+
+        const isTruncated = textContainer[0].scrollWidth > maxWidth;
+
+        if (isTruncated) {
+            const truncatedText = originalText.slice(0, -1);
+            textContainer.text(truncatedText);
+        } else {
+            textContainer.text(originalText);
+        }
+
+        return isTruncated;
     }
 
     async function executePythonScript(directory) {
-        $loadingSpinner.show()
+        $loadingSpinner.show();
 
         try {
-            // Invoke IPC event to execute the Python script
-            const result = await ipcRenderer.invoke(
-                'execute-python-script',
-                directory
-            )
+            const result = await ipcRenderer.invoke('execute-python-script', directory);
 
-            // Process the result if needed
-
-            // Update the file tree
-            $fileTree.empty()
-            await populateTree(directory, $fileTree)
+            $fileTree.empty();
+            await populateTree(directory, $fileTree);
         } catch (err) {
-            console.error(err)
+            console.error(err);
         } finally {
-            $loadingSpinner.hide()
-            //RESETTING SCRIPT
-            const selectedScript = scriptToggle.checked
-                ? 'bigdot.mjs'
-                : 'docdot.mjs'
-            ipcRenderer.send('switch-script', selectedScript)
-            ipcRenderer.send('switch-script', selectedScript)
+            $loadingSpinner.hide();
+            const selectedScript = scriptToggle.checked ? 'bigdot.mjs' : 'docdot.mjs';
+            ipcRenderer.send('switch-script', selectedScript);
+            ipcRenderer.send('switch-script', selectedScript);
         }
     }
 
     try {
-        // Check if the lastOpenedDir.txt file exists
         if (fs.existsSync(lastOpenedDirPath)) {
-            const lastOpenedDir = fs.readFileSync(lastOpenedDirPath, 'utf8')
+            const lastOpenedDir = fs.readFileSync(lastOpenedDirPath, 'utf8');
 
-            // If the directory exists, display its file tree
             if (fs.existsSync(lastOpenedDir)) {
-                $fileTree.empty()
-                populateTree(lastOpenedDir, $fileTree)
+                $fileTree.empty();
+                populateTree(lastOpenedDir, $fileTree);
             }
         }
     } catch (err) {
-        console.error('Error loading the last opened directory:', err)
+        console.error('Error loading the last opened directory:', err);
     }
 
-
-    $('#selectDirectoryButton').click(selectDirectory)
-})
+    $('#selectDirectoryButton').click(selectDirectory);
+});
 
 document.getElementById('selectDirectoryButton').addEventListener('click', async () => {
     await ipcRenderer.invoke('open-dialog');
-});
-
-ipcRenderer.on('directory-selected', (event, path) => {
-    console.log(`Selected directory: ${path}`);
-    document.getElementById('fileTree').classList.add('hidden');
-    document.getElementById('loadingAnimation').classList.remove('hidden');
 });
 
 ipcRenderer.on('update-progress', (event, progress) => {
@@ -683,16 +618,27 @@ ipcRenderer.on('update-progress', (event, progress) => {
     spinner.style.strokeDashoffset = offset;
 });
 
-ipcRenderer.on('loading-complete', () => {
+ipcRenderer.on('directory-selected', (event, path) => {
+    console.log(`Selected directory: ${path}`);
+    document.getElementById('fileTree').classList.add('hidden');
+    document.getElementById('loadingAnimation').classList.remove('hidden');
+    document.getElementById('fileTree').innerHTML = '';
+});
+
+ipcRenderer.on('loading-complete', (event, selectedPath) => {
+    console.log('Loading complete for path:', selectedPath); // Log the selectedPath
     document.getElementById('loadingAnimation').classList.add('hidden');
     document.getElementById('fileTree').classList.remove('hidden');
-    // Show a success message or perform additional actions
+    if (selectedPath) {
+        populateTree(selectedPath, $('#fileTree'));
+    } else {
+        console.error('Error: selectedPath is undefined.');
+    }
 });
 
 ipcRenderer.on('loading-error', (event, message) => {
     document.getElementById('loadingAnimation').classList.add('hidden');
     document.getElementById('fileTree').classList.remove('hidden');
-    // Show an error message
     console.error('Loading error:', message);
 });
 

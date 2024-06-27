@@ -110,6 +110,17 @@
 
         <div class="form-group">
             <div class="flex justify-between items-center">
+                <label for="sources"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-400 ">Sources:</label>
+                <output id="sources_output" for="sources"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-400 ">2000</output>
+            </div>
+            <input type="range" id="sources" name="sources" class="slider w-full bg-gray-200" min="1" max="10" value="1"
+                oninput="updateOutput('sources')">
+        </div>
+
+        <div class="form-group">
+            <div class="flex justify-between items-center">
                 <label for="big_dot_temperature" class="block text-sm font-medium text-gray-700 dark:text-gray-400 ">Big
                     Dot
                     Temperature:</label>
