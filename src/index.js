@@ -15,7 +15,7 @@ const isMac = process.platform === 'darwin'
 let galleryViewInterval // Declare galleryViewInterval globally
 let ttsProcess; // Declare ttsProcess globally
 const childProcesses = new Set(); // Declare childProcesses as a Set
-
+const lastOpenedDirPath = path.join(userDataPath, 'lastOpenedDir.txt');
 
 const template = [
     // { role: 'appMenu' }
@@ -124,82 +124,30 @@ Menu.setApplicationMenu(menu)
 
 let mainWindow
 
-let currentScript = 'docdot.mjs'; // Default script
-let activeChatModule; // To hold the currently active chat module
+const docdotModule = require('./app/docdot.js');
+const bigdotModule = require('./app/bigdot.js');
+const { processDirectory } = require('./app/embeddings.js');
 
+// ... (rest of your existing imports and constants)
 
+let currentScript = 'docdot.js'; // Default script
+let activeChatModule = docdotModule; // Initialize with docdot module
 
-const loadScriptModule = async (scriptName) => {
-    try {
-        const modulePath = path.join(__dirname, 'app', scriptName);
-        const module = await import(`file://${modulePath}`);
-        if (!module.default) {
-            throw new Error(`No default export found in ${scriptName}`);
-        }
-        return module.default;
-    } catch (error) {
-        console.error(`Error loading module ${scriptName}:`, error);
-        throw error;
+// Modify the loadScriptModule function
+const loadScriptModule = (scriptName) => {
+    switch (scriptName) {
+        case 'docdot.js':
+            return docdotModule;
+        case 'bigdot.js':
+            return bigdotModule;
+        default:
+            throw new Error(`Unknown script: ${scriptName}`);
     }
 };
 
-ipcMain.on('switch-script', async (event, selectedScript) => {
-    console.log('Switching script to:', selectedScript);
-    currentScript = selectedScript; // Set the selected script
-    try {
-        activeChatModule = await loadScriptModule(currentScript);
-        console.log(`Switched to ${currentScript} module`);
-        mainWindow.webContents.send('script-switched', currentScript);
-    } catch (error) {
-        console.error(`Error switching to script ${currentScript}:`, error);
-    }
-});
-
-ipcMain.handle('run-chat', async (event, userInput) => {
-    console.log(`IPC call received to run ${currentScript}`);
-    try {
-        const sendToken = (token) => {
-            console.log('Sending token:', token);
-            event.sender.send('chat-token', token);
-        };
-        if (activeChatModule) {
-            const response = await activeChatModule(userInput, sendToken, configPath);
-            console.log('Final response:', response);
-            return response;
-        } else {
-            throw new Error(`Module ${currentScript} is not loaded.`);
-        }
-    } catch (error) {
-        console.error(`Error running ${currentScript}:`, error);
-        throw error;
-    }
-});
 
 
-//OPEN FOLDER THING!!!!
-
-// Define a path for the file where you will store the last opened directory
-const lastOpenedDirPath = path.join(userDataPath, 'lastOpenedDir.txt');
-
-ipcMain.on('get-user-data-path', (event) => {
-    event.returnValue = app.getPath('userData');
-});
-
-
-
-ipcMain.handle('open-dialog', async (event) => {
-    const result = await dialog.showOpenDialog(mainWindow, {
-        properties: ['openDirectory'],
-    });
-
-    if (!result.canceled) {
-        const selectedPath = result.filePaths[0];
-        fs.writeFileSync(lastOpenedDirPath, selectedPath, 'utf-8'); // Save the selected path to lastOpenedDir.txt
-        mainWindow.webContents.send('directory-selected', selectedPath);
-        await processSelectedDirectory(selectedPath, mainWindow.webContents);
-    }
-});
-
+// Update the processSelectedDirectory function
 async function processSelectedDirectory(selectedPath, webContents) {
     const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
     progressBar.start(100, 0);
@@ -210,10 +158,9 @@ async function processSelectedDirectory(selectedPath, webContents) {
     };
 
     try {
-        const { processDirectory } = await import('./app/embeddings.mjs');
         await processDirectory(selectedPath, updateProgress);
         progressBar.stop();
-        webContents.send('loading-complete', selectedPath); // Ensure selectedPath is passed here
+        webContents.send('loading-complete', selectedPath);
     } catch (error) {
         console.error('Error processing directory:', error);
         progressBar.stop();
@@ -222,12 +169,279 @@ async function processSelectedDirectory(selectedPath, webContents) {
 }
 
 
+
+function initializeHandlers() {
+
+    ipcMain.handle('run-chat', async (event, userInput) => {
+        console.log(`IPC call received to run ${currentScript}`);
+        try {
+            const sendToken = (token) => {
+                console.log('Sending token:', token);
+                event.sender.send('chat-token', token);
+            };
+            if (activeChatModule) {
+                const response = await activeChatModule(userInput, sendToken, configPath);
+                console.log('Final response:', response);
+                return response;
+            } else {
+                throw new Error(`Module ${currentScript} is not loaded.`);
+            }
+        } catch (error) {
+            console.error(`Error running ${currentScript}:`, error);
+            throw error;
+        }
+    });
+
+    ipcMain.on('get-user-data-path', (event) => {
+        event.returnValue = app.getPath('userData');
+    });
+
+    ipcMain.on('switch-script', (event, selectedScript) => {
+        console.log('Switching script to:', selectedScript);
+        currentScript = selectedScript;
+        try {
+            activeChatModule = loadScriptModule(currentScript);
+            console.log(`Switched to ${currentScript} module`);
+            mainWindow.webContents.send('script-switched', currentScript);
+        } catch (error) {
+            console.error(`Error switching to script ${currentScript}:`, error);
+            mainWindow.webContents.send('script-switch-error', error.message);
+        }
+    });
+
+    ipcMain.handle('execute-python-script', async (event, directory) => {
+        try {
+            const { processDirectory } = await import('./app/embeddings.js');
+            await processDirectory(directory, configPath);
+            console.log('Processing complete.');
+        } catch (err) {
+            console.error(err);
+        }
+    });
+
+    ipcMain.on('start-download', (event, data) => {
+        console.log("IPC Message Received:", data);
+        ensureAndDownloadDependencies(event.sender)
+            .catch(error => {
+                console.error('Download Initiation Failed:', error);
+                event.sender.send('download-error', error.toString());
+            });
+    });
+
+    ipcMain.handle('run-tts', async (event, message) => {
+        return new Promise((resolve, reject) => {
+            const ttsProcess = createTtsProcess();
+            const userDataPath = app.getPath('userData');
+            childProcesses.add(ttsProcess);
+
+            ttsProcess.on('message', (response) => {
+                if (response.filePath) {
+                    resolve(response.filePath);
+                } else {
+                    reject(new Error(response.error));
+                }
+            });
+
+            ttsProcess.on('error', (error) => {
+                console.error('Error from TTS process:', error);
+                reject(new Error('TTS process error'));
+            });
+
+            ttsProcess.on('exit', (code) => {
+                console.log(`TTS process exited with code ${code}`);
+                if (code !== 0) {
+                    reject(new Error('TTS process exited unexpectedly'));
+                }
+            });
+
+            ttsProcess.send({ cmd: 'run-tts', message, userDataPath });
+
+            setTimeout(() => {
+                ttsProcess.kill();
+                reject(new Error('TTS process did not respond in time'));
+            }, 100000); // Adjust timeout duration as needed
+        }).finally(() => {
+            if (ttsProcess) {
+                ttsProcess.kill();
+            }
+        });
+    });
+
+    ipcMain.handle('play-audio', async (event, filePath) => {
+        const { exec } = require('child_process');
+        return new Promise((resolve, reject) => {
+            exec(`afplay "${filePath}"`, (err) => {
+                if (err) {
+                    console.error('Error during audio playback:', err);
+                    reject(new Error('Audio playback failed'));
+                } else {
+                    console.log('Audio playback successful.');
+                    resolve('Playback success');
+                }
+            });
+        });
+    });
+
+    ipcMain.on('show-context-menu', (event) => {
+        const template = [
+            {
+                label: 'Menu Item 1',
+                click: () => {
+                    event.sender.send('context-menu-command', 'menu-item-1');
+                },
+            },
+            { type: 'separator' },
+            { label: 'Menu Item 2', type: 'checkbox', checked: true },
+        ];
+        const menu = Menu.buildFromTemplate(template);
+        menu.popup({ window: BrowserWindow.fromWebContents(event.sender) });
+    });
+
+    ipcMain.on('toggle-gallery-view', () => {
+        toggleGalleryView();
+    });
+
+    ipcMain.on('update-background', (event, imagePath) => {
+        mainWindow.webContents.send('update-background', imagePath);
+    });
+
+    ipcMain.on('set-auto-tts', (event, isEnabled) => {
+        console.log("Setting auto TTS to", isEnabled);
+        autoTtsEnabled = isEnabled;
+        BrowserWindow.getAllWindows().forEach(win => {
+            win.webContents.send('update-auto-tts', autoTtsEnabled);
+        });
+    });
+
+    ipcMain.on('request-auto-tts-state', (event) => {
+        console.log("Sending auto TTS state:", autoTtsEnabled);
+        event.sender.send('get-auto-tts-state', autoTtsEnabled);
+    });
+
+    ipcMain.on('open-settings-window', () => {
+        if (!settingsWindow) {
+            settingsWindow = new BrowserWindow({
+                width: 600,
+                height: 500,
+                parent: mainWindow,
+                titleBarStyle: 'hidden',
+                modal: true,
+                webPreferences: {
+                    nodeIntegration: true,
+                    contextIsolation: false,
+                }
+            });
+
+            const settingsPath = path.join(__dirname, 'settings.html');
+            settingsWindow.loadFile(settingsPath);
+
+            settingsWindow.on('closed', () => {
+                settingsWindow = null;
+                mainWindow.webContents.send('settings-closed');
+            });
+        }
+    });
+
+    ipcMain.on('close-settings', () => {
+        if (settingsWindow) {
+            settingsWindow.close();
+        }
+    });
+
+    ipcMain.handle('getConfig', async () => {
+        if (fs.existsSync(configPath)) {
+            return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        }
+        return null;
+    });
+
+    ipcMain.handle('setConfig', async (event, newConfig) => {
+        fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2), 'utf-8');
+    });
+
+    ipcMain.handle('open-file-dialog', async (event) => {
+        const { canceled, filePaths } = await dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [{ name: 'GGUF Files', extensions: ['gguf'] }]
+        });
+        if (canceled) {
+            return { filePaths: [] };
+        } else {
+            return { filePaths };
+        }
+    });
+
+    ipcMain.handle('open-dialog', async (event) => {
+        const result = await dialog.showOpenDialog(mainWindow, {
+            properties: ['openDirectory'],
+        });
+
+        if (!result.canceled) {
+            const selectedPath = result.filePaths[0];
+            fs.writeFileSync(lastOpenedDirPath, selectedPath, 'utf-8'); // Save the selected path to lastOpenedDir.txt
+            mainWindow.webContents.send('directory-selected', selectedPath);
+            await processSelectedDirectory(selectedPath, mainWindow.webContents);
+        }
+    });
+
+    ipcMain.on('run-stream-model', (event) => {
+        const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
+        const args = [
+            '-m', modelPath,
+            '-t', '8',
+            '--step', '500',
+            '--length', '5000'
+        ];
+
+        const streamPath = path.join(__dirname, '..', 'llm', 'whisper', 'stream');
+
+        streamProcess = spawn(streamPath, args, { shell: true });
+
+        streamProcess.stdout.on('data', (data) => {
+            event.sender.send('stream-data', data.toString());
+        });
+
+        streamProcess.stderr.on('data', (data) => {
+            event.sender.send('stream-error', data.toString());
+        });
+
+        streamProcess.on('close', (code) => {
+            event.sender.send('stream-close', code);
+            streamProcess = null;
+            console.log(`Stream process closed with code ${code}`);
+        });
+    });
+
+    ipcMain.on('kill-stream-process', (event) => {
+        if (streamProcess) {
+            streamProcess.kill('SIGINT');
+            streamProcess = null;
+            event.sender.send('stream-terminated');
+        }
+    });
+
+    ipcMain.on('toggle-dark-mode', (event) => {
+        isDarkModeEnabled = !isDarkModeEnabled;
+        BrowserWindow.getAllWindows().forEach(win => {
+            win.webContents.send('dark-mode-toggled', isDarkModeEnabled);
+        });
+    });
+
+    ipcMain.on('request-dark-mode-state', (event) => {
+        event.sender.send('current-dark-mode-state', isDarkModeEnabled);
+    });
+}
+
+
 // ELECTRON STUFF, CREATE THE WINDOW BLA BLA !!!!
 
 
 // Flag to track whether dark mode is enabled or not
 
-
+function setupTtsWorker() {
+    const ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+    return fork(ttsProcessorPath);
+}
 const createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 1250,
@@ -259,62 +473,6 @@ const createWindow = () => {
         return fork(ttsProcessorPath);
     }
 
-    ipcMain.handle('run-tts', async (event, message) => {
-        return new Promise((resolve, reject) => {
-            const ttsProcess = createTtsProcess();
-            const userDataPath = app.getPath('userData');
-            childProcesses.add(ttsProcess);
-
-
-            ttsProcess.on('message', (response) => {
-                if (response.filePath) {
-                    resolve(response.filePath);
-                } else {
-                    reject(new Error(response.error));
-                }
-            });
-
-            ttsProcess.on('error', (error) => {
-                console.error('Error from TTS process:', error);
-                reject(new Error('TTS process error'));
-            });
-
-            ttsProcess.on('exit', (code) => {
-                console.log(`TTS process exited with code ${code}`);
-                if (code !== 0) {
-                    reject(new Error('TTS process exited unexpectedly'));
-                }
-            });
-
-            ttsProcess.send({ cmd: 'run-tts', message, userDataPath });
-
-            // Timeout to handle cases where the process might not respond
-            setTimeout(() => {
-                ttsProcess.kill();
-                reject(new Error('TTS process did not respond in time'));
-            }, 100000); // Adjust timeout duration as needed
-        }).finally(() => {
-            if (ttsProcess) {
-                ttsProcess.kill();
-            }
-        });
-    });
-
-    ipcMain.handle('play-audio', async (event, filePath) => {
-        const { exec } = require('child_process');
-        return new Promise((resolve, reject) => {
-            exec(`afplay "${filePath}"`, (err) => {
-                if (err) {
-                    console.error('Error during audio playback:', err);
-                    reject(new Error('Audio playback failed'));
-                } else {
-                    //ttsProcess.kill(); // Kill the process instead of terminate
-                    console.log('Audio playback successful.');
-                    resolve('Playback success');
-                }
-            });
-        });
-    });
 
 
     return mainWindow; // Ensure to return the created mainWindow
@@ -403,21 +561,6 @@ app.on('window-all-closed', function () {
 
 const appPath = app.getAppPath()
 
-ipcMain.handle('execute-python-script', async (event, directory) => {
-    try {
-        //const configPath = path.resolve(__dirname, '..', 'llm', 'scripts', 'config.json'); // Adjust the config path as necessary
-
-        // Dynamically import the ES module
-        const { processDirectory } = await import('./app/embeddings.mjs');
-
-        // Call the processDirectory function from embeddings.mjs
-        await processDirectory(directory, configPath);
-
-        console.log('Processing complete.');
-    } catch (err) {
-        console.error(err);
-    }
-});
 // DOWNLOAD LLM AND SUCH!
 
 
@@ -531,11 +674,11 @@ async function ensureAndDownloadDependencies(event) {
 
 
 app.on('ready', () => {
-    mainWindow = createWindow(); // This should now correctly create and return the window
+    mainWindow = createWindow();
 
     mainWindow.once('ready-to-show', async () => {
         try {
-            activeChatModule = await loadScriptModule(currentScript); // Load docdot.mjs on startup
+            activeChatModule = docdotModule; // Initialize with docdot module
             console.log(`Loaded ${currentScript} module on startup`);
             mainWindow.webContents.send('script-switched', currentScript);
         } catch (error) {
@@ -548,9 +691,11 @@ app.on('ready', () => {
                     mainWindow.webContents.send('download-error', error.message);
                 }
             });
+
         ttsWorker = setupTtsWorker();
         initializeHandlers();
     });
+
 
     // IPC event handler
     ipcMain.on('start-download', (event, { url, outputPath }) => {
@@ -685,32 +830,7 @@ if (!fs.existsSync(configPath)) {
 }
 
 
-// Listener to get the current configuration
-ipcMain.handle('getConfig', async () => {
-    if (fs.existsSync(configPath)) {
-        return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-    }
-    return null;
-});
 
-// Listener to save the configuration
-ipcMain.handle('setConfig', async (event, newConfig) => {
-    fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2), 'utf-8');
-});
-
-
-
-ipcMain.handle('open-file-dialog', async (event) => {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-        properties: ['openFile'],
-        filters: [{ name: 'GGUF Files', extensions: ['gguf'] }]
-    });
-    if (canceled) {
-        return { filePaths: [] };
-    } else {
-        return { filePaths };
-    }
-});
 
 
 

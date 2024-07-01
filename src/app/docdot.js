@@ -1,18 +1,22 @@
-import { LlamaCpp } from "@langchain/community/llms/llama_cpp";
-import { PromptTemplate } from "@langchain/core/prompts";
-import path from "path";
-import { homedir } from "os";
-import os from 'os';
-import { FaissStore } from "@langchain/community/vectorstores/faiss";
-import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/hf_transformers";
-import fs from "fs";
-import { formatDocumentsAsString } from "langchain/util/document";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import {
+const { PromptTemplate } = require("@langchain/core/prompts");
+const path = require("path");
+const os = require('os');
+const { FaissStore } = require("@langchain/community/vectorstores/faiss");
+const fs = require("fs");
+const { formatDocumentsAsString } = require("langchain/util/document");
+const { StringOutputParser } = require("@langchain/core/output_parsers");
+const {
   RunnableSequence,
   RunnablePassthrough,
   RunnableMap,
-} from "@langchain/core/runnables";
+} = require("@langchain/core/runnables");
+
+// Wrap the problematic imports in a dynamic import function
+async function importESModules() {
+  const { LlamaCpp } = await import("@langchain/community/llms/llama_cpp");
+  const { HuggingFaceTransformersEmbeddings } = await import("@langchain/community/embeddings/hf_transformers");
+  return { LlamaCpp, HuggingFaceTransformersEmbeddings };
+}
 
 // Function to read configuration from a file
 async function readConfig(configPath) {
@@ -27,7 +31,6 @@ async function readConfig(configPath) {
     config.n_ctx = Number(config.n_ctx);
     config.sources = Number(config.sources);
 
-
     return config;
   } catch (error) {
     console.error(
@@ -40,6 +43,7 @@ async function readConfig(configPath) {
 
 // Main function to handle chat completion
 async function runChat(input, sendToken, configPath) {
+  const { LlamaCpp, HuggingFaceTransformersEmbeddings } = await importESModules();
   if (!configPath) {
     throw new Error("Configuration path is required");
   }
@@ -48,7 +52,7 @@ async function runChat(input, sendToken, configPath) {
   const config = await readConfig(configPath);
 
   // Setup configuration with defaults in case some settings are missing
-  const documentsPath = path.join(homedir(), "Documents");
+  const documentsPath = path.join(os.homedir(), "Documents");
   const folderName = "Dot-Data";
   const folderPath = path.join(documentsPath, folderName);
   if (!fs.existsSync(folderPath)) {
@@ -235,4 +239,4 @@ async function runChat(input, sendToken, configPath) {
   return completeResponse;
 }
 
-export default runChat;
+module.exports = runChat;

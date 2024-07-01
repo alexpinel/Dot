@@ -1,9 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import { homedir } from 'os';
-import { PromptTemplate } from "@langchain/core/prompts";
-import { ChatLlamaCpp } from "@langchain/community/chat_models/llama_cpp";
-import { StringOutputParser } from "@langchain/core/output_parsers";
+const fs = require('fs');
+const path = require('path');
+const { homedir } = require('os');
+const { PromptTemplate } = require("@langchain/core/prompts");
+const { StringOutputParser } = require("@langchain/core/output_parsers");
 
 // Function to read configuration from a file
 async function readConfig(configPath) {
@@ -124,4 +123,4 @@ async function runChat(input, sendToken, configPath) {
 }
 
 // Export the function for use
-export default runChat;
+module.exports = runChat;

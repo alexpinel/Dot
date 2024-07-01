@@ -1,19 +1,19 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { FaissStore } from "@langchain/community/vectorstores/faiss";
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import { DocxLoader } from "@langchain/community/document_loaders/fs/docx";
-import { PPTXLoader } from "@langchain/community/document_loaders/fs/pptx";
-import { NotionLoader } from "@langchain/community/document_loaders/fs/notion";
-import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
-import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/hf_transformers";
-import fs from 'fs/promises';
-import os from 'os';
+const path = require('path');
+const fs = require('fs').promises;
+const os = require('os');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// Wrap the problematic imports in a dynamic import function
+async function importESModules() {
+  const { FaissStore } = await import("@langchain/community/vectorstores/faiss");
+  const { RecursiveCharacterTextSplitter } = await import("langchain/text_splitter");
+  const { PDFLoader } = await import("@langchain/community/document_loaders/fs/pdf");
+  const { DocxLoader } = await import("@langchain/community/document_loaders/fs/docx");
+  const { PPTXLoader } = await import("@langchain/community/document_loaders/fs/pptx");
+  const { NotionLoader } = await import("@langchain/community/document_loaders/fs/notion");
+  const { DirectoryLoader } = await import("langchain/document_loaders/fs/directory");
+  const { HuggingFaceTransformersEmbeddings } = await import("@langchain/community/embeddings/hf_transformers");
+  return { FaissStore, RecursiveCharacterTextSplitter, PDFLoader, DocxLoader, PPTXLoader, NotionLoader, DirectoryLoader, HuggingFaceTransformersEmbeddings };
+}
 
 const readConfig = async (configPath) => {
   try {
@@ -25,11 +25,9 @@ const readConfig = async (configPath) => {
   }
 };
 
-const embeddings = new HuggingFaceTransformersEmbeddings({
-  modelName: "Xenova/all-MiniLM-L6-v2",
-});
+const processDirectory = async (directory, updateProgress) => {
+  const { FaissStore, RecursiveCharacterTextSplitter, PDFLoader, DocxLoader, PPTXLoader, NotionLoader, DirectoryLoader, HuggingFaceTransformersEmbeddings } = await importESModules();
 
-export const processDirectory = async (directory, updateProgress) => {
   const configPath = path.join(__dirname, 'config.json');
   const config = await readConfig(configPath);
   const chunkSize = config.chunk_length || 4000;
@@ -47,6 +45,10 @@ export const processDirectory = async (directory, updateProgress) => {
   } catch (error) {
     console.error(`Error creating directory: ${error.message}`);
   }
+
+  const embeddings = new HuggingFaceTransformersEmbeddings({
+    modelName: "Xenova/all-MiniLM-L6-v2",
+  });
 
   const loader = new DirectoryLoader(
     directory,
@@ -88,3 +90,5 @@ export const processDirectory = async (directory, updateProgress) => {
   await Vittorio.save(desktopPath);
   console.log({ Documentato });
 };
+
+module.exports = { processDirectory };

@@ -661,7 +661,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (scriptToggle) {
         scriptToggle.addEventListener('change', function () {
-            const selectedScript = scriptToggle.checked ? 'bigdot.mjs' : 'docdot.mjs';
+            const selectedScript = scriptToggle.checked ? 'bigdot.js' : 'docdot.js';
             ipcRenderer.send('switch-script', selectedScript);
         });
 
@@ -705,7 +705,7 @@ function toggleDropdown() {
 
 function selectOption(option) {
     document.getElementById('selected-option').textContent = option
-    const selectedScript = option === 'Doc Dot' ? 'docdot.mjs' : 'bigdot.mjs'
+    const selectedScript = option === 'Doc Dot' ? 'docdot.js' : 'bigdot.js'
     ipcRenderer.send('switch-script', selectedScript)
     document.getElementById('dropdown').classList.add('hidden')
 }

@@ -83,8 +83,8 @@ function addEventListeners() {
                 console.log('Script toggle changed')
 
                 const selectedScript = scriptToggle.checked
-                    ? 'bigdot.mjs'
-                    : 'docdot.mjs'
+                    ? 'bigdot.js'
+                    : 'docdot.js'
                 console.log('Selected script:', selectedScript)
 
                 ipcRenderer.send('switch-script', selectedScript)
@@ -96,8 +96,8 @@ function addEventListeners() {
             await ipcRenderer.invoke('setConfig', newConfig);
             alert('Settings saved successfully!');
             const selectedScript = scriptToggle.checked
-                ? 'bigdot.mjs'
-                : 'docdot.mjs'
+                ? 'bigdot.js'
+                : 'docdot.js'
             ipcRenderer.send('switch-script', selectedScript)
             ipcRenderer.send('switch-script', selectedScript)
         } catch (error) {
