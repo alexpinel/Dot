@@ -141,6 +141,9 @@ function appendMessage(sender, message, isMarkdown) {
         console.log("Auto TTS Enabled:", autoTtsEnabled);
         if (autoTtsEnabled) {
             console.log("Attempting to click TTS button for automatic TTS");
+            // Reset message streaming complete flag for new message
+            messageStreamingComplete = false;
+
             // Handle auto TTS processing only when the message is complete
             if (messageStreamingComplete) {
                 ttsButton.click();
@@ -162,6 +165,7 @@ function appendMessage(sender, message, isMarkdown) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
     return messageDiv;
 }
+
 
 // Event listener to handle tokens received from the main process
 ipcRenderer.on('chat-token', (event, token) => {
@@ -212,6 +216,27 @@ function sendMessageToMainForTTS(message, onComplete, onError) {
             onError(error);
         });
 }
+
+function showSpinner(speakerIcon) {
+    // Change to spinner
+    speakerIcon.innerHTML = `<svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>`;
+    speakerIcon.style.width = '16px'; // Adjust size for spinner if needed
+    speakerIcon.style.height = '16px';
+}
+
+function resetSpeakerIcon(speakerIcon) {
+    // Reset back to speaker icon
+    speakerIcon.innerHTML = `<path d="M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M16 8.99998C16.5 9.49998 17 10.5 17 12C17 13.5 16.5 14.5 16 15M3 10.5V13.5C3 14.6046 3.5 15.5 5.5 16C7.5 16.5 9 21 12 21C14 21 14 3 12 3C9 3 7.5 7.5 5.5 8C3.5 8.5 3 9.39543 3 10.5Z" fill="none" stroke="#424242" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;
+    speakerIcon.style.width = '16px'; // Reset size for speaker icon
+    speakerIcon.style.height = '16px';
+}
+
+function handleTtsError(error) {
+    // Update the UI to reflect the error state
+    console.error('Error during TTS:', error);
+    resetSpeakerIcon(); // Function to change the icon or display an error message
+}
+
 
 
 

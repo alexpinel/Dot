@@ -11,3 +11,13 @@ mpnet/
 baai/
 whisper
 espeak-ng-data
+llm/piper/piper_phonemize.dll
+llm/piper/piper.exe
+llm/piper/onnxruntime_providers_shared.dll
+llm/piper/onnxruntime.dll
+llm/piper/libtashkeel_model.ort
+llm/piper/espeak-ng.dll
+llm/piper/en_US-kathleen-low.onnx
+llm/piper/en_US-hfc_female-medium.onnx
+llm/piper/en_US-amy-low.onnx
+llm/piper/en_en_US_kathleen_low_en_US-kathleen-low.onnx.json

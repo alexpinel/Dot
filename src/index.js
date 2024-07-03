@@ -438,10 +438,11 @@ function initializeHandlers() {
 
 // Flag to track whether dark mode is enabled or not
 
-function setupTtsWorker() {
-    const ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
+function createTtsProcess() {
+    const ttsProcessorPath = path.join(__dirname, '..', 'llm', 'piper', 'ttsProcessor.js');
     return fork(ttsProcessorPath);
 }
+
 const createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 1250,
@@ -465,14 +466,6 @@ const createWindow = () => {
     // Setup TTS child process
 
     //let ttsProcessorPath;  // Use let instead of const
-
-
-    function createTtsProcess() {
-        //let ttsProcessorPath = path.join(process.resourcesPath, 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
-        let ttsProcessorPath = path.join(__dirname, '..', 'llm', 'vits-piper-en_US-glados', 'ttsProcessor.js');
-        return fork(ttsProcessorPath);
-    }
-
 
 
     return mainWindow; // Ensure to return the created mainWindow
@@ -692,7 +685,7 @@ app.on('ready', () => {
                 }
             });
 
-        ttsWorker = setupTtsWorker();
+        ttsWorker = createTtsProcess();
         initializeHandlers();
     });
 
