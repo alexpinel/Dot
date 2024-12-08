@@ -8,6 +8,9 @@ const userDataPath = app.getPath('userData');
 const configPath = path.join(userDataPath, 'config.json');
 const { Worker } = require('worker_threads');
 const cliProgress = require('cli-progress');
+const appPath = app.getAppPath();
+const resourcesPath = path.join(appPath, '..', 'Resources');  // For MacOS and Linux, '..' goes one level up from app.asar
+
 
 
 const isMac = process.platform === 'darwin'
@@ -124,11 +127,19 @@ Menu.setApplicationMenu(menu)
 
 let mainWindow
 
-const docdotModule = require('./app/docdot.js');
-const bigdotModule = require('./app/bigdot.js');
-const { processDirectory } = require('./app/embeddings.js');
 
-// ... (rest of your existing imports and constants)
+
+//PRODUCTION
+const bigdotModule = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'bigdot.js'));
+const docdotModule = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'docdot.js'));
+const { processDirectory } = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'embeddings.js'));
+
+//DEV
+//const bigdotModule = require('aadotllm/bigdot.js');
+//const docdotModule = require('aadotllm/docdot.js');
+//const { processDirectory } = require('aadotllm/embeddings.js');
+
+
 
 let currentScript = 'docdot.js'; // Default script
 let activeChatModule = docdotModule; // Initialize with docdot module
@@ -384,6 +395,7 @@ function initializeHandlers() {
         }
     });
 
+
     ipcMain.on('run-stream-model', (event) => {
         const modelPath = path.join(__dirname, '..', 'llm', 'whisper', 'models', 'ggml-model-whisper-base.bin');
         const args = [
@@ -437,11 +449,12 @@ function initializeHandlers() {
 
 
 // Flag to track whether dark mode is enabled or not
-
+/*
 function createTtsProcess() {
     const ttsProcessorPath = path.join(__dirname, '..', 'llm', 'piper', 'ttsProcessor.js');
     return fork(ttsProcessorPath);
 }
+*/
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -552,7 +565,6 @@ app.on('window-all-closed', function () {
     }
 });
 
-const appPath = app.getAppPath()
 
 // DOWNLOAD LLM AND SUCH!
 
@@ -646,10 +658,10 @@ async function ensureAndDownloadDependencies(event) {
         fs.mkdirSync(dotDataDir, { recursive: true });
     }
 
-    const filePath = path.join(dotDataDir, 'Phi-3-mini-4k-instruct-q4.gguf');
+    const filePath = path.join(dotDataDir, 'Phi-3.5-mini-instruct-Q6_K.gguf');
     if (!checkFileExists(filePath)) {
         try {
-            await downloadFile('https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf?download=true', filePath, event); console.log('Download completed');
+            await downloadFile('https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF/resolve/main/Phi-3.5-mini-instruct-Q6_K.gguf?download=true', filePath, event); console.log('Download completed');
             console.log('Download completed');
         } catch (error) {
             console.error('Download failed:', error);
@@ -685,7 +697,7 @@ app.on('ready', () => {
                 }
             });
 
-        ttsWorker = createTtsProcess();
+        //ttsWorker = createTtsProcess();
         initializeHandlers();
     });
 

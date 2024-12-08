@@ -118,6 +118,7 @@ function appendMessage(sender, message, isMarkdown) {
             };
         })();
 
+        /*
         function showSpinner() {
             // Change to spinner
             speakerIcon.innerHTML = `<svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>`;
@@ -155,9 +156,9 @@ function appendMessage(sender, message, isMarkdown) {
                 }, TOKEN_STREAM_TIMEOUT);
             }
         }
-
+        */
         botContentContainer.appendChild(botBubble);
-        botContentContainer.appendChild(ttsButton);
+        //botContentContainer.appendChild(ttsButton);
         messageDiv.appendChild(botContentContainer);
     }
 
@@ -190,6 +191,7 @@ ipcRenderer.on('chat-token', (event, token) => {
     }, TOKEN_STREAM_TIMEOUT);
 });
 
+/*
 function sendMessageToMainForTTS(message, onComplete, onError) {
     console.log('TTS Requested for:', message);
 
@@ -216,6 +218,7 @@ function sendMessageToMainForTTS(message, onComplete, onError) {
             onError(error);
         });
 }
+
 
 function showSpinner(speakerIcon) {
     // Change to spinner
@@ -249,7 +252,7 @@ ipcRenderer.on('get-auto-tts-state', (event, isEnabled) => {
     document.getElementById('auto-tts-toggle').checked = isEnabled;
 });
 
-
+*/
 
 
 function showTypingIndicator() {
@@ -318,7 +321,7 @@ ipcRenderer.on('python-reply', (event, reply) => {
 let isTranscribing = false;
 let streamProcess = null;
 
-
+/*
 document.getElementById('runStreamBtn').addEventListener('click', () => {
     const micIcon = document.getElementById('mic-icon');
     if (!isTranscribing) {
@@ -360,7 +363,7 @@ function runStreamModel() {
         document.getElementById('mic-icon').classList.remove('mic-active');
     });
 }
-
+*/
 /*
 function sendMessage(buttonClicked) {
     const userInput = document.getElementById('user-input').value;
@@ -451,24 +454,31 @@ function appendTokenToLastMessage() {
 document.getElementById('send-button').addEventListener('click', async () => {
     const userInput = document.getElementById('user-input').value;
     console.log('Send button clicked, user input:', userInput);
+
     if (userInput.trim() !== '') {
+        document.getElementById('user-input').value = ''; // Clear input after sending
+
         appendMessage('User', userInput);
         showTypingIndicator();
+
         try {
+            const selectedScript = document.getElementById('scriptToggle').checked ? 'bigdot.js' : 'docdot.js';
             appendMessage('Bot', '', true); // Create a new message div for the bot response
             accumulatedTokens = ''; // Reset accumulated tokens
             iframesInserted = false; // Reset iframes inserted flag
             iframes = ''; // Reset iframes content
-            await ipcRenderer.invoke('run-chat', userInput);
+
+            await ipcRenderer.invoke('run-chat', userInput, selectedScript); // Specify script in the invoke call
             console.log('IPC call made: run-chat');
         } catch (error) {
-            console.error('Error initiating chat1:', error);
+            console.error('Error initiating chat:', error);
             appendMessage('Bot', 'There was an error processing your request.', false);
         } finally {
             hideTypingIndicator();
         }
     }
 });
+
 
 
 // Handle tokens received from the main process

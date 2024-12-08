@@ -48,19 +48,21 @@ function addEventListeners() {
         document.documentElement.classList.toggle('dark', isEnabled);
     });
 
-    document.getElementById('auto-tts-toggle').addEventListener('change', function () {
+    /*document.getElementById('auto-tts-toggle').addEventListener('change', function () {
         ipcRenderer.send('set-auto-tts', this.checked);
     });
 
     ipcRenderer.on('get-auto-tts-state', (event, isEnabled) => {
         document.getElementById('auto-tts-toggle').checked = isEnabled;
-    });
+    });*/
 
     document.getElementById('configForm').addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const filePathText = document.getElementById('filePathDisplay').textContent;
-        const ggufFilePath = filePathText !== 'No file selected' ? filePathText : null;
+        const ggufFilePath = (filePathText !== 'Default Model' && filePathText !== 'No file selected')
+            ? filePathText
+            : null;
 
         const newConfig = {
             n_ctx: document.getElementById('n_ctx').value,
@@ -137,7 +139,8 @@ const defaultSettings = {
     chunk_overlap: 2000,
     sources: 1,
     big_dot_temperature: 0.7,
-    big_dot_prompt: "You are called Dot, You are a helpful and honest assistant. Always answer as helpfully as possible."
+    big_dot_prompt: "You are called Dot, You are a helpful and honest assistant. Always answer as helpfully as possible.",
+    ggufFilePath: null
 };
 
 
@@ -151,7 +154,7 @@ document.getElementById('resetButton').addEventListener('click', function () {
     document.getElementById('sources').value = defaultSettings.sources;
     document.getElementById('big_dot_temperature').value = defaultSettings.big_dot_temperature;
     document.getElementById('big_dot_prompt').value = defaultSettings.big_dot_prompt;
-    document.getElementById('filePathDisplay').textContent = "Default (Phi-3)";  // Explicitly setting to no file selected
+    document.getElementById('filePathDisplay').textContent = "Default Model";
 
 
     updateSliders(); // If you have a function to update slider displays
