@@ -4,13 +4,11 @@ const { homedir } = require('os');
 const { PromptTemplate } = require("@langchain/core/prompts");
 const { StringOutputParser } = require("@langchain/core/output_parsers");
 
-// Function to read configuration from a file
 async function readConfig(configPath) {
   try {
     const configFile = await fs.promises.readFile(configPath, 'utf8');
     const config = JSON.parse(configFile);
 
-    // Ensure numeric values are correctly parsed
     config.n_batch = Number(config.n_batch);
     config.max_tokens = Number(config.max_tokens);
     config.big_dot_temperature = Number(config.big_dot_temperature);
@@ -23,16 +21,20 @@ async function readConfig(configPath) {
   }
 }
 
-// Main function to handle chat completion
+// Helper function to check for INST tokens
+function containsInstToken(text) {
+  // Check for various forms of INST tokens
+  const instPatterns = ['[INST]', '[/INST]', 'INST]', '[INST', '/INST', 'INST', '[/'];
+  return instPatterns.some(pattern => text.includes(pattern));
+}
+
 async function runChat(input, sendToken, configPath) {
   if (!configPath) {
     throw new Error("Configuration path is required");
   }
 
-  // Read configuration from the provided path
   const config = await readConfig(configPath);
 
-  // Setup configuration with defaults in case some settings are missing
   const documentsPath = path.join(homedir(), "Documents");
   const folderName = "Dot-Data";
   const folderPath = path.join(documentsPath, folderName);
@@ -48,16 +50,13 @@ async function runChat(input, sendToken, configPath) {
   const contextSize = config.n_ctx || 4000;
   const initialPrompt = config.big_dot_prompt || "You are called Dot, You are a helpful and honest assistant.";
 
-  // Handle model path with possible null value in config
   if ('ggufFilePath' in config && config['ggufFilePath'] === null) {
-    delete config['ggufFilePath'];  // Removes the key if it's explicitly None
+    delete config['ggufFilePath'];
   }
   const modelPath = config.ggufFilePath || defaultModelPath;
 
-  // Define the prompt template based on config or default to pirate prompt
   const promptTemplate = PromptTemplate.fromTemplate(`${initialPrompt} {input}`);
 
-  // Function to initialize the ChatLlamaCpp model
   async function initializeLlamaModel() {
     const { ChatLlamaCpp } = await import("@langchain/community/chat_models/llama_cpp");
     return new ChatLlamaCpp({
@@ -71,21 +70,14 @@ async function runChat(input, sendToken, configPath) {
     });
   }
 
-  // Initialize a new instance of the LlamaCpp model for each input
   const llamaCpp = await initializeLlamaModel();
-
-  // Use only the current user input for the prompt
   const prompt = `${initialPrompt} ${input}`;
-
-  // Initialize the output parser
   const parser = new StringOutputParser();
 
-  // Create a new instance of the chain for each input to avoid context carryover
   const chain = promptTemplate
-    .pipe(llamaCpp.bind({ stop: [] }, ["User:", "AI:"], { maxTokens: maxTokens })) // Ensure maxTokens is set here
+    .pipe(llamaCpp.bind({ stop: [] }, ["User:", "AI:"], { maxTokens: maxTokens }))
     .pipe(parser);
 
-  // Generate the response
   let stream;
   try {
     stream = await chain.stream({ input: prompt });
@@ -97,16 +89,16 @@ async function runChat(input, sendToken, configPath) {
   let completeResponse = '';
   try {
     for await (const chunk of stream) {
-      completeResponse += chunk;
-      sendToken(chunk); // Send token to the renderer process
-
-      // Manually check for stop condition based on the content
-      if (completeResponse.includes('[/INST]')) {
-        completeResponse = completeResponse.replace('[/INST]', '').trim();
+      // Check for INST tokens before adding the chunk
+      if (containsInstToken(chunk)) {
+        console.log("INST token detected, stopping generation");
         break;
       }
 
-      // Manually check token count to stop generating if maxTokens is reached
+      completeResponse += chunk;
+      sendToken(chunk);
+
+      // Check token count
       if (completeResponse.split(' ').length >= maxTokens) {
         break;
       }
@@ -116,11 +108,8 @@ async function runChat(input, sendToken, configPath) {
     throw error;
   }
 
-  // Log the generated response
   console.log("Generated response:", completeResponse);
-
   return completeResponse;
 }
 
-// Export the function for use
 module.exports = runChat;

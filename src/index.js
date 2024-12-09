@@ -130,14 +130,14 @@ let mainWindow
 
 
 //PRODUCTION
-const bigdotModule = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'bigdot.js'));
-const docdotModule = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'docdot.js'));
-const { processDirectory } = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'embeddings.js'));
+//const bigdotModule = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'bigdot.js'));
+//const docdotModule = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'docdot.js'));
+//const { processDirectory } = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'embeddings.js'));
 
 //DEV
-//const bigdotModule = require('aadotllm/bigdot.js');
-//const docdotModule = require('aadotllm/docdot.js');
-//const { processDirectory } = require('aadotllm/embeddings.js');
+const bigdotModule = require('aadotllm/bigdot.js');
+const docdotModule = require('aadotllm/docdot.js');
+const { processDirectory } = require('aadotllm/embeddings.js');
 
 
 
