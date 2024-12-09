@@ -53,7 +53,7 @@ Built with Electron JS, The application uses libraries such as FAISS for creatin
 - Enhanced document awareness beyond content
 - Simplified file loading (select individual files, not just folders)
 - Increased security measures for using local LLMs
-- Support for additional document types
+- Support for additional document types - Done!
 - Efficient file database management for quicker access to groups of files
 
 ## 🤝 Want to Help?
