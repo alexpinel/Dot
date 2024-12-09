@@ -134,6 +134,7 @@ let mainWindow
 //const docdotModule = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'docdot.js'));
 //const { processDirectory } = require(path.join(process.resourcesPath, 'app.asar.unpacked', 'aadotllm', 'embeddings.js'));
 
+
 //DEV
 const bigdotModule = require('aadotllm/bigdot.js');
 const docdotModule = require('aadotllm/docdot.js');
@@ -153,6 +154,7 @@ const loadScriptModule = (scriptName) => {
             return bigdotModule;
         default:
             throw new Error(`Unknown script: ${scriptName}`);
+
     }
 };
 
@@ -238,6 +240,7 @@ function initializeHandlers() {
                 event.sender.send('download-error', error.toString());
             });
     });
+
 
     ipcMain.handle('run-tts', async (event, message) => {
         return new Promise((resolve, reject) => {
@@ -564,6 +567,7 @@ app.on('window-all-closed', function () {
         app.quit();  // Optionally quit the app on non-macOS platforms
     }
 });
+
 
 
 // DOWNLOAD LLM AND SUCH!

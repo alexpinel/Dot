@@ -17,6 +17,7 @@
 
 # TTS and Voice input only supported for MacOS, support for Windows coming very soon!
 
+
 ## 🚀 About Dot
 
 Dot is a standalone, open-source application designed for seamless interaction with documents and files using local LLMs and Retrieval Augmented Generation (RAG). It is inspired by solutions like Nvidia's Chat with RTX, providing a user-friendly interface for those without a programming background. Using the Phi-3 LLM by default, Dot ensures accessibility and simplicity right out of the box.
@@ -81,9 +82,15 @@ That's it! If you follow these steps you should be able to get it all running, p
 
 Contributions are highly encouraged! As a student managing this project on the side, any help is greatly appreciated. Whether it's coding, documentation, or feature suggestions, please feel free to get involved!
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=alexpinel/dot&type=Date)](https://star-history.com/#alexpinel/dot&Date)
+
 ---
 
 <div align="center">
   <strong><a href="#top">Back to top</a></strong>
 </div>
+
+
 
