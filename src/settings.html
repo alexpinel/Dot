@@ -43,13 +43,15 @@
 
     </div>
 
-    <div class="auto-tts-container flex justify-between items-center dark:text-gray-400 ">
+    <!--
+        <div class="auto-tts-container flex justify-between items-center dark:text-gray-400 ">
         <label for="auto-tts-toggle">Enable
             Automatic TTS: </label>
         <input type="checkbox" id="auto-tts-toggle"
             class="mr-1 border-gray-500 rounded text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
             id="hs-default-checkbox">
     </div>
+    -->
 
     <hr class="mt-4"> <!-- Separator line -->
     <form id="configForm" class="p-6 rounded-lg space-y-4">
@@ -106,6 +108,17 @@
             </div>
             <input type="range" id="chunk_overlap" name="chunk_overlap" class="slider w-full bg-gray-200" min="0"
                 max="4000" value="2000" oninput="updateOutput('chunk_overlap')">
+        </div>
+
+        <div class="form-group">
+            <div class="flex justify-between items-center">
+                <label for="sources"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-400 ">Sources:</label>
+                <output id="sources_output" for="sources"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-400 ">2000</output>
+            </div>
+            <input type="range" id="sources" name="sources" class="slider w-full bg-gray-200" min="1" max="10" value="1"
+                oninput="updateOutput('sources')">
         </div>
 
         <div class="form-group">

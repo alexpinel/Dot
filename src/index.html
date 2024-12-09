@@ -53,25 +53,15 @@
             </div>
 
             <hr class="my-2 h-px border-0 bg-gray-200 dark:bg-gray-700" />
-            <div role="status" id="loadingAnimation"
-                class="hidden flex flex-col items-center h-full w-full justify-center max-w-md p-4 space-y-4 rounded border border-gray-200 shadow md:p-6 dark:border-gray-700 animate-pulse">
-                <!-- Spinner -->
-                <svg class="mt-8 text-gray-300 animate-spin w-20 h-20 mx-auto " viewBox="0 0 64 64" fill="none"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                    <path
-                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path
-                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
-                        class="text-gray-900">
-                    </path>
-                </svg>
-                <!-- Loading Text -->
-                <div class="text-center text-gray-600 dark:text-gray-400 text-sm mx-auto">This might take a while</div>
+            <div id="loadingAnimation"
+                class="hidden flex flex-col items-center h-full w-full justify-center max-w-md p-4 space-y-4 rounded border border-gray-200 shadow md:p-6 dark:border-gray-700">
+                <div class="spinner">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="path" cx="50" cy="50" r="45" fill="none" stroke-width="5"></circle>
+                    </svg>
+                    <div class="percentage-text text-center text-gray-600 dark:text-gray-400 text-sm mx-auto">0%</div>
+                </div>
             </div>
-
-
 
 
             <!-- Rest of the menu content... -->
@@ -443,22 +433,28 @@
                 }
 
                 .spinner {
-                    animation: rotate 2s linear infinite;
-                    width: 25px;
-                    height: 25px;
+                    width: 100px;
+                    height: 100px;
+                    position: relative;
                 }
 
                 .spinner .path {
                     stroke: #565656;
                     stroke-linecap: round;
-                    animation: dash 1.5s ease-in-out infinite;
+                    transition: stroke-dashoffset 0.35s;
+                    transform: rotate(-90deg);
+                    transform-origin: center;
                 }
 
-                @keyframes rotate {
-                    100% {
-                        transform: rotate(360deg);
-                    }
+                .percentage-text {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 20px;
+                    color: #565656;
                 }
+
 
                 @keyframes dash {
                     0% {
@@ -476,6 +472,8 @@
                         stroke-dashoffset: -124;
                     }
                 }
+
+
 
                 @keyframes jumpy {
 
@@ -509,14 +507,16 @@
                 <div class="input-container mt-3 w-3/4 relative">
                     <input type="text" id="user-input" placeholder="Type your message..."
                         class="h-9.5 focus:ring-none block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-3 pr-10 text-base text-gray-900 shadow-sm focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder-gray-400" />
-                    <button id="runStreamBtn" class="absolute inset-y-0 right-0 flex items-center pr-3">
+
+                    <!--                  <button id="runStreamBtn" class="absolute inset-y-0 right-0 flex items-center pr-3">
                         <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path
                                 d="M20 12V13C20 17.4183 16.4183 21 12 21C7.58172 21 4 17.4183 4 13V12M12 17C9.79086 17 8 15.2091 8 13V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V13C16 15.2091 14.2091 17 12 17Z"
                                 stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
-                    </button>
+                    </button>>
+-->
                 </div>
 
                 <!-- send button -->

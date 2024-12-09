@@ -1,0 +1,17 @@
+{
+  "name": "aadotllm",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@langchain/community": "^0.2.33",
+    "@langchain/core": "^0.2.36",
+    "@langchain/langgraph": "^0.0.21",
+    "@xenova/transformers": "^2.17.2",
+    "faiss-node": "^0.5.1",
+    "langchain": "^0.2.8",
+    "node-llama-cpp": "^2.8.11",
+    "officeparser": "^4.1.1",
+    "pdf-parse": "^1.1.1",
+    "sherpa-onnx": "^1.9.24"
+  }
+} 

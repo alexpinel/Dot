@@ -15,6 +15,7 @@ function initializeSettings() {
             document.getElementById('max_tokens').value = config.max_tokens;
             document.getElementById('chunk_length').value = config.chunk_length;
             document.getElementById('chunk_overlap').value = config.chunk_overlap;
+            document.getElementById('sources').value = config.sources;
             document.getElementById('big_dot_temperature').value = config.big_dot_temperature;
             document.getElementById('big_dot_prompt').value = config.big_dot_prompt;
             if (config.ggufFilePath && config.ggufFilePath !== null) {
@@ -47,19 +48,21 @@ function addEventListeners() {
         document.documentElement.classList.toggle('dark', isEnabled);
     });
 
-    document.getElementById('auto-tts-toggle').addEventListener('change', function () {
+    /*document.getElementById('auto-tts-toggle').addEventListener('change', function () {
         ipcRenderer.send('set-auto-tts', this.checked);
     });
 
     ipcRenderer.on('get-auto-tts-state', (event, isEnabled) => {
         document.getElementById('auto-tts-toggle').checked = isEnabled;
-    });
+    });*/
 
     document.getElementById('configForm').addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const filePathText = document.getElementById('filePathDisplay').textContent;
-        const ggufFilePath = filePathText !== 'No file selected' ? filePathText : null;
+        const ggufFilePath = (filePathText !== 'Default Model' && filePathText !== 'No file selected')
+            ? filePathText
+            : null;
 
         const newConfig = {
             n_ctx: document.getElementById('n_ctx').value,
@@ -67,6 +70,7 @@ function addEventListeners() {
             max_tokens: parseInt(document.getElementById('max_tokens').value, 10),
             chunk_length: parseInt(document.getElementById('chunk_length').value, 10),
             chunk_overlap: parseInt(document.getElementById('chunk_overlap').value, 10),
+            sources: parseInt(document.getElementById('sources').value, 10),
             big_dot_temperature: parseFloat(document.getElementById('big_dot_temperature').value),
             big_dot_prompt: document.getElementById('big_dot_prompt').value,
             ggufFilePath: ggufFilePath  // Save the file path if not the default message
@@ -81,8 +85,8 @@ function addEventListeners() {
                 console.log('Script toggle changed')
 
                 const selectedScript = scriptToggle.checked
-                    ? 'bigdot.py'
-                    : 'docdot.py'
+                    ? 'bigdot.js'
+                    : 'docdot.js'
                 console.log('Selected script:', selectedScript)
 
                 ipcRenderer.send('switch-script', selectedScript)
@@ -94,8 +98,8 @@ function addEventListeners() {
             await ipcRenderer.invoke('setConfig', newConfig);
             alert('Settings saved successfully!');
             const selectedScript = scriptToggle.checked
-                ? 'bigdot.py'
-                : 'docdot.py'
+                ? 'bigdot.js'
+                : 'docdot.js'
             ipcRenderer.send('switch-script', selectedScript)
             ipcRenderer.send('switch-script', selectedScript)
         } catch (error) {
@@ -112,6 +116,7 @@ function updateSliders() {
         { id: 'max_tokens', value: document.getElementById('max_tokens').value },
         { id: 'chunk_length', value: document.getElementById('chunk_length').value },
         { id: 'chunk_overlap', value: document.getElementById('chunk_overlap').value },
+        { id: 'sources', value: document.getElementById('sources').value },
         { id: 'big_dot_temperature', value: document.getElementById('big_dot_temperature').value }
     ];
 
@@ -129,11 +134,13 @@ function updateSliders() {
 const defaultSettings = {
     n_ctx: 4000,
     n_batch: 256,
-    max_tokens: 2048,
+    max_tokens: 128,
     chunk_length: 4000,
     chunk_overlap: 2000,
+    sources: 1,
     big_dot_temperature: 0.7,
-    big_dot_prompt: "You are called Dot, You are a helpful and honest assistant. Always answer as helpfully as possible."
+    big_dot_prompt: "You are called Dot, You are a helpful and honest assistant. Always answer as helpfully as possible.",
+    ggufFilePath: null
 };
 
 
@@ -144,9 +151,10 @@ document.getElementById('resetButton').addEventListener('click', function () {
     document.getElementById('max_tokens').value = defaultSettings.max_tokens;
     document.getElementById('chunk_length').value = defaultSettings.chunk_length;
     document.getElementById('chunk_overlap').value = defaultSettings.chunk_overlap;
+    document.getElementById('sources').value = defaultSettings.sources;
     document.getElementById('big_dot_temperature').value = defaultSettings.big_dot_temperature;
     document.getElementById('big_dot_prompt').value = defaultSettings.big_dot_prompt;
-    document.getElementById('filePathDisplay').textContent = "No file selected";  // Explicitly setting to no file selected
+    document.getElementById('filePathDisplay').textContent = "Default Model";
 
 
     updateSliders(); // If you have a function to update slider displays
